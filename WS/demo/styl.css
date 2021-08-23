@@ -1,0 +1,97 @@
+body {
+	background: url('obrazky/pozadi_sede.png') #1c2228;
+	margin: 0px;
+	font: 14px Verdana;
+	min-width: 1000px;
+}
+
+h2, h3, h4, h5, h6 {
+	text-align: center;
+	color: #0a294b;
+	font-family: Arial;
+	text-shadow: 3px 3px 7px #666666;
+}
+
+h2 {
+	font-size: 1.7em;
+}
+
+h1 {
+	font-size: 2em;
+	font-weight: normal;
+	color: white;
+	text-align: center;
+	text-shadow: 2px 2px 1px #0a294b;
+}
+
+#logo {
+	background: url('obrazky/logo.png') no-repeat;
+	width: 250px;
+	height: 60px;
+	float: left;
+	margin: 7px 0px 0px 20px;
+  width: 300px;
+  height: 100px;
+}
+
+#logo h1 {	
+	margin: 14px 0px 0px 10px;
+}
+
+nav ul {
+	margin: 0px;
+	list-style-type: none;
+}
+
+nav ul li {
+	float: left;
+	padding: 0px 25px;
+	margin: 0 5px;
+	font-size: 17px;
+	height: 73px;
+	line-height: 4.3em;	
+}
+
+nav ul li:hover, .aktivni {
+	background: #ffbb00;
+	box-shadow: 0px 0px 5px black;
+}
+
+nav a {
+	color: white;
+	text-decoration: none;
+}
+
+.centrovany  {
+	text-align: center;
+}
+
+header {
+	height: 73px;
+}
+
+article {
+	background: url('obrazky/pozadi.png') #009aca;
+}
+
+article header {
+	width: 250px;
+	float: left;    	
+}
+
+article section {
+	width: 666px;
+	float: left; 
+	background: white;
+	border: 2px solid #006797;
+	box-shadow: 2px 2px 7px #1c2228;
+	padding: 20px;
+}
+
+.cistic {
+	clear: both;
+}
+
+.vlevo {
+	float: left;
+}

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Battery monitor </title>
+<script src="./jquery-3.3.1.min.js"></script>
+<style>
+	body {
+		width: 35em;
+		margin: 0 auto;
+		font-family: Tahoma, Verdana, Arial, sans-serif;
+	}
+	table, td, th {
+		border: 1px solid gray;
+		border-collapse: collapse;
+		padding: 5px;
+	}
+	td, th {
+		padding: 5px;
+	}
+	.error {
+		color: red;
+		display: none;
+	}
+</style>
+</head>
+<body>
+<h1>Battery monitor</h1>
+
+
+
+<h3>Live data</h3>
+
+<p id="LiveData"></p>
+
+<h3>Individual cells</h3>
+
+<p id="Cells">--TBD--</p>
+
+<h3>Battery pack info</h3>
+
+<p id="BatteryPackInfo"></p>
+
+<a href="bms.json">JSON data</a>.<br>
+
+
+
+
+
+<script>
+	var INTERVAL_MS = 3000; // 3 sec
+	var error_msg = $("#update-error");
+
+	function download_data() {
+		$.ajax({
+			url: "./bms.json",
+			success: function(resp) {
+				error_msg.hide();
+				show_simple_tables(resp);
+				show_multi_tables(resp);
+			},
+			error: function() {
+				error_msg.show();
+			},
+		});
+	}
+
+	// key val to table
+	function show_simple_tables(resp) {
+		var blocks = ["BatteryPackInfo", "LiveData"]
+		for (var i = 0; i < blocks.length; i++) {
+			var block = resp[blocks[i]];
+			var table = $("<table>");
+			// table header
+			var tr = $("<tr>");
+			tr.append($("<th>").html("Key"));
+			tr.append($("<th>").html("Value"));
+			table.append(tr);
+			//table content
+			$("#" + blocks[i]).html(table);
+			for (var key in block) {
+				tr = $("<tr>");
+				tr.append($("<td>").html(key));
+				tr.append($("<td>").html(block[key]));
+				table.append(tr);
+			}
+		}
+	}
+
+	// array to table
+	function show_multi_tables(resp) {
+		var blocks = ["Cells"];
+		for (var i = 0; i < blocks.length; i++) {
+			var block = resp[blocks[i]];
+			var table = $("<table>");
+			// table header
+			var tr = $("<tr>");
+			tr.append($("<th>").html(""));
+			for (var key in block[0]) {
+				tr.append($("<th>").html(key));
+			}
+			table.append(tr);
+			//table content
+			$("#" + blocks[i]).html(table);
+			for (var j = 0; j < block.length; j++) {
+				tr = $("<tr>");
+				tr.append($("<td>").html("Cell " + (j + 1)));
+				for (var key in block[j]) {
+					tr.append($("<td>").html(block[j][key]));
+				}
+				table.append(tr);
+			}
+		}
+	}
+
+	// after document is loaded
+	$(document).ready(function() {
+
+		download_data(); // download data now
+
+		setInterval(function() { // download data timer
+			download_data();
+		}, INTERVAL_MS);
+	});
+</script>
+</body>
+</html>

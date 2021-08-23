@@ -131,17 +131,17 @@ int main()
 			PrintData(bms);	
 			bms.CreateJson();
 
-		//	cout << "Sending data to UHA.."  << endl;
-		//	uha.UHA_SendValues();
+			cout << "Sending data to UHA.."  << endl;
+			uha.UHA_SendValues();
 		}
 
-		if (millis() > lastUhaUpdate + UHA_PERIOD )
+	/*	if (millis() > lastUhaUpdate + UHA_PERIOD )
 		{
 			lastUhaUpdate = millis();
 			// Send values to UHA 
 			cout << "Sending data to UHA.."  << endl;
 			uha.UHA_SendValues();
-		}
+		}*/
 
 		uha.UHA_ProcessMessage();
 		

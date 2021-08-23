@@ -1,0 +1,185 @@
+/* CSS Document */
+body {
+  background-color: white;
+	margin: 0px;
+	font: 15px Verdana;
+	min-width: 1000px;
+}
+
+#pagecenter {
+  margin: 0px auto;
+  width: 1000px;
+
+}
+
+h1 {
+  margin-top: 110px;
+  font: 3em Verdana, sans-serif;
+	color: white;
+	text-align: center;
+}
+
+h2 {
+  margin-top: 5px;
+  font: 1.6em Verdana;
+	color: white;
+	text-align: center;
+}
+
+h3 {
+  margin: 20px 0px 0px 0px;
+  font: 1.6em Verdana;
+}
+
+h4 {
+  margin: 0px 0px 20px 0px;
+  font: 1.2em Verdana;
+  font-weight: bold;
+}
+
+
+
+header {
+	height: 350px;
+  background: url('images/vrana.png') #284768 no-repeat;
+  color: white;
+  margin: 0px;
+  padding: 0px;
+}
+ 
+ 
+.logo {
+   font: 1.6em Verdana;
+   border-width: 2px;
+   border-color: white;
+   border-style: solid;
+   border-radius: 15px;
+   width: 120px;
+   height: 30px;
+   text-align: center;
+   position: relative;
+   top: 50px;
+   left: 100px;
+}
+
+.refs
+{
+  
+}
+
+.refs img{
+  float: left;
+  margin: 0px 20px 0px 0px;
+  width: 500px;
+  min-height: 300px;
+  padding-bottom: 50px;
+  
+}
+
+.refs p{
+  margin: 0px 20px 0px 0px;
+}
+.contacts{
+  height: 70px;  
+  position: relative;
+  left: 335px;
+}
+
+.contacts img{
+  float: left;
+  margin: 20px;
+}
+
+.contacts p{
+    font: 1.1em Verdana;
+    float: left;
+    margin: 20px;
+    line-height: 30px;
+}
+
+
+.contacts a {
+  float: left;
+  color: #858282;
+	text-decoration: none;
+}
+
+.leftcol{
+  float: left;
+  position: relative;
+  left: 200px;
+  width: 500px;
+  
+}
+
+nav ul {
+  position: relative;
+  top: 25px;
+  left: 380px;
+	margin: 0px;
+	list-style-type: none;
+}
+
+nav ul li {
+	float: left;
+	padding: 0px 12px;
+  margin: 0px;
+	font-size: 15px;
+	height: 30px;
+	line-height: 2em;	
+}
+
+nav ul li:hover, .active {
+  background-color: rgba(250, 250, 250, 0.3);
+}
+
+nav a {
+	color: white;
+	text-decoration: none;
+}
+
+article 
+{
+  color: #858282;
+  padding: 0px 30px;
+  font: 1em Verdana;
+  margin-top: 40px;
+  
+  line-height: 2em;
+  text-align: justify;
+}
+
+article a {
+	color: #284768;
+	text-decoration: none;
+}
+
+.list{
+  
+  list-style-type: none;
+}
+
+.list li:before {
+		content: "\00BB \0020";
+	     }
+
+footer{
+  height: 40px;
+  background: url('images/footer.png') #284768 ;
+  color: white;
+  margin: 20px 0px 0px 0px;
+  padding: 0px;
+  text-align: center;
+  line-height: 2.5em;
+}
+
+.clearing {
+	clear: both;
+}
+
+.center {
+  text-align: center;
+}
+.vlevo {
+	float: left;
+}

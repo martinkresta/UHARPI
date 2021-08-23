@@ -53,7 +53,7 @@ void UHA::UHA_SendValues(void)
     txData[4] = (Soc >> 8) & 0xFF;
     txData[5] = Soc & 0xFF;
     TransmitMesssage();  
-    delay(2);
+    delay(20);
  
      // Charging
     txData[0] = (CMD_RPI_VAR_VALUE >> 8) & 0xFF;
@@ -63,7 +63,7 @@ void UHA::UHA_SendValues(void)
     txData[4] = (Charg >> 8) & 0xFF;
     txData[5] = Charg & 0xFF;
     TransmitMesssage(); 
-    delay(2);
+    delay(20);
 
     // Discharging
     txData[0] = (CMD_RPI_VAR_VALUE >> 8) & 0xFF;
@@ -73,7 +73,7 @@ void UHA::UHA_SendValues(void)
     txData[4] = (DisCharg >> 8) & 0xFF;
     txData[5] = DisCharg & 0xFF;
     TransmitMesssage(); 
-    delay(2);
+    delay(20);
 
     // VBAT
     txData[0] = (CMD_RPI_VAR_VALUE >> 8) & 0xFF;
@@ -83,7 +83,7 @@ void UHA::UHA_SendValues(void)
     txData[4] = (Vbat >> 8) & 0xFF;
     txData[5] = Vbat & 0xFF;
     TransmitMesssage(); 
-    delay(2);
+    delay(20);
 
     // Heartbeat
     txData[0] = (0x704 >> 8) & 0xFF;
