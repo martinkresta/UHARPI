@@ -1,0 +1,32 @@
+{
+	"BatteryPackInfo":	{
+		"CapacityKwh":	1.4,
+		"MinCellVoltageV":	3,
+		"MaxCellVoltageV":	3.6,
+		"BalanceCellVoltageV":	3.5,
+		"NumOfCells":	4
+	},
+	"LiveData":	{
+		"TotalVoltageV":	12.825,
+		"ChargingA":	0,
+		"DischargingA":	0,
+		"TodayChargingKwh":	0,
+		"TodayDischargingKwh":	0,
+		"AvailableEnergyKwh":	0.2,
+		"TotalChargingKwh":	0,
+		"TotalDischargingKwh":	0
+	},
+	"Cells":	[{
+			"VoltageV":	3.2,
+			"TemperatureC":	23
+		}, {
+			"VoltageV":	3.21,
+			"TemperatureC":	19
+		}, {
+			"VoltageV":	3.2,
+			"TemperatureC":	21
+		}, {
+			"VoltageV":	3.215,
+			"TemperatureC":	18
+		}]
+}
