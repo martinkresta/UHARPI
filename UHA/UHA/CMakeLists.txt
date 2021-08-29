@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.7.2)
-project (BmsMon)
+project (UhaGate)
 
-add_executable(BmsMon BMS.cpp BmsTest.cpp cJSON.c UHA.cpp)
+add_executable(UhaGate UHA.cpp Main.cpp cJSON.c)
 
 find_library(wiringPi_LIB wiringPi)
-target_link_libraries(BmsMon ${wiringPi_LIB})
+target_link_libraries(UhaGate ${wiringPi_LIB})
 
  
 

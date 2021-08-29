@@ -134,6 +134,8 @@ void BMS::CreateJson(void)
 
   cJSON_AddItemToObject(Bms,"LiveData", LiveData);
   
+  cout << "filling cells in json."  << endl;
+  
   for (i=0;i<NUM_OF_CELLS;i++)
   {
     cJSON *Cell = cJSON_CreateObject();
@@ -145,7 +147,7 @@ void BMS::CreateJson(void)
   
   cJSON_AddItemToObject(Bms,"Cells",CellsJson);
   
-  cout << "saving file BMS.json"  << endl;
+  cout << "saving file.."  << endl;
   
 	FILE* fh = fopen(JSON_FULLPATH, "w");
 	fprintf(fh, cJSON_Print(Bms));

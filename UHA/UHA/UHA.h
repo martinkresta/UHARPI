@@ -3,7 +3,6 @@
 #ifndef UHA_H
 #define UHA_H
 
-#include "BMS.h"
 
 
 #define COM_BUFLEN	10
@@ -24,9 +23,7 @@ class UHA
 	// private variables
 private:  
 
-	BMS* mBms;
     int mSp;  // bms serial port handler
-
     int i;
     int recLength;
     char txData[COM_BUFLEN];
@@ -47,7 +44,7 @@ private:
 // public methods
 public:
 
-   void UHA_Init(BMS* bms);
+   void UHA_Init(void);
    void UHA_DeInit(void);
    void UHA_SendValues(void);
    void UHA_ProcessMessage(void);

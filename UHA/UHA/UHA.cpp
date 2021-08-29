@@ -1,26 +1,23 @@
 #include <wiringPi.h>
 #include <wiringSerial.h>
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include "UHA.h"
+#include "cJSON.h"
 using namespace std;
 
 #define UHA_PORT	"/dev/ttyUSB0"
 #define UHA_JSON_FULLPATH	"/home/pi/Web/uha.json"
+#define BMS_JSON_FULLPATH	"/home/pi/Web/bms.json"
 
 
-#include "UHA.h"
-#include "BMS.h"
-#include "cJSON.h"
-
-
-
-//void TransmitMesssage(void);
 
 // Init and open the serial port
-void UHA::UHA_Init(BMS* bms)
+void UHA::UHA_Init(void)
 {
-    mBms = bms;
-  //  wiringPiSetupGpio();	
-	mSp = serialOpen(UHA_PORT, 57600);
+	 // mSp = serialOpen(UHA_PORT, 57600);
+    mSp = serialOpen(UHA_PORT, 19200);
     txData[0] = (CMD_RPI_VAR_VALUE >> 8) & 0xFF;
     txData[1] = CMD_RPI_VAR_VALUE & 0xFF;
 
@@ -37,13 +34,50 @@ void UHA::UHA_DeInit(void)
 
 void UHA::UHA_SendValues(void)
 {
-    // get values from the BMS.h
+    // get values from the bms.json file
+    char* buffer;
+    long size;
+    FILE* fh = fopen(BMS_JSON_FULLPATH, "r");
+    if(fh == NULL)
+    {
+      cout << "Input file not found" << endl;
+      return ;     
+    }
+    fseek(fh, 0, SEEK_END);
+    size = ftell(fh);
+    rewind(fh);
 
-    short Soc = (short)mBms->SOC();
-    short Charg = (short)(mBms->ChargingA() * 10);
-    short DisCharg = (short)(mBms->DischargingA() * 10);
-    short Vbat = (short)(mBms->TotalVoltageV() * 10);
+    buffer = (char*)malloc(sizeof(char) * size); 
+    if (buffer == NULL)
+    {
+      cout << "Memory error" << endl;
+      return ; 
+    }
+    fread(buffer, 1, size, fh);
+    fclose(fh);
 
+    cJSON *Bms = cJSON_Parse(buffer);
+    if (Bms == NULL)
+    {
+      cout << "JSON parse error" << endl;
+      return ; 
+    }
+    cJSON *BmsLiveData = cJSON_GetObjectItemCaseSensitive(Bms,"LiveData");
+    if (BmsLiveData == NULL)
+    {
+      cout << "JSON parse error livedata" << endl;
+      return ; 
+    }
+
+
+    short Soc = (short)cJSON_GetNumberValue(cJSON_GetObjectItem(BmsLiveData,"SocPct"));
+    short Charg = (short)(cJSON_GetNumberValue(cJSON_GetObjectItem(BmsLiveData,"ChargingA")) * 10);
+    short DisCharg = (short)(cJSON_GetNumberValue(cJSON_GetObjectItem(BmsLiveData,"DischargingA")) * 10);
+    short Vbat = (short)(cJSON_GetNumberValue(cJSON_GetObjectItem(BmsLiveData,"TotalVoltageV")) * 10);
+
+    cJSON_Delete(Bms);
+
+    free(buffer);
     // compose the uart message
     // SOC
     txData[0] = (CMD_RPI_VAR_VALUE >> 8) & 0xFF;
@@ -90,6 +124,8 @@ void UHA::UHA_SendValues(void)
     txData[1] = 0x704 & 0xFF;
     txData[2] = 0x01;
     TransmitMesssage(); 
+
+    cout << "Data sent: SOC = " << Soc <<" | Charg = " << Charg <<" | Discharg = " << DisCharg << endl; 
     // also create json
     CreateJson();
     
@@ -103,23 +139,35 @@ void UHA::UHA_ProcessMessage(void)
     if (recLength >= COM_BUFLEN)
     {
         // complete message recived
-        for (i=0;i<recLength;i++)
+        for (i=0;i<COM_BUFLEN;i++)
         {
             rxData[i] = serialGetchar(mSp);
+            cout << hex << uppercase  << (int)rxData[i] << " "; 
         }
+        cout << dec << endl;
 
         // decode meseage
         cmd = (rxData[0] << 8) + rxData[1];
         varId = (rxData[2] << 8) + rxData[3];
         value = (rxData[4] << 8) + rxData[5];
-        if (cmd == CMD_TM_VAR_VALUE && varId < 256)
+
+     //   cout << "Raw Data: " << hex << uppercase << (int)rxData[0] << (int)rxData[1] << "  "  << (int)rxData[2] << (int)rxData[3] << "  " << (int)rxData[4] << (int)rxData[5] << dec << endl;
+        if ((cmd == CMD_TM_VAR_VALUE) && (varId < 256))
         {
-            mVars[varId] = value;	        
+            mVars[varId] = value;	
+            if (varId >= 10 && varId < 15)
+            {        
+       /*     cout << "Cmd: " << cmd ;
+            cout << "   VarId:  " << varId ;
+            cout << "   value:  " << value <<endl;
+            cout << "------------------------------" << endl;       */
+            }
         }
-        cout << "Cmd: 	    " << cmd <<endl;
-        cout << "VarId: 	" << varId <<endl;
-	    cout << "value: 	" << value <<endl;
-        cout << "------------------------------" << endl;
+        else
+        {
+         //  cout << "Unknown Cmd: " << hex << cmd << dec <<"------------------------------"  << endl;  
+        }
+       
         //serialFlush(mSp);
     }
     else
@@ -202,7 +250,17 @@ void UHA::CreateJson(void)
   cout << "saving file UHA.json"  << endl;
   
 	FILE* fh = fopen(UHA_JSON_FULLPATH, "w");
-	fprintf(fh, cJSON_Print(Uha));
-	fclose(fh);
+  if (fh == NULL)
+  {
+    cout << "Error opening file UHA.json " << endl; 
+  }
+  else
+  {
+	  fprintf(fh, cJSON_Print(Uha));
+	  fclose(fh);
+    cout << "File UHA.json writen and closed " << endl; 
+  }
+  
   cJSON_Delete(Uha);
+  return;
 }
