@@ -14,6 +14,8 @@
 
 
 #define  CMD_RPI_VAR_VALUE  0x50
+#define  CMD_RPI_RTC_SYNC  0x51
+
 
 #define  CMD_TM_VAR_VALUE  	0x221
 
@@ -48,6 +50,7 @@ public:
    void UHA_DeInit(void);
    void UHA_SendValues(void);
    void UHA_ProcessMessage(void);
+   void UHA_SendRTC(void);
 
 };
 

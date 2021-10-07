@@ -178,7 +178,20 @@ void UHA::UHA_ProcessMessage(void)
     
 }
 
+void UHA::UHA_SendRTC(void)
+{
+    int unixtime = (int)time(NULL);
 
+    txData[0] = (CMD_RPI_RTC_SYNC >> 8) & 0xFF;
+    txData[1] = CMD_RPI_RTC_SYNC & 0xFF;
+    txData[2] = (unixtime >> 24) & 0xFF;
+    txData[3] = (unixtime >> 16) & 0xFF;
+    txData[4] = (unixtime >> 8) & 0xFF;
+    txData[5] = unixtime & 0xFF;
+    TransmitMesssage(); 
+
+    cout << "RTC Sync sent.." << endl;
+}
 
 void UHA::TransmitMesssage(void)
 {
