@@ -254,6 +254,8 @@ void UHA::CreateJson(void)
     cJSON_AddItemToObject(Uha, "VAR_TEMP_IOBOARD_U", cJSON_CreateNumber(mVars[122]));
     cJSON_AddItemToObject(Uha, "VAR_TEMP_ELECON_BOARD", cJSON_CreateNumber(mVars[123]));
     cJSON_AddItemToObject(Uha, "VAR_TEMP_DOWNSTAIRS", cJSON_CreateNumber(mVars[124]));
+    cJSON_AddItemToObject(Uha, "VAR_TEMP_OFFICE", cJSON_CreateNumber(mVars[125]));
+
 
     cJSON_AddItemToObject(Uha, "UnixTime", cJSON_CreateNumber(Time));
 
