@@ -45,10 +45,12 @@ int main()
 		if (millis() > lastUhaUpdate + UHA_PERIOD )
 		{
 			lastUhaUpdate = millis();
-			// Send values to UHA 
-			cout << "Sending data to UHA:"  << lastUhaUpdate << endl;
-			uha.UHA_SendValues();
 
+			uha.UHA_CreateUhaJson();
+			uha.UHA_CreateBmsJson();
+
+			// Send values to UHA 
+		//	uha.UHA_SendValues();
 
 			// check real time
 			time(&unixTime);
@@ -61,7 +63,7 @@ int main()
 			if (now->tm_hour != lastTime.tm_hour)
 			{
 				// every hour
-				uha.UHA_SendRTC();
+			//	uha.UHA_SendRTC();
 			}
 			if (now->tm_mday != lastTime.tm_mday)
 			{
