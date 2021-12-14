@@ -1,77 +1,75 @@
 {
 	"BatteryPackInfo":	{
-		"CapacityKwh":	-5.6680775758778408e-44,
-		"MinCellVoltageV":	-1.735544491535953e-44,
-		"MaxCellVoltageV":	2.0319888045692182e-302,
-		"BalanceCellVoltageV":	1.4133340769472237e-309,
-		"NumOfCells":	-1094245056
+		"CapacityKwh":	16,
+		"MinCellVoltageV":	3,
+		"MaxCellVoltageV":	3.6,
+		"BalanceCellVoltageV":	3.5,
+		"NumOfCells":	16
 	},
 	"LiveData":	{
-		"SunPowerW":	2147483647,
-		"TotalVoltageV":	-1094245.244,
-		"ChargingA":	-1225504.04,
-		"DischargingA":	0.006,
-		"TodayChargingKwh":	-1225515.36,
-		"TodayDischargingKwh":	0.001,
-		"AvailableEnergyKwh":	0,
-		"TotalChargingKwh":	1,
-		"TotalDischargingKwh":	-1225521736,
-		"SocPct":	7,
-		"TemperatureC":	0,
-		"SunPowerPct":	195225700,
-		"BattCurrentA":	-1225504.046,
-		"LoadPowerW":	-6565,
-		"LoadPowerPct":	-200,
-		"TodayDiffKwh":	-1225515.361,
-		"UnixTime":	1583779366
+		"SunPowerW":	0,
+		"TotalVoltageV":	53.2,
+		"ChargingA":	0,
+		"DischargingA":	3.3,
+		"TodayChargingKwh":	0.72,
+		"TodayDischargingKwh":	0.683,
+		"AvailableEnergyKwh":	12.132,
+		"SocPct":	76,
+		"TemperatureC":	22,
+		"SunPowerPct":	0,
+		"BattCurrentA":	-3.3,
+		"LoadPowerW":	175,
+		"LoadPowerPct":	0,
+		"TodayDiffKwh":	37,
+		"UnixTime":	1637179541
 	},
 	"Cells":	[{
-			"VoltageV":	-5.6871333191549221e-44,
-			"TemperatureC":	-5.6348209195577012e-44
+			"VoltageV":	3.305,
+			"TemperatureC":	22
 		}, {
-			"VoltageV":	4.94065645841247e-324,
-			"TemperatureC":	-5.6856248311671317e-44
+			"VoltageV":	3.3,
+			"TemperatureC":	20
 		}, {
-			"VoltageV":	1.51651639141565e-314,
-			"TemperatureC":	-3.9559584370510496e-44
+			"VoltageV":	3.32,
+			"TemperatureC":	20
 		}, {
-			"VoltageV":	-2.7593572932313596e-06,
-			"TemperatureC":	-4.0119866103662959e-44
+			"VoltageV":	3.31,
+			"TemperatureC":	18
 		}, {
-			"VoltageV":	null,
-			"TemperatureC":	-1.7668642538888526e-44
+			"VoltageV":	3.32,
+			"TemperatureC":	18
 		}, {
-			"VoltageV":	-3.9849440360202277e-44,
-			"TemperatureC":	-4.0130230327154386e-44
+			"VoltageV":	3.315,
+			"TemperatureC":	18
 		}, {
-			"VoltageV":	-4.0036234537827852e-44,
-			"TemperatureC":	3.4770325858501336e-309
+			"VoltageV":	3.3,
+			"TemperatureC":	19
 		}, {
-			"VoltageV":	1.42319530224631e-309,
-			"TemperatureC":	1.51650441328814e-314
+			"VoltageV":	3.31,
+			"TemperatureC":	18
 		}, {
-			"VoltageV":	-5.67525878051551e-44,
-			"TemperatureC":	-5.0910169839102626e-44
+			"VoltageV":	3.32,
+			"TemperatureC":	18
 		}, {
-			"VoltageV":	3.63850609351591e-314,
-			"TemperatureC":	4.94065645841247e-324
+			"VoltageV":	3.32,
+			"TemperatureC":	17
 		}, {
-			"VoltageV":	-1.76686501693708e-44,
-			"TemperatureC":	5.75923852305204e-314
+			"VoltageV":	3.33,
+			"TemperatureC":	19
 		}, {
-			"VoltageV":	-1.0181312971939174e-44,
-			"TemperatureC":	-4.7912087104128873e-45
+			"VoltageV":	3.315,
+			"TemperatureC":	17
 		}, {
-			"VoltageV":	6.36606818820164e-314,
-			"TemperatureC":	3.47099095519773e-309
+			"VoltageV":	3.305,
+			"TemperatureC":	18
 		}, {
-			"VoltageV":	2.12199579244747e-314,
-			"TemperatureC":	1.5601919990215743e-309
+			"VoltageV":	3.315,
+			"TemperatureC":	21
 		}, {
-			"VoltageV":	2.12202816955737e-314,
-			"TemperatureC":	1.56121055699942e-309
+			"VoltageV":	3.325,
+			"TemperatureC":	20
 		}, {
-			"VoltageV":	2.0600335138690864e-309,
-			"TemperatureC":	2.0584207970679528e-309
+			"VoltageV":	3.335,
+			"TemperatureC":	17
 		}]
 }

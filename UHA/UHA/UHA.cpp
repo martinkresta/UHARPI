@@ -347,6 +347,10 @@ void UHA::CreateJson(void)
       cJSON_AddItemToObject(Uha, "VAR_EL_HEATER_CURRENT", cJSON_CreateNumber(mVars[82]));
       cJSON_AddItemToObject(Uha, "VAR_EL_HEATER_CONS", cJSON_CreateNumber(mVars[83]));
 
+      cJSON_AddItemToObject(Uha, "VAR_HEAT_TOTAL_WH", cJSON_CreateNumber(mVars[85]));
+      cJSON_AddItemToObject(Uha, "VAR_HEAT_HEATING_WH", cJSON_CreateNumber(mVars[86]));
+
+
       cJSON_AddItemToObject(Uha, "VAR_FLOW_COLD", cJSON_CreateNumber(mVars[90]));
       cJSON_AddItemToObject(Uha, "VAR_FLOW_HOT", cJSON_CreateNumber(mVars[91]));
       cJSON_AddItemToObject(Uha, "VAR_CONS_COLD", cJSON_CreateNumber(mVars[92]));
@@ -379,6 +383,26 @@ void UHA::CreateJson(void)
       cJSON_AddItemToObject(Uha, "VAR_TEMP_OFFICE", cJSON_CreateNumber(mVars[125]));
       cJSON_AddItemToObject(Uha, "VAR_TEMP_KIDROOM", cJSON_CreateNumber(mVars[126]));
       cJSON_AddItemToObject(Uha, "VAR_TEMP_OUTSIDE", cJSON_CreateNumber(mVars[127]));
+
+      cJSON_AddItemToObject(Uha, "VAR_CONS_AC300_WH", cJSON_CreateNumber(mVars[60]));
+      cJSON_AddItemToObject(Uha, "VAR_CONS_AC3KW_WH", cJSON_CreateNumber(mVars[61]));
+      cJSON_AddItemToObject(Uha, "VAR_CONS_AC5KW_WH", cJSON_CreateNumber(mVars[62]));
+      cJSON_AddItemToObject(Uha, "VAR_CONS_FRIDGE_WH", cJSON_CreateNumber(mVars[63]));
+      cJSON_AddItemToObject(Uha, "VAR_CONS_KITCHEN_WH", cJSON_CreateNumber(mVars[64]));
+      cJSON_AddItemToObject(Uha, "VAR_CONS_WASCHMACHINE_WH", cJSON_CreateNumber(mVars[65]));
+      cJSON_AddItemToObject(Uha, "VAR_CONS_OTHER_WH", cJSON_CreateNumber(mVars[66]));
+      cJSON_AddItemToObject(Uha, "VAR_CONS_TECHM_WH", cJSON_CreateNumber(mVars[67]));
+
+
+      cJSON_AddItemToObject(Uha, "VAR_POW_AC300_W", cJSON_CreateNumber(mVars[70]));
+      cJSON_AddItemToObject(Uha, "VAR_POW_AC3KW_W", cJSON_CreateNumber(mVars[71]));
+      cJSON_AddItemToObject(Uha, "VAR_POW_AC5KW_W", cJSON_CreateNumber(mVars[72]));
+      cJSON_AddItemToObject(Uha, "VAR_POW_FRIDGE_W", cJSON_CreateNumber(mVars[73]));
+      cJSON_AddItemToObject(Uha, "VAR_POW_KITCHEN_W", cJSON_CreateNumber(mVars[74]));
+      cJSON_AddItemToObject(Uha, "VAR_POW_WASCHMACHINE_W", cJSON_CreateNumber(mVars[75]));
+      cJSON_AddItemToObject(Uha, "VAR_POW_OTHER_W", cJSON_CreateNumber(mVars[76]));
+      cJSON_AddItemToObject(Uha, "VAR_POW_TECHM_W", cJSON_CreateNumber(mVars[77]));
+
 
       cJSON_AddItemToObject(Uha, "VAR_BMS1_CELL1_MV", cJSON_CreateNumber(mVars[180]));
       cJSON_AddItemToObject(Uha, "VAR_BMS1_CELL2_MV", cJSON_CreateNumber(mVars[181]));
