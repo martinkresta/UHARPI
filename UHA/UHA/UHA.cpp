@@ -217,7 +217,7 @@ void UHA::UHA_ProcessMessage(void)
 
     if (recLength >= COM_BUFLEN)
     {
-      cout << recLength << "  ";
+     // cout << recLength << "  ";
       rxData[0] = serialGetchar(mSp);
        while (msgSynced == 0  && serialDataAvail(mSp) >= COM_BUFLEN - 1)
        {
@@ -225,7 +225,7 @@ void UHA::UHA_ProcessMessage(void)
           if (rxData[0] == MSG_START_B1  &&  rxData[1] == MSG_START_B2)
           {
             msgSynced = 1;
-            cout << "msg:  ";
+          //  cout << "msg:  ";
           }
           else
           {
@@ -239,9 +239,9 @@ void UHA::UHA_ProcessMessage(void)
         for (i=2;i<COM_BUFLEN;i++)
         {
             rxData[i] = serialGetchar(mSp);
-            cout << hex << uppercase  << (int)rxData[i] << " "; 
+          //  cout << hex << uppercase  << (int)rxData[i] << " "; 
         }
-        cout << dec << endl;
+       // cout << dec << endl;
 
         // decode meseage
         cmd = (rxData[2] << 8) + rxData[3];
@@ -251,12 +251,12 @@ void UHA::UHA_ProcessMessage(void)
         if ((cmd == CMD_TM_VAR_VALUE) && (varId < 256))
         {
             mVars[varId] = value;	
-            if (varId >= 10 && varId < 15)
+            if (varId >= 98 && varId <= 99)
             {        
-       /*     cout << "Cmd: " << cmd ;
+          /*  cout << "Cmd: " << cmd ;
             cout << "   VarId:  " << varId ;
             cout << "   value:  " << value <<endl;
-            cout << "------------------------------" << endl;       */
+            cout << "------------------------------" << endl;        */
             }
         }
         else
@@ -356,6 +356,8 @@ void UHA::CreateJson(void)
       cJSON_AddItemToObject(Uha, "VAR_CONS_COLD", cJSON_CreateNumber(mVars[92]));
       cJSON_AddItemToObject(Uha, "VAR_CONS_HOT", cJSON_CreateNumber(mVars[93]));
 
+      cJSON_AddItemToObject(Uha, "VAR_BOILER_POWER", cJSON_CreateNumber(mVars[98]));
+      cJSON_AddItemToObject(Uha, "VAR_BOILER_HEAT", cJSON_CreateNumber(mVars[99]));
       cJSON_AddItemToObject(Uha, "VAR_TEMP_BOILER", cJSON_CreateNumber(mVars[100]));
       cJSON_AddItemToObject(Uha, "VAR_TEMP_BOILER_IN", cJSON_CreateNumber(mVars[101]));
       cJSON_AddItemToObject(Uha, "VAR_TEMP_BOILER_OUT", cJSON_CreateNumber(mVars[102]));
