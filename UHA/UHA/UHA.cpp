@@ -279,14 +279,26 @@ void UHA::UHA_ProcessMessage(void)
 
 void UHA::UHA_SendRTC(void)
 {
-    int unixtime = (int)time(NULL);
+    long int unixtime = (long int)time(NULL);
+    struct tm* now = localtime(&unixtime);
+
+    unsigned int localunixtime = unixtime + 3600;  // +1Hour Time zone offset
+    if(now->tm_isdst > 0)
+    {
+      localunixtime += 3600; 
+      cout << "Summer time" << endl;
+    }
+    else
+    {
+      cout << "Winter time" << endl;
+    }
 
     txData[0] = (CMD_RPI_RTC_SYNC >> 8) & 0xFF;
     txData[1] = CMD_RPI_RTC_SYNC & 0xFF;
-    txData[2] = (unixtime >> 24) & 0xFF;
-    txData[3] = (unixtime >> 16) & 0xFF;
-    txData[4] = (unixtime >> 8) & 0xFF;
-    txData[5] = unixtime & 0xFF;
+    txData[2] = (localunixtime >> 24) & 0xFF;
+    txData[3] = (localunixtime >> 16) & 0xFF;
+    txData[4] = (localunixtime >> 8) & 0xFF;
+    txData[5] = localunixtime & 0xFF;
     TransmitMesssage(); 
 
     cout << "RTC Sync sent.." << endl;
