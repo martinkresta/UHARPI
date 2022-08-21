@@ -417,6 +417,10 @@ void UHA::CreateJson(void)
       cJSON_AddItemToObject(Uha, "VAR_POW_OTHER_W", cJSON_CreateNumber(mVars[76]));
       cJSON_AddItemToObject(Uha, "VAR_POW_TECHM_W", cJSON_CreateNumber(mVars[77]));
 
+      cJSON_AddItemToObject(Uha, "VAR_METEO_WIND_BURST", cJSON_CreateNumber(mVars[161]));
+      cJSON_AddItemToObject(Uha, "VAR_METEO_WIND_AVG", cJSON_CreateNumber(mVars[162]));
+      cJSON_AddItemToObject(Uha, "VAR_METEO_WIND_POW", cJSON_CreateNumber(mVars[163]));
+      cJSON_AddItemToObject(Uha, "VAR_METEO_WIND_ENERGY", cJSON_CreateNumber(mVars[164]));
 
       cJSON_AddItemToObject(Uha, "VAR_BMS1_CELL1_MV", cJSON_CreateNumber(mVars[180]));
       cJSON_AddItemToObject(Uha, "VAR_BMS1_CELL2_MV", cJSON_CreateNumber(mVars[181]));
