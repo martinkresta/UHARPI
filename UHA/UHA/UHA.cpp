@@ -417,6 +417,22 @@ void UHA::CreateJson(void)
       cJSON_AddItemToObject(Uha, "VAR_POW_OTHER_W", cJSON_CreateNumber(mVars[76]));
       cJSON_AddItemToObject(Uha, "VAR_POW_TECHM_W", cJSON_CreateNumber(mVars[77]));
 
+
+      cJSON_AddItemToObject(Uha, "VAR_TEMP_RECU_FC", cJSON_CreateNumber(mVars[128]));
+      cJSON_AddItemToObject(Uha, "VAR_TEMP_RECU_FH", cJSON_CreateNumber(mVars[129]));
+      cJSON_AddItemToObject(Uha, "VAR_TEMP_RECU_WH", cJSON_CreateNumber(mVars[130]));
+      cJSON_AddItemToObject(Uha, "VAR_TEMP_RECU_WC", cJSON_CreateNumber(mVars[131]));
+      cJSON_AddItemToObject(Uha, "VAR_RH_RECU_FH", cJSON_CreateNumber(mVars[132]));
+      cJSON_AddItemToObject(Uha, "VAR_RH_RECU_WH", cJSON_CreateNumber(mVars[133]));
+
+      cJSON_AddItemToObject(Uha, "VAR_CO2_RECU", cJSON_CreateNumber(mVars[137]));
+      cJSON_AddItemToObject(Uha, "VAR_DP_RECU_F", cJSON_CreateNumber(mVars[138]));
+      cJSON_AddItemToObject(Uha, "VAR_DP_RECU_W", cJSON_CreateNumber(mVars[139]));
+      cJSON_AddItemToObject(Uha, "VAR_RECU_FAN_F", cJSON_CreateNumber(mVars[140]));
+      cJSON_AddItemToObject(Uha, "VAR_RECU_FAN_W", cJSON_CreateNumber(mVars[141]));
+      cJSON_AddItemToObject(Uha, "VAR_CURR_RECU_A", cJSON_CreateNumber(mVars[142]));
+
+
       cJSON_AddItemToObject(Uha, "VAR_METEO_WIND_BURST", cJSON_CreateNumber(mVars[161]));
       cJSON_AddItemToObject(Uha, "VAR_METEO_WIND_AVG", cJSON_CreateNumber(mVars[162]));
       cJSON_AddItemToObject(Uha, "VAR_METEO_WIND_POW", cJSON_CreateNumber(mVars[163]));

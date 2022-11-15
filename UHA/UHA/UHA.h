@@ -78,6 +78,21 @@
 #define  VAR_TEMP_KIDROOM  126
 #define  VAR_TEMP_OUTSIDE  127
 
+#define  VAR_TEMP_RECU_FC  128
+#define  VAR_TEMP_RECU_FH  129
+#define  VAR_TEMP_RECU_WH  130
+#define  VAR_TEMP_RECU_WC  131
+#define  VAR_RH_RECU_FH  132
+#define  VAR_RH_RECU_WH  133
+
+#define  VAR_CO2_RECU  137
+#define  VAR_DP_RECU_F  138
+#define  VAR_DP_RECU_W  139
+#define  VAR_RECU_FAN_F  140
+#define  VAR_RECU_FAN_W  141
+#define  VAR_CURR_RECU_A  142
+
+
 #define  VAR_METEO_WIND_BURST  161
 #define  VAR_METEO_WIND_AVG  162
 #define  VAR_METEO_WIND_POW  163
