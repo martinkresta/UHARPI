@@ -51,15 +51,15 @@ function update() {
 function UpddateDashboard(resp) {
 	var blocks = ["BatteryPackInfo", "LiveData"];
 	var block = resp[blocks[1]];
-	var BattCurrentA = (block["ChargingA"] - block["DischargingA"]);
-	var LoadPowerW = (block["DischargingA"]*block["TotalVoltageV"]);
-	var SunPowerPct = (block["SunPowerW"] / 1100) * 100;
-	var LoadPowerPct = (LoadPowerW / 3000) * 100;
-	var TodayDiffKwh = (block["TodayChargingKwh"] - block["TodayDischargingKwh"]);
+	var BattCurrentA = (block["BattCurrentA"]);
+	var LoadPowerW = (block["LoadPowerW"]);
+	var SunPowerPct = (block["SunPowerW"] / 5400) * 100;
+	var LoadPowerPct = (LoadPowerW / 8000) * 100;
+	var TodayDiffKwh = (block["TodayDiffKwh"] / 1000);
 	var date = new Date(block["UnixTime"]*1000); // *1000 because of date takes milliseconds
 	
 	$("#SunPowerW").html(block["SunPowerW"].toFixed(0) + " W");
-	$("#SunChargingA").html(block["ChargingA"].toFixed(1) + " A");
+	$("#SunChargingA").html(block["ChargingA"].toFixed(2) + " A");
 	$("#SunPowerPct").html(SunPowerPct.toFixed(0) + " %");
 	$("#TodayChargingKwh").html(block["TodayChargingKwh"].toFixed(3) + " kWh");
 
@@ -68,14 +68,14 @@ function UpddateDashboard(resp) {
 	$("#TodayDiffKwh").html(TodayDiffKwh.toFixed(3) + " kWh");
 	$("#AvailableEnergyKwh").html(block["AvailableEnergyKwh"].toFixed(2) + " kWh");
 	$("#TotalVoltageV").html(block["TotalVoltageV"].toFixed(1) + " V");
-	$("#BattCurrentA").html(BattCurrentA.toFixed(1) + " A");
+	$("#BattCurrentA").html(BattCurrentA.toFixed(2) + " A");
 	
 
 	$("#LoadPowerW").html(LoadPowerW.toFixed(0) + " W");
 	$("#TodayDischargingKwh").html(block["TodayDischargingKwh"].toFixed(3) + " kWh");
 	$("#LoadPowerPct").html(LoadPowerPct.toFixed(0) + " %");
 	$("#LoadVoltageV").html(block["TotalVoltageV"].toFixed(1) + " V");
-	$("#DischargingA").html(block["DischargingA"].toFixed(1) + " A");
+	$("#DischargingA").html(block["LoadCurrentA"].toFixed(2) + " A");
 	
 	
 	$("#TemperatureC").html(block["TemperatureC"].toFixed(0) + " °C");

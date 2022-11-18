@@ -102,8 +102,8 @@ void UHA::UHA_SendValues(void)
     // Discharging
     txData[0] = (CMD_RPI_VAR_VALUE >> 8) & 0xFF;
     txData[1] = CMD_RPI_VAR_VALUE & 0xFF;
-    txData[2] = (VAR_LOAD_A10 >> 8) & 0xFF;
-    txData[3] = VAR_LOAD_A10 & 0xFF;
+    txData[2] = (VAR_LOAD_A100 >> 8) & 0xFF;
+    txData[3] = VAR_LOAD_A100 & 0xFF;
     txData[4] = (DisCharg >> 8) & 0xFF;
     txData[5] = DisCharg & 0xFF;
     TransmitMesssage(); 
@@ -170,7 +170,7 @@ void UHA::UHA_CreateBmsJson(void)
   cJSON_AddItemToObject(LiveData, "SunPowerW", cJSON_CreateNumber(SunPowerW));
   cJSON_AddItemToObject(LiveData, "TotalVoltageV", cJSON_CreateNumber(mVars[VAR_BAT_VOLTAGE_V10]/10.0));
   cJSON_AddItemToObject(LiveData, "ChargingA", cJSON_CreateNumber(mVars[VAR_CHARGING_A10]/10.0));
-  cJSON_AddItemToObject(LiveData, "DischargingA", cJSON_CreateNumber(mVars[VAR_LOAD_A10]/10.0));
+  cJSON_AddItemToObject(LiveData, "DischargingA", cJSON_CreateNumber(mVars[VAR_LOAD_A100]/100.0));
   cJSON_AddItemToObject(LiveData, "TodayChargingKwh", cJSON_CreateNumber(mVars[VAR_MPPT_YIELD_TODAY_10WH]/100.0));
   cJSON_AddItemToObject(LiveData, "TodayDischargingKwh", cJSON_CreateNumber(mVars[VAR_CONS_TODAY_WH]/1000.0));
   cJSON_AddItemToObject(LiveData, "AvailableEnergyKwh", cJSON_CreateNumber(mVars[VAR_BAT_ENERGY_WH]/1000.0));
@@ -179,7 +179,8 @@ void UHA::UHA_CreateBmsJson(void)
   cJSON_AddItemToObject(LiveData, "SocPct", cJSON_CreateNumber(mVars[VAR_BAT_SOC]));
   cJSON_AddItemToObject(LiveData, "TemperatureC", cJSON_CreateNumber(mVars[VAR_BMS2_CELL4_C]));
   cJSON_AddItemToObject(LiveData, "SunPowerPct", cJSON_CreateNumber(SunPowerPct));
-  cJSON_AddItemToObject(LiveData, "BattCurrentA", cJSON_CreateNumber(mVars[VAR_BAT_CURRENT_A10]/10.0));
+  cJSON_AddItemToObject(LiveData, "BattCurrentA", cJSON_CreateNumber(mVars[VAR_SHUNT_CURRENT_A100]/100.0));
+  cJSON_AddItemToObject(LiveData, "LoadCurrentA", cJSON_CreateNumber(mVars[VAR_LOAD_A100]/100.0));
   cJSON_AddItemToObject(LiveData, "LoadPowerW", cJSON_CreateNumber(mVars[VAR_LOAD_W]));
   cJSON_AddItemToObject(LiveData, "LoadPowerPct", cJSON_CreateNumber(LoadPowerPct));
   cJSON_AddItemToObject(LiveData, "TodayDiffKwh", cJSON_CreateNumber(TodayDiffKwh));
@@ -325,12 +326,14 @@ void UHA::CreateJson(void)
 
       cJSON_AddItemToObject(Uha, "VAR_BAT_SOC", cJSON_CreateNumber(mVars[10]));
       cJSON_AddItemToObject(Uha, "VAR_BAT_VOLTAGE_V10", cJSON_CreateNumber(mVars[11]));
-      cJSON_AddItemToObject(Uha, "VAR_LOAD_A10", cJSON_CreateNumber(mVars[12]));
+      cJSON_AddItemToObject(Uha, "VAR_LOAD_A100", cJSON_CreateNumber(mVars[12]));
       cJSON_AddItemToObject(Uha, "VAR_CHARGING_A10", cJSON_CreateNumber(mVars[13]));
       cJSON_AddItemToObject(Uha, "VAR_BAT_CURRENT_A10", cJSON_CreateNumber(mVars[14]));
       cJSON_AddItemToObject(Uha, "VAR_CONS_TODAY_WH", cJSON_CreateNumber(mVars[15]));
       cJSON_AddItemToObject(Uha, "VAR_BAT_ENERGY_WH", cJSON_CreateNumber(mVars[16]));
       cJSON_AddItemToObject(Uha, "VAR_LOAD_W", cJSON_CreateNumber(mVars[17]));
+      cJSON_AddItemToObject(Uha, "VAR_SHUNT_CURRENT_A100", cJSON_CreateNumber(mVars[50]));
+
 
       cJSON_AddItemToObject(Uha, "VAR_BMS1_SOC", cJSON_CreateNumber(mVars[20]));
       cJSON_AddItemToObject(Uha, "VAR_BMS1_CURRENT_A10", cJSON_CreateNumber(mVars[21]));

@@ -12,7 +12,7 @@
 
 #define  VAR_BAT_SOC  10
 #define  VAR_BAT_VOLTAGE_V10  11
-#define  VAR_LOAD_A10  12
+#define  VAR_LOAD_A100  12
 #define  VAR_CHARGING_A10  13
 #define  VAR_BAT_CURRENT_A10  14
 #define  VAR_CONS_TODAY_WH  15
