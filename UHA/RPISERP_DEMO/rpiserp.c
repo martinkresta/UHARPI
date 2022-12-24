@@ -1,6 +1,5 @@
 
 
-//#include "rpiserp.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,7 +11,7 @@
 #include <pthread.h>
 #include "rpiserp.h"
 
-#define UART_DEVICE     "/dev/ttyACM1"
+#define UART_DEVICE     "/dev/ttyACM0"
 
 struct termios t_vcp;
 
@@ -57,7 +56,7 @@ char Checksum(char* data, char length)
 void* Thread_Receiver(void *iface)
 {
 
-    unsigned char stream[1000]; // stream of received bytes
+    unsigned char stream[RPISERP_RX_RAW_BUFLEN]; // stream of received bytes
     int writeIdx = 0;
     int processIdx =0;
     int rxlen, idx;
@@ -70,20 +69,24 @@ void* Thread_Receiver(void *iface)
     sReceiverIface* interface = (sReceiverIface*) iface;
     while(interface->enable)
     {
-        rxlen = read(fd_vcp, &(stream[writeIdx]),1000);
+        rxlen = read(fd_vcp, &(stream[writeIdx]),RPISERP_RX_RAW_BUFLEN-writeIdx);
         if(rxlen > 0)
         {
             // adjust write index for next read
             writeIdx += rxlen;
-            if(writeIdx >= 1000) writeIdx -=1000;
+            if(writeIdx >= RPISERP_RX_RAW_BUFLEN) writeIdx -=RPISERP_RX_RAW_BUFLEN;
 
             // parse the stream
             cont = true;
             idx = processIdx;
+            printf(" \n Receiver: entering while loop with %d new bytes from idx = %d\n", rxlen, idx );
             while ( cont == true)
             {
                 remainingBytes = writeIdx - idx;
-                if(idx >= writeIdx) remainingBytes = writeIdx + 1000 - idx;
+                if(idx >= writeIdx) remainingBytes = writeIdx + RPISERP_RX_RAW_BUFLEN - idx;
+
+               // printf(" \n Receiver: idx: %d | remaining: %d : writeIdx : %d  \n", idx, remainingBytes, writeIdx);
+               validPacket = false;
 
                 if(stream[idx] == MSG_START_B1 && stream[idx+1] == MSG_START_B2)
                 {  // detected start sequence of the packet
@@ -111,7 +114,7 @@ void* Thread_Receiver(void *iface)
                             if(interface->writeIndex >= interface->buffSize) interface->writeIndex = 0;
                             // increment the idx
                             idx += packetLength + 4;
-                            if(idx >= 1000) idx -= 1000;
+                            if(idx >= RPISERP_RX_RAW_BUFLEN) idx -= RPISERP_RX_RAW_BUFLEN;
 
                         }
                         else  
@@ -127,19 +130,38 @@ void* Thread_Receiver(void *iface)
 
                    }
                    else   // not enough data to parse entire packet
-                   {
+                   { 
+                    printf("\n Receiver: leaving the while loop with idx = %d", idx);
                      cont = false;  // skip the parsing for now and wait for mor data
                    }
                  
                 }
+                else
+                {
+                    idx ++;
+                    if(idx >= RPISERP_RX_RAW_BUFLEN) idx = 0;
+                    printf ("\n Receiver: index incremented to %d", idx);
+                    
+                }
+
+                if(idx == writeIdx-1)
+                {
+                    cont = false;
+                    printf("\n Receiver: leaving the while loop with idx = %d", idx);
+                } 
+
+
 
                 if(validPacket == false) // no packet found, move to next byte
                 {
-                    idx ++;
-                    if(idx >= 1000) idx = 0;
+                    // printf(" \n Receiver: idx: %d | remaining: %d : writeIdx : %d  \n", idx, remainingBytes, writeIdx);
+                   // idx ++;
+                  //  printf ("\n Receiver: index incremented to %d", idx);
+                   // if(idx >= 1000) idx = 0;
                 }
                 else
                 {
+                    printf ("\n Receiver: valid packet %d found.   idx = %d", interface->recPackets, idx);
                     // do nothing. the idx was already incremented, when packet was detected
  
                 }
@@ -200,7 +222,7 @@ void main(void)
         printf(" \nError setting atributes \n" );        
     }
 
-    write(fd_vcp, txBuff, 7);
+  //  write(fd_vcp, txBuff, 7);
 
     InitReceiverInterface();
     pthread_create(&RecThread_handle, NULL, Thread_Receiver, (void*)&mRecIface);
@@ -220,10 +242,11 @@ void main(void)
             }
             printf("  | ri: %d | wi: %d \n", mRecIface.readIndex, mRecIface.writeIndex);
 
-            mRecIface.writeIndex++;
+            mRecIface.readIndex++;
+            if(mRecIface.readIndex >= mRecIface.buffSize) mRecIface.readIndex = 0;
         }
 
-
+        //printf("  | ri: %d | wi: %d \n", mRecIface.readIndex, mRecIface.writeIndex);
 
 
         usleep(1000000);  // 1second sleep
