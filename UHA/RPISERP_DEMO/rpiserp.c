@@ -17,8 +17,11 @@ struct termios t_vcp;
 
 int fd_vcp; /* File descriptor for the port */
 
+int bitrate_counter = 0;
+
 unsigned char buff[1000];
-unsigned char txBuff[] = {0x7F, 0xAA, 0x03, 2, 0x00, 0x00, 0xCC};
+unsigned char Ibuff[1000];   // intermediate buffer
+unsigned char txBuff[] = {0x7F, 0xAA, 0x03, 5, 0x00, 0x00, 0xCC};
 
 int rxlen;
 
@@ -69,28 +72,38 @@ void* Thread_Receiver(void *iface)
     sReceiverIface* interface = (sReceiverIface*) iface;
     while(interface->enable)
     {
+        
         rxlen = read(fd_vcp, &(stream[writeIdx]),RPISERP_RX_RAW_BUFLEN-writeIdx);
         if(rxlen > 0)
         {
             // adjust write index for next read
             writeIdx += rxlen;
-            if(writeIdx >= RPISERP_RX_RAW_BUFLEN) writeIdx -=RPISERP_RX_RAW_BUFLEN;
-
+        
+            processIdx = 0;  // allways start processing from the first byte in the stream buffer
             // parse the stream
             cont = true;
             idx = processIdx;
-            printf(" \n Receiver: entering while loop with %d new bytes from idx = %d\n", rxlen, idx );
+            #ifdef REC_DBG_PRINT
+            printf(" \n Receiver: entering while loop with %d bytes (%d new) \n", writeIdx, rxlen);
+            #endif
             while ( cont == true)
             {
                 remainingBytes = writeIdx - idx;
-                if(idx >= writeIdx) remainingBytes = writeIdx + RPISERP_RX_RAW_BUFLEN - idx;
-
+                
                // printf(" \n Receiver: idx: %d | remaining: %d : writeIdx : %d  \n", idx, remainingBytes, writeIdx);
                validPacket = false;
 
                 if(stream[idx] == MSG_START_B1 && stream[idx+1] == MSG_START_B2)
                 {  // detected start sequence of the packet
                    packetLength = stream[idx+2];
+                   #ifdef REC_DBG_PRINT
+                   printf(" \n Receiver: found packet start at index %d with length of %d bytes \n", idx, packetLength);
+                   #endif
+
+                   if(packetLength > RPISERP_ID_LENGTH + RPISERP_MAX_DATA_LENGTH)
+                   {
+                        // ERROR packet length, The detectend packet start should be discarded
+                   }
 
                    // check if enough data was received
                    if(remainingBytes >= (packetLength + 4))  // header + len + chsum = 4
@@ -102,6 +115,7 @@ void* Thread_Receiver(void *iface)
                         
                         if(packetLength <= RPISERP_ID_LENGTH + RPISERP_MAX_DATA_LENGTH)
                         {
+
                             // length is valid
                             validPacket = true;
                             interface->recPackets++;
@@ -115,73 +129,64 @@ void* Thread_Receiver(void *iface)
                             // increment the idx
                             idx += packetLength + 4;
                             if(idx >= RPISERP_RX_RAW_BUFLEN) idx -= RPISERP_RX_RAW_BUFLEN;
+                            #ifdef REC_DBG_PRINT
+                            printf(" \n Receiver: complete packet %d stored  \n", interface->recPackets);
+                            #endif
 
                         }
                         else  
                         {
                             // too long messages are discarded - considered as invalid
                             validPacket = false;
+                            #ifdef REC_DBG_PRINT
+                            printf(" \n Receiver: ERROR: too long packet  \n");
+                            #endif
+                            idx ++;
                         }
                      }
                      else  // invalid checksum
                      {
                         validPacket = false;
+                        #ifdef REC_DBG_PRINT
+                        printf(" \n Receiver: ERROR: invalid checksum  \n");
+                        #endif
+                        idx ++;
                      }
 
                    }
                    else   // not enough data to parse entire packet
                    { 
-                    printf("\n Receiver: leaving the while loop with idx = %d", idx);
-                     cont = false;  // skip the parsing for now and wait for mor data
+                     // copy the remaining unprocessed data to the begining of the stream buffer and adjust the write index,
+                     // so the next recived data willl be placed just after this unprocessed data.
+                     // we have to use temporary intermediate buffer, because the source and destination data may overlap
+                     memcpy(Ibuff, &(stream[idx]), remainingBytes);
+                     memcpy(stream, Ibuff, remainingBytes);   // copy to the beggining of stream which will be processed next time
+                     writeIdx = remainingBytes;  // adjust the writeIdx
+                     #ifdef REC_DBG_PRINT
+                     printf("\n Receiver: leaving the while loop with %d remaining bytes, idx = %d" , remainingBytes, idx);
+                     #endif
+                     cont = false;  // skip the parsing for now and wait for more data
+                     continue;
                    }
                  
                 }
                 else
                 {
                     idx ++;
-                    if(idx >= RPISERP_RX_RAW_BUFLEN) idx = 0;
-                    printf ("\n Receiver: index incremented to %d", idx);
                     
                 }
 
-                if(idx == writeIdx-1)
+                if(idx >= writeIdx-1)
                 {
                     cont = false;
-                    printf("\n Receiver: leaving the while loop with idx = %d", idx);
+                    #ifdef REC_DBG_PRINT
+                    printf("\n Receiver: leaving the while loop with all bytes processed");
+                    #endif
+                    writeIdx = 0;
+                    continue;
                 } 
-
-
-
-                if(validPacket == false) // no packet found, move to next byte
-                {
-                    // printf(" \n Receiver: idx: %d | remaining: %d : writeIdx : %d  \n", idx, remainingBytes, writeIdx);
-                   // idx ++;
-                  //  printf ("\n Receiver: index incremented to %d", idx);
-                   // if(idx >= 1000) idx = 0;
-                }
-                else
-                {
-                    printf ("\n Receiver: valid packet %d found.   idx = %d", interface->recPackets, idx);
-                    // do nothing. the idx was already incremented, when packet was detected
- 
-                }
             }
 
-            processIdx = idx;
-
-
-/*
-
-            buff[rxlen] = 0;  // string termination
-           // printf("\n RecBytes: %d  |    %s", rxlen, buff);
-            printf("\n RecBytes: %d  |  ", rxlen);
-            for(int i = 0; i < rxlen; i++)
-            {
-                printf("%02X ", buff[i]);
-            }
-            printf (" ");
-
-            */
         }
 
     }
@@ -222,7 +227,8 @@ void main(void)
         printf(" \nError setting atributes \n" );        
     }
 
-  //  write(fd_vcp, txBuff, 7);
+    // configure the NUCLEO to send more often
+    write(fd_vcp, txBuff, 7);
 
     InitReceiverInterface();
     pthread_create(&RecThread_handle, NULL, Thread_Receiver, (void*)&mRecIface);
@@ -235,6 +241,7 @@ void main(void)
 
         while (mRecIface.readIndex != mRecIface.writeIndex)
         {
+            bitrate_counter++;
             printf("\n ID: %d  |  Data: ", mRecIface.packets[mRecIface.readIndex].id);
             for(int i = 0; i < RPISERP_MAX_DATA_LENGTH; i++)
             {
@@ -248,8 +255,10 @@ void main(void)
 
         //printf("  | ri: %d | wi: %d \n", mRecIface.readIndex, mRecIface.writeIndex);
 
+        printf("\n message counter : %d",bitrate_counter);
+        usleep(100000);  // 100 msecond sleep
+        
 
-        usleep(1000000);  // 1second sleep
     }
 
     close(fd_vcp);

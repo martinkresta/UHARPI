@@ -13,11 +13,13 @@
 
 #define RPISERP_BUFLEN	20
 
-#define RPISERP_RX_RAW_BUFLEN   100
+#define RPISERP_RX_RAW_BUFLEN   1000
 
-#define RPISERP_RX_PACKETS_CAPACITY 1000
+#define RPISERP_RX_PACKETS_CAPACITY 200
 #define RPISERP_MAX_DATA_LENGTH     8 
 #define RPISERP_ID_LENGTH           2
+
+//#define REC_DBG_PRINT   
 
 typedef struct 
 {
