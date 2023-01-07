@@ -19,7 +19,7 @@
 #define RPISERP_MAX_DATA_LENGTH     8 
 #define RPISERP_ID_LENGTH           2
 
-//#define REC_DBG_PRINT   
+#define REC_DBG_PRINT   
 
 typedef struct 
 {

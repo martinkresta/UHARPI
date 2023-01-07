@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <pthread.h>
+#include <sched.h>
 #include "rpiserp.h"
 
 #define UART_DEVICE     "/dev/ttyACM0"
@@ -21,7 +22,7 @@ int bitrate_counter = 0;
 
 unsigned char buff[1000];
 unsigned char Ibuff[1000];   // intermediate buffer
-unsigned char txBuff[] = {0x7F, 0xAA, 0x03, 5, 0x00, 0x00, 0xCC};
+unsigned char txBuff[] = {0x7F, 0xAA, 0x03, 1, 0x00, 0x00, 0xCC};
 
 int rxlen;
 
@@ -50,7 +51,7 @@ char Checksum(char* data, char length)
   {
     chsum += data[i];
   }
-  return chsum;
+  return (chsum & 0xFF);
 }
 
 
@@ -65,14 +66,15 @@ void* Thread_Receiver(void *iface)
     int rxlen, idx;
     bool validPacket = false;
     bool cont = true;
-    char packetLength;
+    unsigned char packetLength;
     int remainingBytes;
+    unsigned char chsum;
     sPacket* pckt;
 
     sReceiverIface* interface = (sReceiverIface*) iface;
     while(interface->enable)
     {
-        
+        usleep(1000);  // 1 msecond sleep
         rxlen = read(fd_vcp, &(stream[writeIdx]),RPISERP_RX_RAW_BUFLEN-writeIdx);
         if(rxlen > 0)
         {
@@ -109,7 +111,9 @@ void* Thread_Receiver(void *iface)
                    if(remainingBytes >= (packetLength + 4))  // header + len + chsum = 4
                    {
                      // validate the checksum
-                     if( stream[idx + packetLength + 3] == Checksum(&(stream[idx]), packetLength + 3))
+                     chsum = Checksum(&(stream[idx]), packetLength + 3);
+                     chsum = chsum & 0xFF;
+                     if( stream[idx + packetLength + 3] == chsum)
                      {
                         // checksum is valid, insert the packet to the application buffer
                         
@@ -149,6 +153,13 @@ void* Thread_Receiver(void *iface)
                         validPacket = false;
                         #ifdef REC_DBG_PRINT
                         printf(" \n Receiver: ERROR: invalid checksum  \n");
+                            printf("\n Receiver: Corrupted frame: ");
+                            for(int i = 0; i < packetLength + 4; i++)
+                            {
+                             printf("%02X ", stream[idx+i]);
+                            }
+                            printf("\n Receiver: Received checksum : %02X", stream[idx + packetLength + 3]);
+                            printf("\n Receiver: Calculated checksum : %02X", chsum);
                         #endif
                         idx ++;
                      }
@@ -231,7 +242,21 @@ void main(void)
     write(fd_vcp, txBuff, 7);
 
     InitReceiverInterface();
-    pthread_create(&RecThread_handle, NULL, Thread_Receiver, (void*)&mRecIface);
+
+    // setting the higher priority for the Receiver theread
+    int rc;
+    pthread_attr_t attr;
+    struct sched_param param;
+
+    rc = pthread_attr_init (&attr);
+    rc = pthread_attr_getschedparam (&attr, &param);
+    printf( "\n The default priority was : %d", (param.sched_priority));
+    (param.sched_priority)+=10;
+    printf( "\n New priority is : %d", (param.sched_priority));
+    rc = pthread_attr_setschedparam (&attr, &param);
+    // check RC ? 
+
+    pthread_create(&RecThread_handle, &attr, Thread_Receiver, (void*)&mRecIface);
     printf(" \nThe receiver thread was started \n" );
 
     while(1)
@@ -245,7 +270,7 @@ void main(void)
             printf("\n ID: %d  |  Data: ", mRecIface.packets[mRecIface.readIndex].id);
             for(int i = 0; i < RPISERP_MAX_DATA_LENGTH; i++)
             {
-                printf("%02X ", mRecIface.packets[mRecIface.readIndex].data[i]);
+                printf("%03d ", mRecIface.packets[mRecIface.readIndex].data[i]);
             }
             printf("  | ri: %d | wi: %d \n", mRecIface.readIndex, mRecIface.writeIndex);
 
@@ -256,7 +281,7 @@ void main(void)
         //printf("  | ri: %d | wi: %d \n", mRecIface.readIndex, mRecIface.writeIndex);
 
         printf("\n message counter : %d",bitrate_counter);
-        usleep(100000);  // 100 msecond sleep
+        usleep(10000);  // 10 msecond sleep
         
 
     }
