@@ -19,11 +19,12 @@
 #define RPISERP_MAX_DATA_LENGTH     8 
 #define RPISERP_ID_LENGTH           2
 
-//#define REC_DBG_PRINT   
+#define RPISERP_DBG_PRINT   
 
 typedef struct 
 {
     unsigned short id;
+    unsigned char dlc;
     unsigned char data[RPISERP_MAX_DATA_LENGTH];
 }sPacket;
 
@@ -37,5 +38,19 @@ typedef struct
     int buffSize;      // capacity of pacekets buffer
     sPacket* packets;  // buffer with received packets
 }sReceiverIface;
+
+void RPISERP_Init(unsigned char* port);
+
+void RPISERP_Start(void);
+void RPISERP_Stop(void);
+
+void RPISERP_SendPacket(sPacket* packet);
+
+int RPISERP_GetNumOfRxPackets(void);
+
+int RPISERP_GetRxPacket(sPacket* packet);
+
+
+
 
 #endif

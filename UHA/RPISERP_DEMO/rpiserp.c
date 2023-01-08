@@ -12,25 +12,20 @@
 #include <sched.h>
 #include "rpiserp.h"
 
-#define UART_DEVICE     "/dev/ttyACM0"
-
-struct termios t_vcp;
-
-int fd_vcp; /* File descriptor for the port */
-
-int bitrate_counter = 0;
-
-unsigned char buff[1000];
-unsigned char Ibuff[1000];   // intermediate buffer
-unsigned char txBuff[] = {0x7F, 0xAA, 0x03, 0xBB, 0x00, 0x00, 0xCC};
-
-int rxlen;
 
 
-sPacket RxPackets[RPISERP_RX_PACKETS_CAPACITY];
 
-sReceiverIface mRecIface;
+// global variables
+static struct termios t_vcp;            // handle for serial port configuration
+static pthread_t RecThread_handle;    // receiver thread handle
+static sReceiverIface mRecIface;  // interface with receiver thread
+static int fd_vcp;                     // handle for serial port read/write access
+static sPacket RxPackets[RPISERP_RX_PACKETS_CAPACITY];  // buffer with received packets (validated)
 
+
+static unsigned char Ibuff[1000];   // intermediate buffer
+
+// default initialization of receiver thread interface structure
 void InitReceiverInterface(void)
 {
     mRecIface.buffSize = RPISERP_RX_PACKETS_CAPACITY;
@@ -43,9 +38,9 @@ void InitReceiverInterface(void)
 }
 
 // calculate the 8bit checksum over a byte array with length 0-255 bytes
-char Checksum(char* data, char length)
+unsigned char Checksum(char* data, char length)
 {
-  char i,chsum;
+  unsigned char i,chsum;
   chsum = 0;
   for(i = 0;i < length; i++)
   {
@@ -74,7 +69,10 @@ void* Thread_Receiver(void *iface)
     sReceiverIface* interface = (sReceiverIface*) iface;
     while(interface->enable)
     {
-        usleep(1000);  // 1 msecond sleep
+        #ifdef RPISERP_DBG_PRINT
+         printf(" \n Receiver: receiver thread enabled , %d\n", interface->enable);
+        #endif
+        // read data from port
         rxlen = read(fd_vcp, &(stream[writeIdx]),RPISERP_RX_RAW_BUFLEN-writeIdx);
         if(rxlen > 0)
         {
@@ -85,10 +83,10 @@ void* Thread_Receiver(void *iface)
             // parse the stream
             cont = true;
             idx = processIdx;
-            #ifdef REC_DBG_PRINT
+            #ifdef RPISERP_DBG_PRINT
             printf(" \n Receiver: entering while loop with %d bytes (%d new) \n", writeIdx, rxlen);
             #endif
-            while ( cont == true)
+            while ( cont == true && interface->enable)
             {
                 remainingBytes = writeIdx - idx;
                 
@@ -98,7 +96,7 @@ void* Thread_Receiver(void *iface)
                 if(stream[idx] == MSG_START_B1 && stream[idx+1] == MSG_START_B2)
                 {  // detected start sequence of the packet
                    packetLength = stream[idx+2];
-                   #ifdef REC_DBG_PRINT
+                   #ifdef RPISERP_DBG_PRINT
                    printf(" \n Receiver: found packet start at index %d with length of %d bytes \n", idx, packetLength);
                    #endif
 
@@ -112,7 +110,6 @@ void* Thread_Receiver(void *iface)
                    {
                      // validate the checksum
                      chsum = Checksum(&(stream[idx]), packetLength + 3);
-                     chsum = chsum & 0xFF;
                      if( stream[idx + packetLength + 3] == chsum)
                      {
                         // checksum is valid, insert the packet to the application buffer
@@ -125,6 +122,7 @@ void* Thread_Receiver(void *iface)
                             interface->recPackets++;
                             pckt = &(interface->packets[interface->writeIndex]); // pointer to new packet
                             pckt->id = (unsigned short)(stream[idx+3]) * 256 + stream[idx+4];
+                            pckt->dlc = (unsigned char) (packetLength - 2);
                             memset(pckt->data,0,RPISERP_MAX_DATA_LENGTH);   // reset data to zero
                             memcpy(pckt->data,&(stream[idx+5]),packetLength - 2); // copy data without id
                             // increment the writeindex
@@ -133,7 +131,7 @@ void* Thread_Receiver(void *iface)
                             // increment the idx
                             idx += packetLength + 4;
                             if(idx >= RPISERP_RX_RAW_BUFLEN) idx -= RPISERP_RX_RAW_BUFLEN;
-                            #ifdef REC_DBG_PRINT
+                            #ifdef RPISERP_DBG_PRINT
                             printf(" \n Receiver: complete packet %d stored  \n", interface->recPackets);
                             #endif
 
@@ -142,7 +140,7 @@ void* Thread_Receiver(void *iface)
                         {
                             // too long messages are discarded - considered as invalid
                             validPacket = false;
-                            #ifdef REC_DBG_PRINT
+                            #ifdef RPISERP_DBG_PRINT
                             printf(" \n Receiver: ERROR: too long packet  \n");
                             #endif
                             idx ++;
@@ -151,7 +149,7 @@ void* Thread_Receiver(void *iface)
                      else  // invalid checksum
                      {
                         validPacket = false;
-                        #ifdef REC_DBG_PRINT
+                        #ifdef RPISERP_DBG_PRINT
                         printf(" \n Receiver: ERROR: invalid checksum  \n");
                             printf("\n Receiver: Corrupted frame: ");
                             for(int i = 0; i < packetLength + 4; i++)
@@ -173,7 +171,7 @@ void* Thread_Receiver(void *iface)
                      memcpy(Ibuff, &(stream[idx]), remainingBytes);
                      memcpy(stream, Ibuff, remainingBytes);   // copy to the beggining of stream which will be processed next time
                      writeIdx = remainingBytes;  // adjust the writeIdx
-                     #ifdef REC_DBG_PRINT
+                     #ifdef RPISERP_DBG_PRINT
                      printf("\n Receiver: leaving the while loop with %d remaining bytes, idx = %d" , remainingBytes, idx);
                      #endif
                      cont = false;  // skip the parsing for now and wait for more data
@@ -190,7 +188,7 @@ void* Thread_Receiver(void *iface)
                 if(idx >= writeIdx-1)
                 {
                     cont = false;
-                    #ifdef REC_DBG_PRINT
+                    #ifdef RPISERP_DBG_PRINT
                     printf("\n Receiver: leaving the while loop with all bytes processed");
                     #endif
                     writeIdx = 0;
@@ -198,120 +196,143 @@ void* Thread_Receiver(void *iface)
                 } 
             }
 
+            #ifdef RPISERP_DBG_PRINT
+                //printf(" \n Receiver: leaving the parsing loop\n");
+            #endif
         }
 
+        #ifdef RPISERP_DBG_PRINT
+        // printf(" \n Receiver: left the parsing loop\n");
+        #endif
     }
+
+    printf(" \n Receiver: receiver thread finishing...\n");
+    return NULL;
 }
 
 
-// Init and open the serial port
-void main(void)
+
+void RPISERP_Init(unsigned char* port)
 {
-
-    pthread_t RecThread_handle;
-
+    #ifdef RPISERP_DBG_PRINT   
     printf(" \n*** RPISERP 2.0 *** \n" ); 
-
-    //fd_vcp = open(UART_DEVICE, O_RDWR | O_NOCTTY | O_NDELAY);
-    fd_vcp = open(UART_DEVICE, O_RDWR | O_NOCTTY);
+    printf(" \nInitialization of RPISERP module ... ");
+    #endif
+    
+    fd_vcp = open(port, O_RDWR | O_NOCTTY);
     if (fd_vcp == -1)
     {
-        printf("Cannot open port \n");
+        #ifdef RPISERP_DBG_PRINT 
+        printf("\nCannot open serial device %s\n", port);
+        perror("\nCannot open serial devic");
+        #endif
     }
 
-    //fcntl(fd_vcp, F_SETFL, FNDELAY);
 
-    tcgetattr(fd_vcp, &t_vcp);
-	
-    //cfsetispeed(&t_vcp, B57600);
-    //cfsetospeed(&t_vcp, B57600);
+    tcgetattr(fd_vcp, &t_vcp);	
     cfsetspeed(&t_vcp, B115200);
-
     cfmakeraw(&t_vcp);
-    //t_vcp.c_cflag = CS8 | CREAD;
-    //t_vcp.c_iflag = IGNPAR | ICRNL;
     t_vcp.c_cc[VMIN] = 14;
     t_vcp.c_cc[VTIME] = 1;
 
     if(tcsetattr(fd_vcp,TCSANOW, &t_vcp))
     {
-        printf(" \nError setting atributes \n" );        
+        #ifdef RPISERP_DBG_PRINT 
+        printf(" \nError setting atributes \n" );   
+        perror(" \nError setting atributes \n" ); 
+        #endif     
     }
+}
 
-    // configure the NUCLEO to send more often
-    write(fd_vcp, txBuff, 7);
-
+void RPISERP_Start(void)
+{
     InitReceiverInterface();
 
-    // setting the higher priority for the Receiver theread
+    // setting the higher priority for the Receiver thread
     int rc;
     pthread_attr_t attr;
     struct sched_param param;
 
     rc = pthread_attr_init (&attr);
     rc = pthread_attr_getschedparam (&attr, &param);
-    printf( "\n The default priority was : %d", (param.sched_priority));
-    (param.sched_priority)+=10;
-    printf( "\n New priority is : %d", (param.sched_priority));
+       (param.sched_priority)+=10;
     rc = pthread_attr_setschedparam (&attr, &param);
     // check RC ? 
 
     pthread_create(&RecThread_handle, &attr, Thread_Receiver, (void*)&mRecIface);
+   // pthread_create(&RecThread_handle, NULL, Thread_Receiver, (void*)&mRecIface);
+    #ifdef RPISERP_DBG_PRINT
     printf(" \nThe receiver thread was started \n" );
+    #endif
+}
 
-    while(1)
+void RPISERP_Stop(void)
+{
+    //  kill the rec thread
+    #ifdef RPISERP_DBG_PRINT
+    printf(" \n Stopping the receiver thread... \n" );
+    #endif
+    mRecIface.enable = false;
+    
+    // TODO: pthread_join never returns !  the recevier thread does not terminate.  ?? inverstigate why
+    // pthread_join(RecThread_handle, NULL); 
+    // close the serial port
+    close(fd_vcp);
+    #ifdef RPISERP_DBG_PRINT
+    printf(" \n Receiver thread terminated and serial port closed \n" );
+    #endif
+}
+
+void RPISERP_SendPacket(sPacket* packet)
+{
+    // check the input
+    if(packet->dlc > RPISERP_MAX_DATA_LENGTH)
     {
+        #ifdef RPISERP_DBG_PRINT 
+        printf("/n Invalid Tx packet length!");
+        #endif
+        return;
+    }
+    // compose the packet
+    unsigned char txBuff[RPISERP_MAX_DATA_LENGTH + RPISERP_ID_LENGTH + 4];
+    txBuff[0] = MSG_START_B1;
+    txBuff[1] = MSG_START_B2;
+    txBuff[2] = packet->dlc;
 
-        // just process the RecInterface buffer and printout the received packets
+    memcpy(&(txBuff[3]), packet->data, packet->dlc);
+    txBuff[packet->dlc + 3] = Checksum(txBuff, packet->dlc + 3);
 
-        while (mRecIface.readIndex != mRecIface.writeIndex)
+    // send the complete packet to the serial port
+    write(fd_vcp, txBuff, packet->dlc + 4);
+    
+}
+
+int RPISERP_GetNumOfRxPackets(void)
+{
+    if(mRecIface.readIndex == mRecIface.writeIndex)
+    {
+        return 0;
+    }
+    else
+    {
+        if(mRecIface.readIndex < mRecIface.writeIndex)
         {
-            bitrate_counter++;
-            printf("\n ID: %d  |  Data: ", mRecIface.packets[mRecIface.readIndex].id);
-            for(int i = 0; i < RPISERP_MAX_DATA_LENGTH; i++)
-            {
-                printf("%03d ", mRecIface.packets[mRecIface.readIndex].data[i]);
-            }
-            printf("  | ri: %d | wi: %d \n", mRecIface.readIndex, mRecIface.writeIndex);
-
-            mRecIface.readIndex++;
-            if(mRecIface.readIndex >= mRecIface.buffSize) mRecIface.readIndex = 0;
-
+            return mRecIface.writeIndex - mRecIface.readIndex;
         }
-
-        // send loopback test
-        txBuff[4] ++;
-        txBuff[5] ++;
-        write(fd_vcp, txBuff, 7);
-
-        printf(" \n Sending data bytes: %d, %d", txBuff[4], txBuff[5]);
-
-        printf("\n message counter : %d",bitrate_counter);
-        usleep(1000);  // 10 msecond sleep
-        
-
+        else
+        {
+            return mRecIface.writeIndex + mRecIface.buffSize - mRecIface.readIndex;
+        }
     }
 
-    close(fd_vcp);
-
 }
 
-
-void RPISERP_Deinit(void)
+int RPISERP_GetRxPacket(sPacket* packet)
 {
-  // TBD
-}
+    packet->id = mRecIface.packets[mRecIface.readIndex].id;
+    packet->dlc = mRecIface.packets[mRecIface.readIndex].dlc;
+    memcpy(&(packet->data), &(mRecIface.packets[mRecIface.readIndex].data), packet->dlc);
 
-
-// this hould run in separate thread. It will put complete received messages to the global buffer
-void RPISERP_StartReceiver(void)
-{
-
-   
-}
-
-
-void RPISERP_SendTelegram(void)
-{
-    // TBD
+    mRecIface.readIndex++;
+    if(mRecIface.readIndex >= mRecIface.buffSize) mRecIface.readIndex = 0;
 }
