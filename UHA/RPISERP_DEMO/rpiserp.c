@@ -22,7 +22,7 @@ int bitrate_counter = 0;
 
 unsigned char buff[1000];
 unsigned char Ibuff[1000];   // intermediate buffer
-unsigned char txBuff[] = {0x7F, 0xAA, 0x03, 1, 0x00, 0x00, 0xCC};
+unsigned char txBuff[] = {0x7F, 0xAA, 0x03, 0xBB, 0x00, 0x00, 0xCC};
 
 int rxlen;
 
@@ -276,12 +276,18 @@ void main(void)
 
             mRecIface.readIndex++;
             if(mRecIface.readIndex >= mRecIface.buffSize) mRecIface.readIndex = 0;
+
         }
 
-        //printf("  | ri: %d | wi: %d \n", mRecIface.readIndex, mRecIface.writeIndex);
+        // send loopback test
+        txBuff[4] ++;
+        txBuff[5] ++;
+        write(fd_vcp, txBuff, 7);
+
+        printf(" \n Sending data bytes: %d, %d", txBuff[4], txBuff[5]);
 
         printf("\n message counter : %d",bitrate_counter);
-        usleep(10000);  // 10 msecond sleep
+        usleep(1000);  // 10 msecond sleep
         
 
     }
