@@ -199,13 +199,15 @@ void UHA::UHA_ProcessMessage(void)
   while (0 != RPISERP_GetNumOfRxPackets())
   {
       //printf("\n\n available Rx packets: %d ", RPISERP_GetNumOfRxPackets());
-
+      
 
       RPISERP_GetRxPacket(&rxPacket);
 
       cmd = rxPacket.id;
       varId = (rxPacket.data[0] << 8) + rxPacket.data[1];
       value = (rxPacket.data[2] << 8) + rxPacket.data[3];
+
+      cout << "Received packetid: " << rxPacket.id << " | varID: " << varId << " | value: " << value << endl;
 
       if ((cmd == CMD_TM_VAR_VALUE) && (varId < 256))  // variable value received
       {

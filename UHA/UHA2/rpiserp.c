@@ -300,13 +300,15 @@ void RPISERP_SendPacket(sPacket* packet)
     unsigned char txBuff[RPISERP_MAX_DATA_LENGTH + RPISERP_ID_LENGTH + 4];
     txBuff[0] = MSG_START_B1;
     txBuff[1] = MSG_START_B2;
-    txBuff[2] = packet->dlc;
+    txBuff[2] = packet->dlc + 2;
+    txBuff[3] = (unsigned char) ((packet->id >> 8) & 0xFF);
+    txBuff[4] = (unsigned char) (packet->id  & 0xFF);
 
-    memcpy(&(txBuff[3]), packet->data, packet->dlc);
-    txBuff[packet->dlc + 3] = Checksum(txBuff, packet->dlc + 3);
+    memcpy(&(txBuff[5]), packet->data, packet->dlc);
+    txBuff[packet->dlc + 5] = Checksum(txBuff, packet->dlc + 5);
 
     // send the complete packet to the serial port
-    write(fd_vcp, txBuff, packet->dlc + 4);
+    write(fd_vcp, txBuff, packet->dlc + 6);
     
 }
 
