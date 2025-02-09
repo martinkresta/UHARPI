@@ -22,12 +22,13 @@ using namespace std;
 // Init and open the serial port
 void UHA::UHA_Init(void)
 {
-    for (int i = 0; i < 256; i++)
+    for (int i = 0; i < NUM_OF_VARS; i++)
     {
         mVars[i] = 0;
     }
 	  RPISERP_Init((unsigned char*)UHA_PORT);
     RPISERP_Start();   
+
 }
 
 void UHA::UHA_DeInit(void)
@@ -157,7 +158,7 @@ void UHA::UHA_CreateBmsJson(void)
   
   cJSON_AddItemToObject(LiveData, "SunPowerW", cJSON_CreateNumber(SunPowerW));
   cJSON_AddItemToObject(LiveData, "TotalVoltageV", cJSON_CreateNumber(mVars[VAR_BAT_VOLTAGE_V10]/10.0));
-  cJSON_AddItemToObject(LiveData, "ChargingA", cJSON_CreateNumber(mVars[VAR_BAT_CURRENT_A10]/10.0));
+  cJSON_AddItemToObject(LiveData, "ChargingA", cJSON_CreateNumber(mVars[VAR_CHARGING_A10]/10.0));
   cJSON_AddItemToObject(LiveData, "DischargingA", cJSON_CreateNumber(mVars[VAR_LOAD_A100]/100.0));
   cJSON_AddItemToObject(LiveData, "DischargingA", 0);
   cJSON_AddItemToObject(LiveData, "TodayChargingKwh", cJSON_CreateNumber(mVars[VAR_MPPT_YIELD_TODAY_10WH]/100.0));
@@ -170,7 +171,6 @@ void UHA::UHA_CreateBmsJson(void)
   cJSON_AddItemToObject(LiveData, "SunPowerPct", cJSON_CreateNumber(SunPowerPct));
   cJSON_AddItemToObject(LiveData, "BattCurrentA", cJSON_CreateNumber(mVars[VAR_BAT_CURRENT_A10]/10.0));
   cJSON_AddItemToObject(LiveData, "LoadCurrentA", cJSON_CreateNumber(mVars[VAR_LOAD_A100]/100.0));
-  cJSON_AddItemToObject(LiveData, "LoadCurrentA", 0);
   cJSON_AddItemToObject(LiveData, "LoadPowerW", cJSON_CreateNumber(mVars[VAR_LOAD_W]));
   cJSON_AddItemToObject(LiveData, "LoadPowerPct", cJSON_CreateNumber(LoadPowerPct));
   cJSON_AddItemToObject(LiveData, "TodayDiffKwh", cJSON_CreateNumber(TodayDiffKwh));
@@ -219,7 +219,7 @@ void UHA::UHA_ProcessMessage(void)
 
       cout << "Received packetid: " << rxPacket.id << " | varID: " << varId << " | value: " << value << endl;
 
-      if ((cmd == CMD_TM_VAR_VALUE) && (varId < 256))  // variable value received
+      if ((cmd == CMD_TM_VAR_VALUE) && (varId < NUM_OF_VARS))  // variable value received
       {
           mVars[varId] = value;	  // store the variable
       }
@@ -319,14 +319,8 @@ cJSON_AddItemToObject(Uha, "VAR_MPPT_MAX_BAT_CURRENT_A10", cJSON_CreateNumber(mV
 cJSON_AddItemToObject(Uha, "VAR_MPPT_ENERGY_TODAY_WH", cJSON_CreateNumber(mVars[VAR_MPPT_ENERGY_TODAY_WH]));
 cJSON_AddItemToObject(Uha, "VAR_SHUNT_PCK1_CURRENT_A100", cJSON_CreateNumber(mVars[VAR_SHUNT_PCK1_CURRENT_A100]));
 cJSON_AddItemToObject(Uha, "VAR_SHUNT_PCK2_CURRENT_A100", cJSON_CreateNumber(mVars[VAR_SHUNT_PCK2_CURRENT_A100]));
-cJSON_AddItemToObject(Uha, "VAR_BATPACK1_POWER_W", cJSON_CreateNumber(mVars[VAR_BATPACK1_POWER_W]));
-cJSON_AddItemToObject(Uha, "VAR_BATPACK1_SOC", cJSON_CreateNumber(mVars[VAR_BATPACK1_SOC]));
-cJSON_AddItemToObject(Uha, "VAR_BATPACK1_CURRENT_A10", cJSON_CreateNumber(mVars[VAR_BATPACK1_CURRENT_A10]));
-cJSON_AddItemToObject(Uha, "VAR_BATPACK1_ENERGY_WH", cJSON_CreateNumber(mVars[VAR_BATPACK1_ENERGY_WH]));
-cJSON_AddItemToObject(Uha, "VAR_BATPACK2_POWER_W", cJSON_CreateNumber(mVars[VAR_BATPACK2_POWER_W]));
-cJSON_AddItemToObject(Uha, "VAR_BATPACK2_SOC", cJSON_CreateNumber(mVars[VAR_BATPACK2_SOC]));
-cJSON_AddItemToObject(Uha, "VAR_BATPACK2_CURRENT_A10", cJSON_CreateNumber(mVars[VAR_BATPACK2_CURRENT_A10]));
-cJSON_AddItemToObject(Uha, "VAR_BATPACK2_ENERGY_WH", cJSON_CreateNumber(mVars[VAR_BATPACK2_ENERGY_WH]));
+
+
 cJSON_AddItemToObject(Uha, "VAR_CONS_AC300_WH", cJSON_CreateNumber(mVars[VAR_CONS_AC300_WH]));
 cJSON_AddItemToObject(Uha, "VAR_CONS_AC3KW_WH", cJSON_CreateNumber(mVars[VAR_CONS_AC3KW_WH]));
 cJSON_AddItemToObject(Uha, "VAR_CONS_AC5KW_WH", cJSON_CreateNumber(mVars[VAR_CONS_AC5KW_WH]));
@@ -506,11 +500,53 @@ cJSON_AddItemToObject(Uha, "VAR_AXPERT_ENERGY_TODAY_WH", cJSON_CreateNumber(mVar
 cJSON_AddItemToObject(Uha, "VAR_AXPERT_LOAD_W", cJSON_CreateNumber(mVars[VAR_AXPERT_LOAD_W]));
 cJSON_AddItemToObject(Uha, "VAR_AXPERT_DISCHARGING_W", cJSON_CreateNumber(mVars[VAR_AXPERT_DISCHARGING_W]));
 
+cJSON_AddItemToObject(Uha, "VAR_STRG1_SOC", cJSON_CreateNumber(mVars[VAR_STRG1_SOC]));
+cJSON_AddItemToObject(Uha, "VAR_STRG1_POWER_W", cJSON_CreateNumber(mVars[VAR_STRG1_POWER_W]));
+cJSON_AddItemToObject(Uha, "VAR_STRG1_CURRENT_A10", cJSON_CreateNumber(mVars[VAR_STRG1_CURRENT_A10]));
+cJSON_AddItemToObject(Uha, "VAR_STRG1_ENERGY_WH", cJSON_CreateNumber(mVars[VAR_STRG1_ENERGY_WH]));
+cJSON_AddItemToObject(Uha, "VAR_STRG1_OPT_CHARGING_A", cJSON_CreateNumber(mVars[VAR_STRG1_OPT_CHARGING_A]));
+cJSON_AddItemToObject(Uha, "VAR_STRG1_CAPACITY_AH", cJSON_CreateNumber(mVars[VAR_STRG1_CAPACITY_AH]));
+cJSON_AddItemToObject(Uha, "VAR_STRG1_BALANCED_TODAY", cJSON_CreateNumber(mVars[VAR_STRG1_BALANCED_TODAY]));
+cJSON_AddItemToObject(Uha, "VAR_STRG1_VOLTAGE_V10", cJSON_CreateNumber(mVars[VAR_STRG1_VOLTAGE_V10]));
+cJSON_AddItemToObject(Uha, "VAR_LLOAD1_POWER_W", cJSON_CreateNumber(mVars[VAR_LLOAD1_POWER_W]));
+cJSON_AddItemToObject(Uha, "VAR_LLOAD1_CONS_WH", cJSON_CreateNumber(mVars[VAR_LLOAD1_CONS_WH]));
+cJSON_AddItemToObject(Uha, "VAR_LPV1_POWER_W", cJSON_CreateNumber(mVars[VAR_LPV1_POWER_W]));
+cJSON_AddItemToObject(Uha, "VAR_LPV1_PROD_WH", cJSON_CreateNumber(mVars[VAR_LPV1_PROD_WH]));
+/*cJSON_AddItemToObject(Uha, "VAR_LPV1_S1_POWER_W", cJSON_CreateNumber(mVars[VAR_LPV1_S1_POWER_W]));
+cJSON_AddItemToObject(Uha, "VAR_LPV1_S1_CURRENT_A10", cJSON_CreateNumber(mVars[VAR_LPV1_S1_CURRENT_A10]));
+cJSON_AddItemToObject(Uha, "VAR_LPV1_S1_VOLTAGE_V", cJSON_CreateNumber(mVars[VAR_LPV1_S1_VOLTAGE_V]));
+cJSON_AddItemToObject(Uha, "VAR_LPV1_S2_POWER_W", cJSON_CreateNumber(mVars[VAR_LPV1_S2_POWER_W]));
+cJSON_AddItemToObject(Uha, "VAR_LPV1_S2_CURRENT_A10", cJSON_CreateNumber(mVars[VAR_LPV1_S2_CURRENT_A10]));
+cJSON_AddItemToObject(Uha, "VAR_LPV1_S2_VOLTAGE_V", cJSON_CreateNumber(mVars[VAR_LPV1_S2_VOLTAGE_V]));*/
+
+
+cJSON_AddItemToObject(Uha, "VAR_STRG2_SOC", cJSON_CreateNumber(mVars[VAR_STRG2_SOC]));
+cJSON_AddItemToObject(Uha, "VAR_STRG2_POWER_W", cJSON_CreateNumber(mVars[VAR_STRG2_POWER_W]));
+cJSON_AddItemToObject(Uha, "VAR_STRG2_CURRENT_A10", cJSON_CreateNumber(mVars[VAR_STRG2_CURRENT_A10]));
+cJSON_AddItemToObject(Uha, "VAR_STRG2_ENERGY_WH", cJSON_CreateNumber(mVars[VAR_STRG2_ENERGY_WH]));
+cJSON_AddItemToObject(Uha, "VAR_STRG2_OPT_CHARGING_A", cJSON_CreateNumber(mVars[VAR_STRG2_OPT_CHARGING_A]));
+cJSON_AddItemToObject(Uha, "VAR_STRG2_CAPACITY_AH", cJSON_CreateNumber(mVars[VAR_STRG2_CAPACITY_AH]));
+cJSON_AddItemToObject(Uha, "VAR_STRG2_BALANCED_TODAY", cJSON_CreateNumber(mVars[VAR_STRG2_BALANCED_TODAY]));
+cJSON_AddItemToObject(Uha, "VAR_STRG2_VOLTAGE_V10", cJSON_CreateNumber(mVars[VAR_STRG2_VOLTAGE_V10]));
+cJSON_AddItemToObject(Uha, "VAR_LLOAD2_POWER_W", cJSON_CreateNumber(mVars[VAR_LLOAD2_POWER_W]));
+cJSON_AddItemToObject(Uha, "VAR_LLOAD2_CONS_WH", cJSON_CreateNumber(mVars[VAR_LLOAD2_CONS_WH]));
+cJSON_AddItemToObject(Uha, "VAR_LPV2_POWER_W", cJSON_CreateNumber(mVars[VAR_LPV2_POWER_W]));
+cJSON_AddItemToObject(Uha, "VAR_LPV2_PROD_WH", cJSON_CreateNumber(mVars[VAR_LPV2_PROD_WH]));
+
+/*cJSON_AddItemToObject(Uha, "VAR_LPV2_S1_POWER_W", cJSON_CreateNumber(mVars[VAR_LPV2_S1_POWER_W]));
+cJSON_AddItemToObject(Uha, "VAR_LPV2_S1_CURRENT_A20", cJSON_CreateNumber(mVars[VAR_LPV2_S1_CURRENT_A20]));
+cJSON_AddItemToObject(Uha, "VAR_LPV2_S1_VOLTAGE_V", cJSON_CreateNumber(mVars[VAR_LPV2_S1_VOLTAGE_V]));
+cJSON_AddItemToObject(Uha, "VAR_LPV2_S2_POWER_W", cJSON_CreateNumber(mVars[VAR_LPV2_S2_POWER_W]));
+cJSON_AddItemToObject(Uha, "VAR_LPV2_S2_CURRENT_A20", cJSON_CreateNumber(mVars[VAR_LPV2_S2_CURRENT_A20]));
+cJSON_AddItemToObject(Uha, "VAR_LPV2_S2_VOLTAGE_V", cJSON_CreateNumber(mVars[VAR_LPV2_S2_VOLTAGE_V]));*/
+
+
 /*cJSON_AddItemToObject(Uha, "VAR_LVDC_VDIFF_V100", cJSON_CreateNumber(mVars[VAR_LVDC_VDIFF_V100]));
 cJSON_AddItemToObject(Uha, "VAR_LVDC_VDIFF_MAX", cJSON_CreateNumber(mVars[VAR_LVDC_VDIFF_MAX]));
 cJSON_AddItemToObject(Uha, "VAR_LVDC_CURRENT_A", cJSON_CreateNumber(mVars[VAR_LVDC_CURRENT_A]));
 cJSON_AddItemToObject(Uha, "VAR_LVDC_LOSS_W", cJSON_CreateNumber(mVars[VAR_LVDC_LOSS_W]));
 cJSON_AddItemToObject(Uha, "VAR_LVDC_LOSS_CONS_WH", cJSON_CreateNumber(mVars[VAR_LVDC_LOSS_CONS_WH]));*/
+
 
 
 
