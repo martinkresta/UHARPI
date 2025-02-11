@@ -139,7 +139,7 @@ void UHA::UHA_CreateBmsJson(void)
 	int LoadPowerW = (int)(mVars[VAR_LOAD_W]);	
 	int LoadPowerPct = (int)(LoadPowerW / 8000) * 100;
 	double TodayDiffKwh = (mVars[VAR_SOLAR_ENERGY_TODAY_10WH]*10 - mVars[VAR_CONS_TODAY_WH]);   // WH! 
-  double totalCharging = (mVars[VAR_AXPERT_BAT_CHARGING_A]  +  mVars[VAR_MPPT_BAT_CURRENT_A10]);
+  double totalCharging = (mVars[VAR_AXPERT_BAT_CHARGING_A]  +  (mVars[VAR_MPPT_BAT_CURRENT_A10]/10.0));
 
   int Time = (int)time(NULL);
 
@@ -163,7 +163,7 @@ void UHA::UHA_CreateBmsJson(void)
   cJSON_AddItemToObject(LiveData, "ChargingA", cJSON_CreateNumber(totalCharging));
   cJSON_AddItemToObject(LiveData, "DischargingA", cJSON_CreateNumber(mVars[VAR_LOAD_A100]/100.0));
   cJSON_AddItemToObject(LiveData, "DischargingA", 0);
-  cJSON_AddItemToObject(LiveData, "TodayChargingKwh", cJSON_CreateNumber(mVars[VAR_MPPT_YIELD_TODAY_10WH]/100.0));
+  cJSON_AddItemToObject(LiveData, "TodayChargingKwh", cJSON_CreateNumber(mVars[VAR_SOLAR_ENERGY_TODAY_10WH]/100.0));
   cJSON_AddItemToObject(LiveData, "TodayDischargingKwh", cJSON_CreateNumber(mVars[VAR_CONS_TODAY_WH]/1000.0));
   cJSON_AddItemToObject(LiveData, "AvailableEnergyKwh", cJSON_CreateNumber(mVars[VAR_BAT_ENERGY_WH]/1000.0));
   cJSON_AddItemToObject(LiveData, "TotalChargingKwh", 0);
