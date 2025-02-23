@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include "UHA.h"
 #include "cJSON.h"
+#include "LOG.h"
 
 extern "C" {
   #include "rpiserp.h"
@@ -19,6 +20,7 @@ using namespace std;
 
 
 
+
 // Init and open the serial port
 void UHA::UHA_Init(void)
 {
@@ -27,7 +29,8 @@ void UHA::UHA_Init(void)
         mVars[i] = 0;
     }
 	  RPISERP_Init((unsigned char*)UHA_PORT);
-    RPISERP_Start();   
+    RPISERP_Start();  
+
 
 }
 
@@ -216,14 +219,26 @@ void UHA::UHA_ProcessMessage(void)
       RPISERP_GetRxPacket(&rxPacket);
 
       cmd = rxPacket.id;
-      varId = (rxPacket.data[0] << 8) + rxPacket.data[1];
-      value = (rxPacket.data[2] << 8) + rxPacket.data[3];
+      
 
-      cout << "Received packetid: " << rxPacket.id << " | varID: " << varId << " | value: " << value << endl;
-
-      if ((cmd == CMD_TM_VAR_VALUE) && (varId < NUM_OF_VARS))  // variable value received
+      if (cmd == CMD_TM_VAR_VALUE)  // variable value received
       {
+
+        varId = (rxPacket.data[0] << 8) + rxPacket.data[1];
+        value = (rxPacket.data[2] << 8) + rxPacket.data[3];
+
+        cout << "Received packetid: " << rxPacket.id << " | varID: " << varId << " | value: " << value << endl;
+        if(varId < NUM_OF_VARS)
+        {
           mVars[varId] = value;	  // store the variable
+        }
+        
+      }
+      if(cmd == CMD_LOG_MSG)
+      {
+        LOG log;
+        log.LOG_InsertMsg
+        //this->log.LOG_InsertMsg(rxPacket.data);
       }
   } 
 }
