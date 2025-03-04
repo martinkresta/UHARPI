@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.7.2)
-project (UhaGate4)
+project (UhaGate3)
 
-add_executable(UhaGate4 rpiserp.c UHA.cpp Main.cpp LOG.cpp cJSON.c)
+add_executable(UhaGate3 rpiserp.c UHA.cpp Main.cpp cJSON.c)
 
-TARGET_LINK_LIBRARIES( UhaGate4 pthread)
+TARGET_LINK_LIBRARIES( UhaGate3 pthread)
 
 
 

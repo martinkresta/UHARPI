@@ -278,7 +278,6 @@
 #define  CMD_RPI_RTC_SYNC  0x51
 
 #define  CMD_TM_VAR_VALUE  	0x221
-#define  CMD_LOG_MSG  0x620
 
 #define  NUM_OF_VARS       350
 
@@ -288,7 +287,6 @@ class UHA
 private:  
 
     short mVars[NUM_OF_VARS];
-    
     
 // public getters
 public:  
