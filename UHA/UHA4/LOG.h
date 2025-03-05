@@ -1,7 +1,9 @@
 #ifndef LOG_H
 #define LOG_H
 
-#include <string.h>
+#include <string>
+
+using namespace std;
 
 
 #define LOGFILE_FULLPATH	"/home/pi/Web/log.txt"
@@ -19,13 +21,14 @@ public:
 
 //private methods
 private:
-    static std::string getSourceName(unsigned char nodeId);
-    static std::string getEventName(unsigned char eventId);
-	
+    
+std::string getSourceName(unsigned char nodeId);
+std::string getEventName(unsigned char eventId);
 // public methods
 public:
 
    void LOG_InsertMsg(unsigned char data[]);
+
 
 
 };

@@ -6,6 +6,7 @@
 #include "UHA.h"
 #include "cJSON.h"
 #include "LOG.h"
+#include <string>
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -34,17 +35,11 @@ typedef enum {
 } eLogEvent;
 
 
-/// @brief Constructor
-void LOG::LOG(void)
-{
-
-}
-
 
 
 #define LOGFILE_FULLPATH "/home/pi/Web/log.txt"
 
-void LOG_InsertMsg(unsigned char data[]) {
+void LOG::LOG_InsertMsg(unsigned char data[]) {
     std::ofstream file(LOGFILE_FULLPATH, std::ios::app);
 
     if (!file) {

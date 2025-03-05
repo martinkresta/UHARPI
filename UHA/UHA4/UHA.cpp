@@ -183,7 +183,7 @@ void UHA::UHA_CreateBmsJson(void)
 
   cJSON_AddItemToObject(Bms,"LiveData", LiveData);
   
-  cout << "filling cells in json."  << endl;
+  //cout << "filling cells in json."  << endl;
   
   for (i=0;i<16;i++)
   {
@@ -196,7 +196,7 @@ void UHA::UHA_CreateBmsJson(void)
   
   cJSON_AddItemToObject(Bms,"Cells",CellsJson);
   
-  cout << "saving file BSM.json"  << endl;
+ // cout << "saving file BSM.json"  << endl;
   
 	FILE* fh = fopen(BMS_JSON_FULLPATH, "w");
 	fprintf(fh, cJSON_Print(Bms));
@@ -209,6 +209,7 @@ void UHA::UHA_ProcessMessage(void)
 {
   int cmd, varId,value;
   sPacket rxPacket;
+  LOG log;
 
   // process all messages available in the RPISERP rx buffer
   while (0 != RPISERP_GetNumOfRxPackets())
@@ -227,7 +228,7 @@ void UHA::UHA_ProcessMessage(void)
         varId = (rxPacket.data[0] << 8) + rxPacket.data[1];
         value = (rxPacket.data[2] << 8) + rxPacket.data[3];
 
-        cout << "Received packetid: " << rxPacket.id << " | varID: " << varId << " | value: " << value << endl;
+        //cout << "Received packetid: " << rxPacket.id << " | varID: " << varId << " | value: " << value << endl;
         if(varId < NUM_OF_VARS)
         {
           mVars[varId] = value;	  // store the variable
@@ -236,8 +237,8 @@ void UHA::UHA_ProcessMessage(void)
       }
       if(cmd == CMD_LOG_MSG)
       {
-        LOG log;
-        log.LOG_InsertMsg
+        cout << "Received LOG packet" << endl;
+        log.LOG_InsertMsg(rxPacket.data);
         //this->log.LOG_InsertMsg(rxPacket.data);
       }
   } 
@@ -577,7 +578,7 @@ cJSON_AddItemToObject(Uha, "VAR_BMS2_CELL16_C", cJSON_CreateNumber(mVars[VAR_BMS
 
 
   
-  cout << "saving file UHA.json"  << endl;
+  //cout << "saving file UHA.json"  << endl;
   
 	FILE* fh = fopen(UHA_JSON_FULLPATH, "w");
   if (fh == NULL)
@@ -588,7 +589,7 @@ cJSON_AddItemToObject(Uha, "VAR_BMS2_CELL16_C", cJSON_CreateNumber(mVars[VAR_BMS
   {
 	  fprintf(fh, cJSON_Print(Uha));
 	  fclose(fh);
-    cout << "File UHA.json writen and closed " << endl; 
+ //   cout << "File UHA.json writen and closed " << endl; 
   }
   
   cJSON_Delete(Uha);
