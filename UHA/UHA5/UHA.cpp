@@ -393,6 +393,12 @@ cJSON_AddItemToObject(Uha, "VAR_BMS2_VOLTAGE_V10", cJSON_CreateNumber(mVars[VAR_
 cJSON_AddItemToObject(Uha, "VAR_BMS2_ENERGY_STORED_WH", cJSON_CreateNumber(mVars[VAR_BMS2_ENERGY_STORED_WH]));
 cJSON_AddItemToObject(Uha, "VAR_BMS2_TODAY_ENERGY_WH", cJSON_CreateNumber(mVars[VAR_BMS2_TODAY_ENERGY_WH]));
 
+cJSON_AddItemToObject(Uha, "VAR_BMS3_SOC", cJSON_CreateNumber(mVars[VAR_BMS3_SOC]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CURRENT_A10", cJSON_CreateNumber(mVars[VAR_BMS3_CURRENT_A10]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_VOLTAGE_V10", cJSON_CreateNumber(mVars[VAR_BMS3_VOLTAGE_V10]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_ENERGY_STORED_WH", cJSON_CreateNumber(mVars[VAR_BMS3_ENERGY_STORED_WH]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_TODAY_ENERGY_WH", cJSON_CreateNumber(mVars[VAR_BMS3_TODAY_ENERGY_WH]));
+
 cJSON_AddItemToObject(Uha, "VAR_MPPT_BAT_CURRENT_A10", cJSON_CreateNumber(mVars[VAR_MPPT_BAT_CURRENT_A10]));
 cJSON_AddItemToObject(Uha, "VAR_MPPT_BAT_VOLTAGE_V100", cJSON_CreateNumber(mVars[VAR_MPPT_BAT_VOLTAGE_V100]));
 cJSON_AddItemToObject(Uha, "VAR_MPPT_YIELD_TODAY_10WH", cJSON_CreateNumber(mVars[VAR_MPPT_YIELD_TODAY_10WH]));
@@ -569,7 +575,38 @@ cJSON_AddItemToObject(Uha, "VAR_BMS2_CELL14_C", cJSON_CreateNumber(mVars[VAR_BMS
 cJSON_AddItemToObject(Uha, "VAR_BMS2_CELL15_C", cJSON_CreateNumber(mVars[VAR_BMS2_CELL15_C]));
 cJSON_AddItemToObject(Uha, "VAR_BMS2_CELL16_C", cJSON_CreateNumber(mVars[VAR_BMS2_CELL16_C]));
 
-
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL1_MV", cJSON_CreateNumber(mVars[VAR_BMS3_CELL1_MV]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL2_MV", cJSON_CreateNumber(mVars[VAR_BMS3_CELL2_MV]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL3_MV", cJSON_CreateNumber(mVars[VAR_BMS3_CELL3_MV]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL4_MV", cJSON_CreateNumber(mVars[VAR_BMS3_CELL4_MV]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL5_MV", cJSON_CreateNumber(mVars[VAR_BMS3_CELL5_MV]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL6_MV", cJSON_CreateNumber(mVars[VAR_BMS3_CELL6_MV]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL7_MV", cJSON_CreateNumber(mVars[VAR_BMS3_CELL7_MV]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL8_MV", cJSON_CreateNumber(mVars[VAR_BMS3_CELL8_MV]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL9_MV", cJSON_CreateNumber(mVars[VAR_BMS3_CELL9_MV]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL10_MV", cJSON_CreateNumber(mVars[VAR_BMS3_CELL10_MV]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL11_MV", cJSON_CreateNumber(mVars[VAR_BMS3_CELL11_MV]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL12_MV", cJSON_CreateNumber(mVars[VAR_BMS3_CELL12_MV]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL13_MV", cJSON_CreateNumber(mVars[VAR_BMS3_CELL13_MV]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL14_MV", cJSON_CreateNumber(mVars[VAR_BMS3_CELL14_MV]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL15_MV", cJSON_CreateNumber(mVars[VAR_BMS3_CELL15_MV]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL16_MV", cJSON_CreateNumber(mVars[VAR_BMS3_CELL16_MV]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL1_C", cJSON_CreateNumber(mVars[VAR_BMS3_CELL1_C]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL2_C", cJSON_CreateNumber(mVars[VAR_BMS3_CELL2_C]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL3_C", cJSON_CreateNumber(mVars[VAR_BMS3_CELL3_C]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL4_C", cJSON_CreateNumber(mVars[VAR_BMS3_CELL4_C]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL5_C", cJSON_CreateNumber(mVars[VAR_BMS3_CELL5_C]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL6_C", cJSON_CreateNumber(mVars[VAR_BMS3_CELL6_C]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL7_C", cJSON_CreateNumber(mVars[VAR_BMS3_CELL7_C]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL8_C", cJSON_CreateNumber(mVars[VAR_BMS3_CELL8_C]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL9_C", cJSON_CreateNumber(mVars[VAR_BMS3_CELL9_C]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL10_C", cJSON_CreateNumber(mVars[VAR_BMS3_CELL10_C]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL11_C", cJSON_CreateNumber(mVars[VAR_BMS3_CELL11_C]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL12_C", cJSON_CreateNumber(mVars[VAR_BMS3_CELL12_C]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL13_C", cJSON_CreateNumber(mVars[VAR_BMS3_CELL13_C]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL14_C", cJSON_CreateNumber(mVars[VAR_BMS3_CELL14_C]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL15_C", cJSON_CreateNumber(mVars[VAR_BMS3_CELL15_C]));
+cJSON_AddItemToObject(Uha, "VAR_BMS3_CELL16_C", cJSON_CreateNumber(mVars[VAR_BMS3_CELL16_C]));
 
 
 
