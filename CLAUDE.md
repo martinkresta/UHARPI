@@ -86,15 +86,25 @@ loop (1000ms tick):
 
 ## Build & Deploy
 
-```bash
-# Build on RPi
-cd UHA/UHA4
-cmake . && make
-# Binary: UhaGate4
+Service files are installed to `/lib/systemd/system/` (not `/etc/systemd/system/`).
 
-# Service
-sudo systemctl enable uhagate4
-sudo systemctl start uhagate4
+```bash
+# Copy sources to Pi, then build
+cd /home/pi/UHA5
+cmake src/ && make
+# Binary: UhaGate5
+
+# Install and start service
+sudo cp uhagate5.service /lib/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable uhagate5
+sudo systemctl start uhagate5
+sudo systemctl status uhagate5
+
+# To switch from v4 to v5
+sudo systemctl stop uhagate4
+sudo systemctl disable uhagate4
+sudo systemctl start uhagate5
 ```
 
 ---
@@ -108,6 +118,85 @@ sudo systemctl start uhagate4
 | BMS3 | 35–39 | 350–381 | ASW_ELECON (CAN node 4) — house pack 2 |
 
 **BMS3 is NOT yet in UHA.h or UHA.cpp** — this is the pending work (see below).
+
+---
+
+## Web Dashboard (WS/)
+
+Static files served by nginx. Entry point: `WS/index.html`.
+
+### Technology
+- **Bootstrap 4.3.1** + SB Admin template for layout
+- **Chart.js v2.8.0** — bar chart for cell voltages
+- **jQuery 3.3.1** — AJAX polling + DOM updates
+- **DataTables** — cell voltage table
+
+### Data flow
+`js/bms.js` polls `./bms.json` every **3 seconds** via AJAX GET, then calls:
+- `UpdateDashboard(resp)` — updates the 4 top cards (Solar, Battery, Load, Weather)
+- `UpdateCells(resp)` — rebuilds the cell voltage table
+- `DrawCellChart(resp)` — redraws the bar chart from scratch each tick
+
+### bms.json structure (produced by `UHA_CreateBmsJson()` in C++)
+```json
+{
+  "BatteryPackInfo": { "CapacityKwh": 16, "NumOfCells": 16, ... },
+  "LiveData": { "SocPct": 76, "TotalVoltageV": 53.2, "SunPowerW": 0, ... },
+  "Cells": [
+    { "VoltageV": 3.305, "TemperatureC": 22 },
+    ...16 cells...
+  ]
+}
+```
+
+### Cell voltage chart — current state
+- Bar chart, Y-axis hardcoded 2.8–3.7V
+- Reads from **single** `resp["Cells"]` array — **only BMS1 is shown**
+- Bar colour thresholds: green < 3.499V, yellow 3.499–3.6V, red < 3.0V or > 3.6V
+- Chart is destroyed and recreated every poll tick (no incremental update)
+
+### What the dashboard shows today
+| Card | Data |
+|------|------|
+| Solar | Power W, daily kWh, voltage, current |
+| Battery | SOC %, available kWh, voltage, current |
+| Load | Power W, daily kWh |
+| Weather | Temperature, humidity, wind, pressure |
+| Chart + Table | Cell voltages & temps — **BMS1 only** |
+
+---
+
+## Improvement Plan: Multi-Pack Cell Voltage View
+
+### Step 1 — Change bms.json structure (C++ side, `UHA_CreateBmsJson()`)
+Replace the single `"Cells"` array with one array per pack:
+```json
+{
+  "LiveData": { ... },
+  "Cells1": [ { "VoltageV": ..., "TemperatureC": ... }, ... ],
+  "Cells2": [ ... ],
+  "Cells3": [ ... ]
+}
+```
+`Cells1` = BMS1 (workshop, VAR_BMS1_CELL*), `Cells2` = BMS2 (house pack 1, VAR_BMS2_CELL*), `Cells3` = BMS3 (house pack 2, VAR_BMS3_CELL*).
+
+### Step 2 — Add pack selector tabs in index.html
+Add Bootstrap nav-tabs above the chart:
+```html
+<ul class="nav nav-tabs" id="packTabs">
+  <li class="nav-item"><a class="nav-link active" data-pack="Cells1">BMS 1</a></li>
+  <li class="nav-item"><a class="nav-link" data-pack="Cells2">BMS 2</a></li>
+  <li class="nav-item"><a class="nav-link" data-pack="Cells3">BMS 3</a></li>
+</ul>
+```
+
+### Step 3 — Update bms.js
+- Track selected pack in a variable (e.g. `var selectedPack = "Cells1"`)
+- Tab click handler sets `selectedPack` and triggers redraw
+- `DrawCellChart(resp)` and `UpdateCells(resp)` read from `resp[selectedPack]` instead of `resp["Cells"]`
+
+### Effort estimate
+~30–40 lines of JS changes + ~10 lines of HTML for the tabs. No changes to Chart.js config needed.
 
 ---
 
