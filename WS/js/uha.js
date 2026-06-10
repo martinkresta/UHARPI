@@ -68,14 +68,14 @@ function UpdateDashboard(resp) {
     var BattVoltageV      = (resp["VAR_BAT_VOLTAGE_V10"]  || 0) / 10.0;
     var BattCurrentA      = (resp["VAR_BAT_CURRENT_A10"]  || 0) / 10.0;
     var AvailableEnergyKwh = (resp["VAR_BAT_ENERGY_WH"]   || 0) / 1000.0;
-    // Diff today: (solar_10wh - cons_10wh) * 10 = Wh, /1000 = kWh
+    // Diff today: solar in 10Wh units (*10=Wh), cons already in Wh from C++
     var TodayDiffKwh = ((resp["VAR_SOLAR_ENERGY_TODAY_10WH"] || 0) * 10
-                      - (resp["VAR_CONS_TODAY_10WH"]         || 0) * 10) / 1000.0;
+                      -  (resp["VAR_CONS_TODAY_WH"]          || 0)) / 1000.0;
 
     // -- Load card --
     var LoadPowerW         = resp["VAR_LOAD_W"]       || 0;
     var LoadCurrentA       = (resp["VAR_LOAD_A100"]   || 0) / 100.0;
-    var TodayDischargingKwh = (resp["VAR_CONS_TODAY_10WH"] || 0) / 100.0;
+    var TodayDischargingKwh = (resp["VAR_CONS_TODAY_WH"] || 0) / 1000.0;
     var LoadPowerPct       = (LoadPowerW / 8000) * 100;
 
     // -- Weather card --
