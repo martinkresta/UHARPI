@@ -1,0 +1,14 @@
+[Unit]
+Description=UhaGate_v6
+# the serial port can be used by one gateway only: starting v6 stops v5 and vice versa
+Conflicts=uhagate5.service
+
+[Service]
+ExecStart=/home/pi/UHA6/UhaGate6 -c /home/pi/UHA6/uhagate6.conf
+Restart=always
+RestartSec=2
+# safety net: UhaGate6 needs ~2 MB; a leak like in UhaGate5 ends in a clean restart, not an OOM kill
+MemoryMax=64M
+
+[Install]
+WantedBy=multi-user.target
