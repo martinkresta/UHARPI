@@ -3,7 +3,7 @@
 Status: **PRODUCTION runs UhaGate6 since 2026-11-01 07:01** (switched on Martin's request; UhaGate5 disabled, kept as backup).
 Tested before in a 10-min window.
 Plan approved by Martin on 2026-10-31 incl. tmpfs. Installed on the Pi: `/home/pi/UHA6`,
-`uhagate6.service` (disabled), tmpfs symlinks in `/home/pi/Web`. Results in §5.
+`uhagate6.service` (enabled), tmpfs symlinks in `/home/pi/Web`. Results in §5.
 
 ---
 
