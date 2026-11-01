@@ -2,6 +2,8 @@
 Description=UhaGatePy
 # the serial port can be used by one gateway only: starting UhaGatePy stops UhaGate6 / UhaGate5 and vice versa
 Conflicts=uhagate5.service uhagate6.service
+# never give up restarting (the default allows only 5 starts in 10 s, then the service stays dead)
+StartLimitIntervalSec=0
 
 [Service]
 WorkingDirectory=/home/pi/UhaGatePy
@@ -9,8 +11,6 @@ Environment=PYTHONDONTWRITEBYTECODE=1
 ExecStart=/usr/bin/python3 -u -m uhagatepy -c /home/pi/UhaGatePy/uhagatepy.conf
 Restart=always
 RestartSec=2
-# never give up restarting (the default allows only 5 starts in 10 s, then the service stays dead)
-StartLimitIntervalSec=0
 # safety net: UhaGatePy needs ~30 MB; a leak ends in a clean restart, not in an OOM kill of something else
 MemoryMax=128M
 

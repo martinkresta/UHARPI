@@ -213,6 +213,23 @@ Not changed, for Martin to decide: after `switch_to_py.sh` UhaGate6 is disabled 
 (`StartLimitIntervalSec=0`); a permanently broken `uha_vars.yaml` after a reboot would restart-loop without a gateway
 until someone runs `rollback_to_v6.sh`. Keep the YAML deployment in step with the nodes.
 
+### Test window 1 — real link, old path only (2026-11-01 09:26, 3 min as agreed with Martin)
+Production uhagate6 was stopped for 3 min, UhaGatePy ran on the real serial port, uhagate6 was restored
+automatically (`uhagate6: active`, `uhagatepy: inactive` afterwards).
+
+| Check | Result |
+|-------|--------|
+| Link / data | link up from the first second, 17 144 old packets in 181 s (≈ 95/s), 0 checksum / length errors, 0 unknown or short packets, 0 discarded bytes |
+| CPU / RSS | **8.4 % of one core**, RSS 24 820 kB constant (UhaGate6: 2.7 %, 4.7 MB) |
+| Atomic writes | reader parsed the four JSON files 20×/s: 9 984 good reads, **0 errors** |
+| Journal | 13 lines in 3 min (start-up, config, 2 label warnings, link up, receiving data, RTC syncs) |
+| `uha.json` vs. production snapshot | 256 / 256 keys, same order, same types; 136 values equal, 120 differ — real changes during the 3 min between the two snapshots (power, temperatures, cell voltages), not format errors |
+| `bms.json` vs. production snapshot | 53 / 53 keys, same order and types |
+| Tunnel / comparison | 0 tunnel packets (ELECON step 2 not flashed), comparison empty — expected |
+
+Found in this window: systemd ignored `StartLimitIntervalSec` in `[Service]` (it belongs to `[Unit]`), so the
+"never stop restarting" protection was not active. Fixed (`StartLimitIntervalUSec=0` verified on the Pi).
+The `/home/pi/Web/uha2.json` symlink to `/dev/shm` was created for this window (the only change in `/home/pi/Web`).
+
 ### Still to do
-1. **Test window 1** (old path only, ELECON not changed): compare with the production snapshot, CPU/RSS over 10 min.
-2. **Test window 2** after Martin flashes ELECON step 2: tunnel rates per node, mismatch summary ≈ 0.
+1. **Test window 2** after Martin flashes ELECON step 2: tunnel rates per node, mismatch summary ≈ 0.
