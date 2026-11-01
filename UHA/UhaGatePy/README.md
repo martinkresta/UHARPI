@@ -1,9 +1,11 @@
 # UhaGatePy — findings and plan
 
-Status (2026-11-01): **implemented, reviewed, tested on the PC and on the Pi with a fake ELECON; no test window
-on the real link yet. Production still runs UhaGate6.** Martin approved the plan and the decisions in §6.
+Status (2026-11-01): **PRODUCTION runs UhaGatePy since 2026-11-01 09:32** (switched on Martin's request after test
+window 1; UhaGate6 disabled, kept as backup, rollback: `sudo /home/pi/UhaGatePy/rollback_to_v6.sh`).
+Implemented, reviewed, tested on the PC, on the Pi with a fake ELECON and in a 3-min window on the real link.
+Martin approved the plan and the decisions in §6.
 On the Pi: `python3-serial` + `python3-yaml` installed (apt), code in `/home/pi/UhaGatePy`,
-`uhagatepy.service` installed but disabled. Results in §7.
+`uhagatepy.service` enabled (production). Results in §7.
 Task: `Claude/uhagatepy-brief.md`. Contract with ELECON: `VARS2_spec.md` §7 (UHA_FW repo).
 
 ---
@@ -231,5 +233,11 @@ Found in this window: systemd ignored `StartLimitIntervalSec` in `[Service]` (it
 "never stop restarting" protection was not active. Fixed (`StartLimitIntervalUSec=0` verified on the Pi).
 The `/home/pi/Web/uha2.json` symlink to `/dev/shm` was created for this window (the only change in `/home/pi/Web`).
 
+### Switch to production (2026-11-01 09:32)
+`switch_to_py.sh`: its own check passed (link up, 764 packets after 10 s). After one more minute: 7 632 packets,
+0 checksum errors, `uha.json` 1.0 s old with 256 keys, all four JSON files served by nginx (HTTP 200), CPU 9 %,
+RSS 24.7 MB. Only the old format arrives until ELECON step 2 is flashed.
+
 ### Still to do
-1. **Test window 2** after Martin flashes ELECON step 2: tunnel rates per node, mismatch summary ≈ 0.
+1. **Test window 2** (now: a comparison on the live production service, no stop needed — read the journal summary
+   and `uha_status.json` `Comparison` after ELECON step 2 is flashed) after Martin flashes ELECON step 2: tunnel rates per node, mismatch summary ≈ 0.

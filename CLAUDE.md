@@ -12,12 +12,12 @@ A Raspberry Pi C++ application that acts as a gateway between the STM32 CAN node
 UHARPI/
 ├── UHA/
 │   ├── UHA/ UHA2/ UHA3/ UHA4/   (legacy versions)
-│   ├── UhaGatePy/               ← NEW (branch uhagatepy, not in production): Python gateway + VARS2 tunnel
+│   ├── UhaGatePy/               ← PRODUCTION since 2026-11-01: Python gateway + VARS2 tunnel
 │   │   ├── uhagatepy/           ← the program (small modules), start: python3 -m uhagatepy
 │   │   ├── tests/ tools/        ← unittest, golden test vs UhaGate6, fake_elecon.py
 │   │   ├── *.sh / uhatest.py    ← deploy, test window, switch/rollback, tmpfs links
 │   │   └── README.md            ← plan, design, test results
-│   ├── UHA6/                    ← PRODUCTION: UhaGate6 (since 2026-11-01, see "UhaGate6" below)
+│   ├── UHA6/                    ← backup: UhaGate6 (production 2026-11-01 until 09:32, see "UhaGate6" below)
 │   │   ├── src/                 ← sources, CMake target UhaGate6, unit + golden tests
 │   │   ├── *.sh / uhatest.py    ← deploy, test window, switch/rollback, tmpfs links
 │   │   └── README.md            ← Pi findings, design, test results
@@ -177,7 +177,7 @@ SSH from the PC: host alias `uharpi` (key `~/.ssh/id_ed25519_uharpi`).
 
 ## UhaGatePy (UHA/UhaGatePy) — next gateway, Python
 
-Replaces UhaGate6 later (UhaGate6 stays as backup). Same outputs, plus the **VARS2 tunnel** from
+In production since 2026-11-01 09:32 (`sudo /home/pi/UhaGatePy/rollback_to_v6.sh` returns to UhaGate6, which stays as backup). Same outputs, plus the **VARS2 tunnel** from
 ELECON (`VARS2_spec.md` §7 in the UHA_FW repo): RPISERP packets `0x180..0x18F` carry the 8 data bytes
 of a VARS2 CAN frame (var id u16 LE, value 4 B LE float32/int32/uint32 by the YAML type, flags bit0 VALID).
 Variables are defined in `UHA_FW/UHA_COMMON/VarDefs/uha_vars.yaml` (copied to the Pi by `deploy.sh`,
