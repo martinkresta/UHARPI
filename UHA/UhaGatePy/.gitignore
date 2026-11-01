@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+# copied by deploy.sh from UHA_FW, the single source stays there
+uha_vars.yaml
