@@ -181,21 +181,19 @@ status JSON every second; status every 5 s or reading in batches would lower it 
 
 ---
 
-## 6. Questions / decisions for Martin
+## 6. Decisions
 
-1. **Approve this plan?**
-2. **tmpfs for JSON (saves ~170k SD writes/day):** write JSON to `/dev/shm/uha/` and replace
-   `/home/pi/Web/{uha,bms,uha_status}.json` with symlinks. nginx config stays unchanged
-   (symlinks are allowed by default) and the FTP script keeps working. It does change files in
-   `/home/pi/Web`, so only with your OK. Default without OK: atomic writes directly to `/home/pi/Web`.
-3. Serial port default stays `/dev/ttyUSB0`; recommended in the config file:
-   the `/dev/serial/by-id/...CP2102...` path (survives re-enumeration after replug). OK?
-4. Node "last seen" from log messages only (see limitation above). OK?
-5. Unplug test: will you be at the Pi to unplug/replug the USB adapter?
-6. Outside the scope of this task (your decision, I will not touch them):
-   - UhaGate5 is OOM-killed every 2–3 days today. UhaGate6 fixes this; until you switch,
-     v5 keeps restarting itself.
-   - Journal is 1.3 GB; can be trimmed with `sudo journalctl --vacuum-size=200M`
-     and/or `SystemMaxUse=` in journald.conf.
-   - `ftpupload.sh` contains an FTP password in plain text and sends it unencrypted every
-     minute. Consider changing the password and using SFTP/FTPS.
+| Topic | Decision (Martin, 2026-10-31 / 11-01) |
+|-------|---------------------------------------|
+| Plan | approved; fix all serious bugs in UhaGate6 (UhaGate5 untouched) |
+| tmpfs | approved; JSON in `/dev/shm` (directly, not a subfolder, so the links also work for UhaGate5 after a reboot), symlinks in `/home/pi/Web` |
+| Serial port | `/dev/serial/by-id/...CP2102...` in `uhagate6.conf` (survives replug as ttyUSB1) |
+| Node last seen | from log messages only |
+| USB unplug test | not now; later only if link problems appear |
+| FTP upload (`ftpupload.sh`) | hosting ends soon; upload will be removed and moved to another hosting later. Change the password regardless (it was exposed in a session log) |
+| Switch to UhaGate6 | open: Martin decides (`switch_to_v6.sh`) |
+
+Open, outside this task (Martin's decision):
+- UhaGate5 is OOM-killed every 2–3 days; until the switch, v5 keeps restarting itself.
+- Journal is 1.3 GB; can be trimmed with `sudo journalctl --vacuum-size=200M`
+  and/or `SystemMaxUse=` in journald.conf.
