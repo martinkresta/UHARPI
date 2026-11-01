@@ -1,7 +1,8 @@
 # UhaGate6 — findings and plan
 
-Status: **plan, waiting for Martin's approval.** Nothing on the Pi has been changed yet
-(inspection on 2026-10-31 was read-only).
+Status (2026-11-01): **implemented and tested in a 10-min window; production still runs UhaGate5.**
+Plan approved by Martin on 2026-10-31 incl. tmpfs. Installed on the Pi: `/home/pi/UHA6`,
+`uhagate6.service` (disabled), tmpfs symlinks in `/home/pi/Web`. Results in §5.
 
 ---
 
@@ -146,7 +147,41 @@ Runs as root like v5 (`log.txt` is root-owned; changing users is a later step).
 
 ---
 
-## 5. Questions / decisions for Martin
+## 5. Test results
+
+### Before the Pi (deploy.sh)
+- Unit tests (parser: split frames, `0x7F` at chunk end, bad checksum, len 0/1/11, start sequence
+  inside data, all dlc 0..8; JSON; log line format): pass.
+- Golden test `src/tests/compare_with_v5.sh`: UHA5 `UHA.cpp` compiled with redirected paths vs
+  UhaGate6 builders, 100 random variable sets: **uha.json and bms.json byte-identical**.
+
+### Test window 2026-10-31 20:19:30 – 20:31:34 (v6 on production data)
+
+| Check | UhaGate5 | UhaGate6 |
+|-------|----------|----------|
+| CPU | 100 % of one core | 18.0 s CPU in 724 s = **2.5 %** at ~79 packets/s |
+| RSS | 309 MB after 10.4 h, growing | 3.3 → 3.8 MB, flat from minute 5 |
+| Journal | ~3,700 lines/h | 24 lines in 12 min (12 of them RTC sync) |
+| Atomic writes | – | 30,138 parses of uha/bms/status JSON during the window, **0 errors** |
+| Serial | – | 682 kB, 56,863 packets, **0 checksum / length errors**, 0 discarded bytes |
+| RTC sync | every minute | at link-up + every minute (11 sent), 0 TX errors |
+| JSON compare (v5 snapshot 20:19 vs v6 20:29) | | same 256 / 53 keys, same order, same types; differing values are real changes over 10 min (load, temperatures, cells) |
+| Variables | | 272 of 276 received, max age 3 s; never sent: `VAR_CONS_KITCHEN_A/B_WH`, `VAR_POW_KITCHEN_A/B_W` |
+
+Not covered yet: node log messages (none arrived in the window; format covered by unit test),
+serial unplug/replug.
+
+Incident: `test_window.sh` hung in a plain `wait` (it also waited for the `tee` process
+substitution), so its restore did not run. The backstop timer started UhaGate5 at 20:31:33
+as designed (v6 was stopped by `Conflicts=`), the gateway was never down. Fixed: wait only for
+the reader, restore v5 before the evaluation.
+
+Possible improvement: most of the 2.5 % CPU is probably the per-packet wake-ups and the 34 kB
+status JSON every second; status every 5 s or reading in batches would lower it further.
+
+---
+
+## 6. Questions / decisions for Martin
 
 1. **Approve this plan?**
 2. **tmpfs for JSON (saves ~170k SD writes/day):** write JSON to `/dev/shm/uha/` and replace

@@ -12,7 +12,11 @@ A Raspberry Pi C++ application that acts as a gateway between the STM32 CAN node
 UHARPI/
 ├── UHA/
 │   ├── UHA/ UHA2/ UHA3/ UHA4/   (legacy versions)
-│   └── UHA5/                    ← CURRENT VERSION
+│   ├── UHA6/                    ← NEW: UhaGate6 (robust rewrite, see "UhaGate6" below)
+│   │   ├── src/                 ← sources, CMake target UhaGate6, unit + golden tests
+│   │   ├── *.sh / uhatest.py    ← deploy, test window, switch/rollback, tmpfs links
+│   │   └── README.md            ← Pi findings, design, test results
+│   └── UHA5/                    ← PRODUCTION VERSION (kept as backup)
 │       ├── src/                 ← source files (if reorganised on Pi)
 │       ├── Main.cpp
 │       ├── UHA.h / UHA.cpp      ← main logic + VAR defines
@@ -36,14 +40,15 @@ UHARPI/
 ## RPISERP Protocol
 
 Serial port: `/dev/ttyUSB0`  
-Packet framing: `0x7F 0xAA | len | id(2B) | dlc | data(≤8B) | checksum`
+Packet framing: `0x7F 0xAA | len | id_hi id_lo | data(len-2 B, ≤8) | checksum` — `len` = 2 + data length,
+checksum = 8-bit sum of all preceding frame bytes (from `0x7F`).
 
 | ID | Direction | Meaning |
 |----|-----------|---------|
 | `0x221` (`CMD_TM_VAR_VALUE`) | STM32 → RPi | Variable update: 2B var-id + 2B value (int16_t) |
 | `0x620` (`CMD_LOG_MSG`) | STM32 → RPi | 8-byte log event (node-id, event-type, data) |
 | `0x50` (`CMD_RPI_VAR_VALUE`) | RPi → STM32 | Send a variable value to nodes |
-| `0x51` (`CMD_RPI_RTC_SYNC`) | RPi → STM32 | Unix timestamp + TZ offset (every 60s) |
+| `0x51` (`CMD_RPI_RTC_SYNC`) | RPi → STM32 | 4 B big-endian local time = unix + 3600 (+3600 in DST), every minute change |
 
 A background pthread (`RPISERP_Start`) reads serial continuously. `UHA_ProcessMessage()` drains the buffer in a tight loop in `Main.cpp`.
 
@@ -134,6 +139,34 @@ sudo systemctl stop uhagate4
 sudo systemctl disable uhagate4
 sudo systemctl start uhagate5
 ```
+
+---
+
+## UhaGate6 (UHA/UHA6)
+
+Same protocol and outputs as UhaGate5 (`uha.json`/`bms.json` byte-identical, verified by
+`src/tests/compare_with_v5.sh` against the UHA5 sources), plus `uha_status.json`
+(per-variable age, node last-seen from log messages, link state, counters).
+Single-threaded `poll()` loop (no busy-wait), serial reconnect, atomic JSON writes,
+journald logging (`journalctl -u uhagate6`). Fixes the UhaGate5 `cJSON_Print` memory leak
+(UhaGate5 is OOM-killed every 2–3 days).
+
+- Config: `/home/pi/UHA6/uhagate6.conf` (key = value, same keys as `UhaGate6 --help`).
+  Port via `/dev/serial/by-id/...CP2102...`, JSON written to `/dev/shm`.
+- tmpfs: `/home/pi/Web/{uha,bms,uha_status}.json` are symlinks to `/dev/shm/...`
+  (`tmpfs_links.sh install|remove|status`). UhaGate5 also writes through these links.
+  Files in `/dev/shm` must be owned by root (`fs.protected_regular=2` on the Pi).
+- Binary `/home/pi/UHA6/UhaGate6`, unit `/lib/systemd/system/uhagate6.service`
+  (`Conflicts=uhagate5.service`, `MemoryMax=64M`).
+
+```bash
+./UHA/UHA6/deploy.sh                       # PC (Git Bash): copy, build, test, install unit (not enabled)
+sudo /home/pi/UHA6/test_window.sh 10       # Pi: v6 for N≤15 min, v5 always restored
+sudo /home/pi/UHA6/switch_to_v6.sh         # Pi: production -> v6 (auto-rollback if v6 fails to start)
+sudo /home/pi/UHA6/rollback_to_v5.sh       # Pi: production -> v5
+```
+
+SSH from the PC: host alias `uharpi` (key `~/.ssh/id_ed25519_uharpi`).
 
 ---
 

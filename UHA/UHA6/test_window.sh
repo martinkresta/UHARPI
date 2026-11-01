@@ -64,6 +64,7 @@ cpu_ticks() { awk '{print $14 + $15}' "/proc/$PID/stat"; }
 # atomic write check: parse the files 20x/s during the whole window
 python3 "$DIR/uhatest.py" reader $((MIN * 60 - 30)) "$WEB/uha.json" "$WEB/bms.json" "$WEB/uha_status.json" \
     > "$OUT/reader.txt" 2>&1 &
+READER=$!
 
 T0=$(date +%s); C0=$(cpu_ticks)
 END=$((T0 + MIN * 60 - 10))
@@ -77,8 +78,12 @@ T1=$(date +%s); C1=$(cpu_ticks)
 cp -L "$WEB/uha.json" "$OUT/v6_uha.json"
 cp -L "$WEB/bms.json" "$OUT/v6_bms.json"
 cp -L "$WEB/uha_status.json" "$OUT/v6_status.json"
-wait
 journalctl -u uhagate6 --since "$START" --no-pager > "$OUT/v6_journal.txt"
+
+# production back first, evaluation afterwards. Wait only for the reader: a plain "wait" would
+# also wait for the tee process substitution above and hang forever.
+restore
+wait "$READER"
 
 echo "== results"
 awk -v c=$((C1 - C0)) -v t=$((T1 - T0)) -v hz="$TICKS" 'BEGIN{printf "UhaGate6 CPU: %.2f %% of one core over %d s\n", 100*c/hz/t, t}'
