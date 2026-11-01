@@ -1,6 +1,7 @@
 """Content of uha_status.json: link state, counters, age of every variable, nodes, old-vs-VARS2 check.
 
-Same fields as UhaGate6 (so a script reading its status keeps working) plus the VARS2 parts.
+Similar to UhaGate6's status file, but not identical: VarPackets is now OldPackets, a node's LastEvent is
+LastLogEvent, and variables without a name in the old table are not listed. Plus the VARS2 parts.
 """
 import os
 from typing import TYPE_CHECKING

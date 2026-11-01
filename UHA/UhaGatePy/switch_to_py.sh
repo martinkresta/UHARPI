@@ -12,15 +12,22 @@ DIR=/home/pi/UhaGatePy
 restore_v6() {
     echo "UhaGatePy is not working - restoring UhaGate6"
     systemctl disable --now uhagatepy || true
-    systemctl enable --now uhagate6
+    systemctl enable --now uhagate6 || systemctl start uhagate5
 }
 
-systemctl enable --now uhagatepy         # Conflicts= stops uhagate6 / uhagate5
-sleep 8
+systemctl enable --now uhagatepy || { restore_v6; exit 1; }   # Conflicts= stops uhagate6 / uhagate5
+sleep 10
 if ! systemctl is-active -q uhagatepy; then restore_v6; exit 1; fi
-# fresh data? uha.json is written every second, UnixTime must be current
-AGE=$(python3 -c "import json,time; print(int(time.time()-json.load(open('/home/pi/Web/uha.json'))['UnixTime']))" || echo 999)
-if [ "$AGE" -gt 5 ]; then echo "uha.json is $AGE s old"; restore_v6; exit 1; fi
+# Is it really working? uha.json is rewritten every second even without a serial link, so check the
+# status file: link up, packets arriving, and the file itself current.
+if ! python3 - <<'PY'
+import json, sys, time
+s = json.load(open("/home/pi/Web/uha_status.json"))
+ok = s["Link"]["State"] == "up" and s["Counters"]["RxPackets"] > 0 and time.time() - s["UnixTime"] < 5
+print("status: link", s["Link"]["State"], "packets", s["Counters"]["RxPackets"], "age", int(time.time() - s["UnixTime"]), "s")
+sys.exit(0 if ok else 1)
+PY
+then restore_v6; exit 1; fi
 
 systemctl disable uhagate6 || true
 echo "uhagatepy: $(systemctl is-enabled uhagatepy) / $(systemctl is-active uhagatepy)"

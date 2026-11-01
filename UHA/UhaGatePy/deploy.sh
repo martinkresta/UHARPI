@@ -10,9 +10,10 @@ DIR="$(cd "$(dirname "$0")" && pwd)"
 YAML="${UHA_VARS_YAML:-/c/Martin/GIT/UHA_FW/UHA_COMMON/VarDefs/uha_vars.yaml}"
 [ -f "$YAML" ] || { echo "uha_vars.yaml not found: $YAML (set UHA_VARS_YAML)"; exit 1; }
 
+cd "$DIR"
 echo "== copy to $HOST:/home/pi/UhaGatePy"
 ssh "$HOST" "mkdir -p /home/pi/UhaGatePy"
-tar -C "$DIR" --exclude=__pycache__ --exclude=README.md --exclude=deploy.sh \
+tar --exclude=__pycache__ --exclude=README.md --exclude=deploy.sh \
     -cf - uhagatepy tests tools ./*.sh ./*.py ./*.service ./*.conf | ssh "$HOST" "tar -C /home/pi/UhaGatePy -xf - --no-same-owner"
 cat "$YAML" | ssh "$HOST" "cat > /home/pi/UhaGatePy/uha_vars.yaml"
 

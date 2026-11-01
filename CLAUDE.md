@@ -12,6 +12,11 @@ A Raspberry Pi C++ application that acts as a gateway between the STM32 CAN node
 UHARPI/
 ├── UHA/
 │   ├── UHA/ UHA2/ UHA3/ UHA4/   (legacy versions)
+│   ├── UhaGatePy/               ← NEW (branch uhagatepy, not in production): Python gateway + VARS2 tunnel
+│   │   ├── uhagatepy/           ← the program (small modules), start: python3 -m uhagatepy
+│   │   ├── tests/ tools/        ← unittest, golden test vs UhaGate6, fake_elecon.py
+│   │   ├── *.sh / uhatest.py    ← deploy, test window, switch/rollback, tmpfs links
+│   │   └── README.md            ← plan, design, test results
 │   ├── UHA6/                    ← PRODUCTION: UhaGate6 (since 2026-11-01, see "UhaGate6" below)
 │   │   ├── src/                 ← sources, CMake target UhaGate6, unit + golden tests
 │   │   ├── *.sh / uhatest.py    ← deploy, test window, switch/rollback, tmpfs links
@@ -167,6 +172,29 @@ sudo /home/pi/UHA6/rollback_to_v5.sh       # Pi: production -> v5
 ```
 
 SSH from the PC: host alias `uharpi` (key `~/.ssh/id_ed25519_uharpi`).
+
+---
+
+## UhaGatePy (UHA/UhaGatePy) — next gateway, Python
+
+Replaces UhaGate6 later (UhaGate6 stays as backup). Same outputs, plus the **VARS2 tunnel** from
+ELECON (`VARS2_spec.md` §7 in the UHA_FW repo): RPISERP packets `0x180..0x18F` carry the 8 data bytes
+of a VARS2 CAN frame (var id u16 LE, value 4 B LE float32/int32/uint32 by the YAML type, flags bit0 VALID).
+Variables are defined in `UHA_FW/UHA_COMMON/VarDefs/uha_vars.yaml` (copied to the Pi by `deploy.sh`,
+not stored in this repo). VARS2 ids equal the old `VAR_*` ids.
+
+- Per variable the VARS2 value is used while fresh (VALID and age ≤ `timeout_ms`), converted back with
+  `round(value * legacy_scale)`, otherwise the old `0x221` value. `uha.json`/`bms.json` stay identical to UhaGate6
+  (golden test `tests/test_golden_uhagate6.py` compiles the real UhaGate6 builders and compares).
+- New outputs: `uha2.json` (YAML names, physical units, source) and extended `uha_status.json`
+  (nodes seen from the tunnel, old-vs-VARS2 comparison). The comparison summary in the journal
+  (every 10 min) is the main check of the migration.
+- Python 3.11 with `python3-serial`, `python3-yaml` (apt). Service `uhagatepy.service` (`Conflicts=` v5/v6).
+- `tools/fake_elecon.py` feeds the gateway through a pseudo-terminal (no production port needed).
+- Test window `sudo /home/pi/UhaGatePy/test_window.sh 10` stops the production gateway for ≤ 15 min and always restores it.
+
+Known label mismatch: the gateway's old table (`UHA.h`) calls id 49 `VAR_MPPT_ENERGY_TODAY_WH`, the firmware
+`VAR_MPPT_TEMP_C` (a temperature). The `uha.json` key keeps the old name for compatibility.
 
 ---
 

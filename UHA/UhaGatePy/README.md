@@ -1,7 +1,9 @@
 # UhaGatePy — findings and plan
 
-Status: **plan, waiting for Martin's approval** (incl. two apt packages on the Pi, see §6).
-Nothing on the Pi has been changed (only read-only checks and an `apt-get -s` simulation).
+Status (2026-11-01): **implemented, reviewed, tested on the PC and on the Pi with a fake ELECON; no test window
+on the real link yet. Production still runs UhaGate6.** Martin approved the plan and the decisions in §6.
+On the Pi: `python3-serial` + `python3-yaml` installed (apt), code in `/home/pi/UhaGatePy`,
+`uhagatepy.service` installed but disabled. Results in §7.
 Task: `Claude/uhagatepy-brief.md`. Contract with ELECON: `VARS2_spec.md` §7 (UHA_FW repo).
 
 ---
@@ -38,9 +40,17 @@ UhaGate6 reads only the first 4 and ignores `valid`. UhaGatePy will store the va
 - `bms.json` formulas (integer divisions such as `SunPowerW / 11200`, `TodayDiffKwh` in Wh,
   the three keys that never appear) are ported unchanged — quirks included.
 
+### Label mismatch found: id 49
+
+The gateway's old table (`UHA.h`, copied into UhaGate5/6) calls id 49 `VAR_MPPT_ENERGY_TODAY_WH`; the firmware
+(`VARS.h`) and the YAML call it `VAR_MPPT_TEMP_C` — the live value (≈ 31..34) is a temperature. The `uha.json` key
+keeps the old name (compatibility, brief). The loader accepts such label differences with a warning at start-up;
+a real id conflict (same name, different id) stops the program. Id 147 (`TEMP_KOLARNA`) is in the YAML but not in the
+old table, so it appears only in `uha2.json`.
+
 ### Pi (read-only)
 
-Python 3.11.2, `python3-venv` present, **`python3-serial` and `python3-yaml` are missing**.
+Python 3.11.2, `python3-venv` present, `python3-serial` and `python3-yaml` were missing (installed with Martin's OK, see §7).
 Simulation `apt-get -s install python3-serial python3-yaml`: installs exactly these two
 (`python3-serial 3.5-1.1`, `python3-yaml 6.0-3+b2`, both from Debian 12.9) and nothing else,
 no upgrades, no removals. RAM free ≈ 760 MB, disk 9.3 GB free, production = `uhagate6` (enabled).
@@ -64,7 +74,7 @@ every minute:  rtc.send()                ─► 0x051, identical to UhaGate6
 
 | File | Content |
 |------|---------|
-| `main.py` | start-up, event loop, timers, shutdown |
+| `main.py` | start-up: configuration, variable definitions, run the gateway |
 | `config.py` | defaults, `key = value` file, `argparse` options (same keys as UhaGate6 + `vars-yaml`) |
 | `log.py` | logging with journald level prefixes, no per-second output |
 | `rpiserp.py` | frame parser (split frames, checksum, length) + encoder, counters |
@@ -75,6 +85,9 @@ every minute:  rtc.send()                ─► 0x051, identical to UhaGate6
 | `store.py` | old store + VARS2 store, freshness choice, legacy conversion, old-vs-new comparison |
 | `outputs.py` | `uha.json`, `bms.json`, `uha2.json`, `uha_status.json`, atomic writes |
 | `event_log.py` | `log.txt` line (same format as UhaGate6) |
+| `rtc.py` | RTC sync payload (`0x051`) |
+| `status.py` | content of `uha_status.json` |
+| `gateway.py` | the event loop: serial link, packet handling, timers, summaries |
 
 ### Value selection (spec §7.5)
 
@@ -86,7 +99,11 @@ clamped to the int16 range and a clamp is counted/logged once.
 ### `uha.json` / `bms.json` compatibility
 
 Same keys, same order (Python dicts keep it), integral numbers printed as integers (like cJSON), tab indentation.
-Whitespace differs from cJSON — allowed by the brief. Proof: golden test against the UhaGate6 builders (§5).
+Text is not byte-identical to UhaGate6 (`"key": value` instead of `"key":<tab>value`, and a few doubles print with
+16 instead of 17 digits, e.g. `-7.800000000000001`); both parse to the same numbers. Allowed by the brief. Proof: golden
+test against the real UhaGate6 builders compares parsed content, key order included (§5).
+`uha2.json` and `uha_status.json` are written compact (one line): with `indent` Python cannot use its fast C encoder
+and the Pi spent 7 % of a core on it. View with a browser or `python3 -m json.tool`.
 
 ### `uha2.json` (new)
 
@@ -159,14 +176,43 @@ Fast-changing powers will show some mismatches because of different sampling tim
 
 ---
 
-## 6. Decisions needed from Martin
+## 6. Decisions (Martin, 2026-11-01: all approved)
 
-1. **Install `python3-serial` and `python3-yaml` with apt on the Pi?** (2 small packages, nothing else changes;
-   `sudo apt install python3-serial python3-yaml`.) Without them I can write and unit-test the code on the PC,
-   but not run it on the Pi.
-2. **Variables 49 and 142** (`MPPT_ENERGY_TODAY_WH`, `CURR_RECU_A`) are live but missing in `uha_vars.yaml`.
-   Proposal: UhaGatePy keeps them on the old path; add them to the YAML in the UHA_FW repo when convenient.
-3. **Old `valid` flag:** UhaGate6 ignores it. Proposal: same output behaviour (value is used even when
-   `valid = 0`), the flag is stored and shown in `uha2.json`. OK?
-4. **Optional `fake_elecon.py`** — OK to include (about 80 lines, test tool only)?
-5. Test windows replace production (`uhagate6`) for max 15 min with automatic restore, as before — OK without asking each time?
+1. Install `python3-serial` and `python3-yaml` with apt on the Pi: **done**.
+2. Variables 49 and 142 stay on the old path only (142 is not in the YAML; 49 is in the YAML under another name).
+3. Old `valid` flag: stored and shown in `uha2.json`; the value is used even when `valid = 0` (as UhaGate6).
+4. `tools/fake_elecon.py`: included.
+5. Test windows (≤ 15 min, production restored automatically) are allowed — **but Martin wants to be told and to
+   confirm before UhaGate6 is stopped** for each one. Tests without the production port (unit tests, fake ELECON in
+   `/tmp`) run without asking.
+
+## 7. Results so far
+
+### PC and Pi, no production port
+- 56 unit tests (PC and Pi): parser, tunnel decoding (float / int32 / uint32 / bool / enum, LE inside BE id, flags,
+  NaN), legacy conversion (all scales incl. 0.1, rounding half away from zero, int16 clamp), freshness selection,
+  uha.json key order, uha2.json, atomic write incl. symlink, config, RTC (winter/summer), log.txt line, gateway
+  packets-in/files-out.
+- Golden test: the real UhaGate6 builders (`outputs.cpp` + cJSON compiled in the test) vs. the Python builders, 40 random
+  value sets + all zero: identical keys, order and values.
+- Fake ELECON on the Pi (pseudo-terminal, output in `/tmp`, production untouched), 100 s at the real expected rate of
+  ≈ 216 packets/s (old + tunnel, all 257 variables, one tunnel value deliberately 10 % wrong):
+  0 checksum / length errors, 0 dropped tunnel packets, all 257 variables `vars2`,
+  comparison found exactly the wrong variable (`BAT_SOC` 100 % mismatched, every other 0), 684 reader parses of the 4 files
+  with 0 errors, RTC sent every minute, log messages written to `log.txt`.
+  **CPU ≈ 10 % of one core, RSS 24.8 MB and flat** (UhaGate6: 2.5 % / 3.8 MB; UhaGate5: 100 % / growing).
+  Cost split on the Pi: receiving 216 packets/s ≈ 1 %, writing the 4 outputs ≈ 3.4 % per second, the rest event loop.
+
+### Independent review (separate agent, did not write the code)
+Output compatibility, spec §7 and memory/CPU safety: no defect found. Script findings fixed: the backstop timer is now
+stopped only if production really came back (otherwise uhagate5 is tried), a missing backstop aborts the window, the
+`switch_to_py.sh` check needs link up + packets (not just a fresh timestamp) and cannot leave the Pi without a gateway
+if `enable` fails, `rollback_to_v6.sh` falls back to uhagate5, `deploy.sh` works from any folder, one bad packet no longer
+drops the rest of a read.
+Not changed, for Martin to decide: after `switch_to_py.sh` UhaGate6 is disabled and `uhagatepy` restarts forever
+(`StartLimitIntervalSec=0`); a permanently broken `uha_vars.yaml` after a reboot would restart-loop without a gateway
+until someone runs `rollback_to_v6.sh`. Keep the YAML deployment in step with the nodes.
+
+### Still to do
+1. **Test window 1** (old path only, ELECON not changed): compare with the production snapshot, CPU/RSS over 10 min.
+2. **Test window 2** after Martin flashes ELECON step 2: tunnel rates per node, mismatch summary ≈ 0.

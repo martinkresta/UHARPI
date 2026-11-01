@@ -198,11 +198,12 @@ class Gateway:
                 if not data:
                     return
                 for packet in self.parser.feed(data):
-                    self._on_packet(packet)
+                    try:
+                        self._on_packet(packet)
+                    except Exception:                  # a bug in one packet must not lose the others
+                        self._log_once("rx", log.exception, "error while processing a received packet")
         except LinkError as e:
             self._link_lost(str(e))
-        except Exception:
-            self._log_once("rx", log.exception, "error while processing received data")
 
     def _on_packet(self, packet: rpiserp.Packet) -> None:
         mono = time.monotonic()

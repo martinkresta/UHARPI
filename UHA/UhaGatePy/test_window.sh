@@ -42,18 +42,28 @@ mkdir -p "$OUT"
 exec > >(tee -a "$OUT/summary.txt") 2>&1
 
 restore() {
-    trap - EXIT INT TERM
+    trap - EXIT
     echo "== restoring $PROD"
     systemctl stop uhagatepy
     systemctl start "$PROD"
     sleep 3
-    systemctl stop uhapy-backstop.timer 2>/dev/null
+    if ! systemctl is-active -q "$PROD"; then
+        # production did not come back: keep the backstop timer and try the older gateway as well
+        echo "WARNING: $PROD is not active - trying uhagate5, backstop timer kept"
+        systemctl start uhagate5
+    else
+        systemctl stop uhapy-backstop.timer 2>/dev/null
+    fi
     echo "$PROD: $(systemctl is-active "$PROD"), uhagatepy: $(systemctl is-active uhagatepy)"
     chown -R pi:pi "$DIR/test"
 }
-trap restore EXIT INT TERM
+trap restore EXIT
+trap 'exit 1' INT TERM          # leaving the script runs the EXIT trap, so the restore happens exactly once
 
-systemd-run --quiet --unit=uhapy-backstop --on-active="$((MIN + 2))min" /bin/systemctl start "$PROD"
+# the backstop must exist before production is stopped; without it the window does not start
+systemctl stop uhapy-backstop.timer uhapy-backstop.service 2>/dev/null
+systemctl reset-failed uhapy-backstop.service 2>/dev/null
+systemd-run --quiet --collect --unit=uhapy-backstop --on-active="$((MIN + 2))min" /bin/systemctl start "$PROD"     || { echo "cannot create the backstop timer - test window not started"; trap - EXIT; exit 1; }
 
 echo "== test window $MIN min, production $PROD, $(date)"
 for f in uha.json bms.json uha_status.json; do cp -L "$WEB/$f" "$OUT/prod_$f"; done
