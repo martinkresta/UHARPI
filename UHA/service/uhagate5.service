@@ -1,0 +1,9 @@
+[Unit]
+Description=UhaGate_v5
+
+[Service]
+ExecStart=/home/pi/UHA5/UhaGate5
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

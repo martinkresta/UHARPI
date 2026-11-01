@@ -1,0 +1,9 @@
+[Unit]
+Description=UhaGate_v2
+
+[Service]
+ExecStart=/home/pi/UHA2/UhaGate2
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

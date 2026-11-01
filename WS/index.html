@@ -211,33 +211,50 @@
           <div class="card-footer small text-muted LastUpdate"></div>
         </div>
 
-        <!-- DataTables Example -->
+        <!-- Cell Voltages Table -->
         <div class="card mb-3">
           <div class="card-header">
             <i class="fas fa-table"></i>
-            Battery cells voltage</div>
+            Cell voltages (V)</div>
           <div class="card-body">
-            <div class="table-responsive" id="Cells">
-              <table class="table table-bordered" id="tablecells" width="100%" cellspacing="0">
+            <div class="table-responsive">
+              <table class="table table-bordered table-sm" id="tablevoltages" width="100%" cellspacing="0">
                 <thead>
                   <tr>
                     <th>Cell</th>
-                    <th>Voltage</th>
-                    <th>Temperature</th>
+                    <th>BMS 1 Workshop</th>
+                    <th>BMS 2 House 220 Ah</th>
+                    <th>BMS 3 House 80 Ah</th>
                   </tr>
                 </thead>
-                <tfoot>
-                  <tr>
-                    <th>Cell</th>
-                    <th>Voltage</th>
-                    <th>Temperature</th>
-                  </tr>
-                </tfoot>
+                <tbody></tbody>
               </table>
             </div>
-            <p ></p>
           </div>
-          <div class="card-footer small text-muted LastUpdate">Updated unknown when</div>
+          <div class="card-footer small text-muted LastUpdate"></div>
+        </div>
+
+        <!-- Cell Temperatures Table -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa-table"></i>
+            Cell temperatures (°C)</div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered table-sm" id="tabletemps" width="100%" cellspacing="0">
+                <thead>
+                  <tr>
+                    <th>Cell</th>
+                    <th>BMS 1 Workshop</th>
+                    <th>BMS 2 House 220 Ah</th>
+                    <th>BMS 3 House 80 Ah</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card-footer small text-muted LastUpdate"></div>
         </div>
 
       </div>
@@ -297,7 +314,7 @@
 
   <!-- Custom scripts for all pages-->
   <script src="js/sb-admin.min.js"></script>
-  <script src="js/bms.js"></script> 
+  <script src="js/uha.js"></script>
  
   
 
