@@ -1,0 +1,2334 @@
+{
+  "Version": "0.1.0",
+  "UnixTime": 1793538649,
+  "StartUnix": 1793521940,
+  "UptimeS": 16709,
+  "Yaml": {
+    "Version": 0,
+    "Sha": "c18686cc",
+    "Variables": 257
+  },
+  "Link": {
+    "Port": "/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0",
+    "State": "up",
+    "SinceUnix": 1793521940,
+    "Reconnects": 0,
+    "LastPacketAgeS": 0
+  },
+  "Counters": {
+    "RxBytes": 18874992,
+    "RxPackets": 1572916,
+    "OldPackets": 1572916,
+    "TunnelPackets": 0,
+    "LogPackets": 0,
+    "UnknownIds": 0,
+    "Malformed": 0,
+    "OutOfRangeVarIds": 0,
+    "TunnelDropped": {
+      "length": 0,
+      "unknown_id": 0,
+      "bad_value": 0
+    },
+    "WrongProducer": 0,
+    "ChecksumErrors": 0,
+    "LengthErrors": 0,
+    "DiscardedBytes": 0,
+    "ClampedToInt16": 0,
+    "TxPackets": 279,
+    "TxErrors": 0,
+    "RtcSyncSent": 279,
+    "WriteErrors": 0,
+    "EventLogErrors": 0,
+    "RssKb": 24696
+  },
+  "Comparison": {
+    "VariablesCompared": 0,
+    "Compared": 0,
+    "Mismatched": 0,
+    "Worst": {}
+  },
+  "Nodes": {
+    "IOBOARD_D": {
+      "Id": 1,
+      "LastSeenUnix": null,
+      "AgeS": null,
+      "TunnelPackets": 0,
+      "TunnelAvgPerS": 0,
+      "LogMessages": 0,
+      "LastLogEvent": null
+    },
+    "IOBOARD_U": {
+      "Id": 2,
+      "LastSeenUnix": null,
+      "AgeS": null,
+      "TunnelPackets": 0,
+      "TunnelAvgPerS": 0,
+      "LogMessages": 0,
+      "LastLogEvent": null
+    },
+    "TECHM": {
+      "Id": 3,
+      "LastSeenUnix": null,
+      "AgeS": null,
+      "TunnelPackets": 0,
+      "TunnelAvgPerS": 0,
+      "LogMessages": 0,
+      "LastLogEvent": null
+    },
+    "ELECON": {
+      "Id": 4,
+      "LastSeenUnix": null,
+      "AgeS": null,
+      "TunnelPackets": 0,
+      "TunnelAvgPerS": 0,
+      "LogMessages": 0,
+      "LastLogEvent": null
+    },
+    "RECU": {
+      "Id": 5,
+      "LastSeenUnix": null,
+      "AgeS": null,
+      "TunnelPackets": 0,
+      "TunnelAvgPerS": 0,
+      "LogMessages": 0,
+      "LastLogEvent": null
+    },
+    "EVSE": {
+      "Id": 6,
+      "LastSeenUnix": null,
+      "AgeS": null,
+      "TunnelPackets": 0,
+      "TunnelAvgPerS": 0,
+      "LogMessages": 0,
+      "LastLogEvent": null
+    },
+    "ELECON_D": {
+      "Id": 7,
+      "LastSeenUnix": null,
+      "AgeS": null,
+      "TunnelPackets": 0,
+      "TunnelAvgPerS": 0,
+      "LogMessages": 0,
+      "LastLogEvent": null
+    },
+    "RPI": {
+      "Id": 15,
+      "LastSeenUnix": null,
+      "AgeS": null,
+      "TunnelPackets": 0,
+      "TunnelAvgPerS": 0,
+      "LogMessages": 0,
+      "LastLogEvent": null
+    }
+  },
+  "Vars": {
+    "VAR_NETWORK_STATUS": {
+      "Id": 1,
+      "Value": 174,
+      "AgeS": 3,
+      "LastRxUnix": 1793538646,
+      "Count": 3335,
+      "Count2": 0
+    },
+    "VAR_SOLAR_POWER_W": {
+      "Id": 8,
+      "Value": 1111,
+      "AgeS": 1,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_SOLAR_ENERGY_TODAY_10WH": {
+      "Id": 9,
+      "Value": 1114,
+      "AgeS": 1,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_BAT_SOC": {
+      "Id": 10,
+      "Value": 46,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 16710,
+      "Count2": 0
+    },
+    "VAR_BAT_VOLTAGE_V10": {
+      "Id": 11,
+      "Value": 528,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 16710,
+      "Count2": 0
+    },
+    "VAR_LOAD_A100": {
+      "Id": 12,
+      "Value": 676,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 16710,
+      "Count2": 0
+    },
+    "VAR_CHARGING_A10": {
+      "Id": 13,
+      "Value": 90,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 16710,
+      "Count2": 0
+    },
+    "VAR_BAT_CURRENT_A10": {
+      "Id": 14,
+      "Value": 141,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 16710,
+      "Count2": 0
+    },
+    "VAR_CONS_TODAY_10WH": {
+      "Id": 15,
+      "Value": 1571,
+      "AgeS": 1,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_BAT_ENERGY_WH": {
+      "Id": 16,
+      "Value": 13577,
+      "AgeS": 1,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_LOAD_W": {
+      "Id": 17,
+      "Value": 357,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 16710,
+      "Count2": 0
+    },
+    "VAR_BAT_POWER_W": {
+      "Id": 18,
+      "Value": 747,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS1_SOC": {
+      "Id": 20,
+      "Value": 34,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 16710,
+      "Count2": 0
+    },
+    "VAR_BMS1_CURRENT_A10": {
+      "Id": 21,
+      "Value": 89,
+      "AgeS": 1,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_BMS1_VOLTAGE_V10": {
+      "Id": 22,
+      "Value": 528,
+      "AgeS": 1,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_BMS1_ENERGY_STORED_WH": {
+      "Id": 23,
+      "Value": 4509,
+      "AgeS": 1,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_BMS1_TODAY_ENERGY_WH": {
+      "Id": 24,
+      "Value": 0,
+      "AgeS": 1,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_BMS2_SOC": {
+      "Id": 30,
+      "Value": 49,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 16710,
+      "Count2": 0
+    },
+    "VAR_BMS2_CURRENT_A10": {
+      "Id": 31,
+      "Value": 37,
+      "AgeS": 1,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_BMS2_VOLTAGE_V10": {
+      "Id": 32,
+      "Value": 528,
+      "AgeS": 1,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_BMS2_ENERGY_STORED_WH": {
+      "Id": 33,
+      "Value": 5935,
+      "AgeS": 1,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_BMS2_TODAY_ENERGY_WH": {
+      "Id": 34,
+      "Value": 1826,
+      "AgeS": 1,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_BMS3_SOC": {
+      "Id": 35,
+      "Value": 83,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 16710,
+      "Count2": 0
+    },
+    "VAR_BMS3_CURRENT_A10": {
+      "Id": 36,
+      "Value": 15,
+      "AgeS": 1,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_BMS3_VOLTAGE_V10": {
+      "Id": 37,
+      "Value": 528,
+      "AgeS": 1,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_BMS3_ENERGY_STORED_WH": {
+      "Id": 38,
+      "Value": 3343,
+      "AgeS": 1,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_BMS3_TODAY_ENERGY_WH": {
+      "Id": 39,
+      "Value": 0,
+      "AgeS": 1,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_MPPT_BAT_CURRENT_A10": {
+      "Id": 40,
+      "Value": 90,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 16710,
+      "Count2": 0
+    },
+    "VAR_MPPT_BAT_VOLTAGE_V100": {
+      "Id": 41,
+      "Value": 5307,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 16710,
+      "Count2": 0
+    },
+    "VAR_MPPT_YIELD_TODAY_10WH": {
+      "Id": 42,
+      "Value": 562,
+      "AgeS": 1,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_MPPT_MAX_TODAY_W": {
+      "Id": 43,
+      "Value": 4741,
+      "AgeS": 1,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_MPPT_SOLAR_POWER_W": {
+      "Id": 44,
+      "Value": 487,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 16710,
+      "Count2": 0
+    },
+    "VAR_MPPT_SOLAR_VOLTAGE_V100": {
+      "Id": 45,
+      "Value": 9816,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 16710,
+      "Count2": 0
+    },
+    "VAR_MPPT_SOLAR_CURRENT_A10": {
+      "Id": 46,
+      "Value": 49,
+      "AgeS": 1,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_MPPT_SOLAR_MAX_VOLTAGE_V100": {
+      "Id": 47,
+      "Value": 0,
+      "AgeS": 1,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_MPPT_MAX_BAT_CURRENT_A10": {
+      "Id": 48,
+      "Value": 0,
+      "AgeS": 1,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_MPPT_ENERGY_TODAY_WH": {
+      "Id": 49,
+      "Value": 37,
+      "AgeS": 1,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_SHUNT_PCK1_CURRENT_A100": {
+      "Id": 50,
+      "Value": -622,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_SHUNT_PCK2_CURRENT_A100": {
+      "Id": 51,
+      "Value": 523,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_CONS_AC300_WH": {
+      "Id": 60,
+      "Value": 162,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_CONS_AC3KW_WH": {
+      "Id": 61,
+      "Value": 1280,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_CONS_AC5KW_WH": {
+      "Id": 62,
+      "Value": 2256,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_CONS_FRIDGE_WH": {
+      "Id": 63,
+      "Value": 129,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_CONS_KITCHEN_WH": {
+      "Id": 64,
+      "Value": 2033,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_CONS_WASCHMACHINE_WH": {
+      "Id": 65,
+      "Value": 1270,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_CONS_OTHER_WH": {
+      "Id": 66,
+      "Value": 150,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_CONS_TECHM_WH": {
+      "Id": 67,
+      "Value": 5,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_CONS_KITCHEN_A_WH": {
+      "Id": 68,
+      "Value": 0,
+      "AgeS": null,
+      "LastRxUnix": null,
+      "Count": 0,
+      "Count2": 0
+    },
+    "VAR_CONS_KITCHEN_B_WH": {
+      "Id": 69,
+      "Value": 0,
+      "AgeS": null,
+      "LastRxUnix": null,
+      "Count": 0,
+      "Count2": 0
+    },
+    "VAR_POW_AC300_W": {
+      "Id": 70,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_POW_AC3KW_W": {
+      "Id": 71,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_POW_AC5KW_W": {
+      "Id": 72,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_POW_FRIDGE_W": {
+      "Id": 73,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_POW_KITCHEN_W": {
+      "Id": 74,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_POW_WASCHMACHINE_W": {
+      "Id": 75,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_POW_OTHER_W": {
+      "Id": 76,
+      "Value": 0,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_POW_TECHM_W": {
+      "Id": 77,
+      "Value": 0,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_POW_KITCHEN_A_W": {
+      "Id": 78,
+      "Value": 0,
+      "AgeS": null,
+      "LastRxUnix": null,
+      "Count": 0,
+      "Count2": 0
+    },
+    "VAR_POW_KITCHEN_B_W": {
+      "Id": 79,
+      "Value": 0,
+      "AgeS": null,
+      "LastRxUnix": null,
+      "Count": 0,
+      "Count2": 0
+    },
+    "VAR_EL_HEATER_STATUS": {
+      "Id": 80,
+      "Value": 10,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_EL_HEATER_POWER": {
+      "Id": 81,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_EL_HEATER_CURRENT": {
+      "Id": 82,
+      "Value": 119,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_EL_HEATER_CONS": {
+      "Id": 83,
+      "Value": 46,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_HEAT_TOTAL_WH": {
+      "Id": 85,
+      "Value": 11504,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_HEAT_HEATING_WH": {
+      "Id": 86,
+      "Value": 8480,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_FLOW_COLD": {
+      "Id": 90,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_FLOW_HOT": {
+      "Id": 91,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_CONS_COLD": {
+      "Id": 92,
+      "Value": 1287,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_CONS_HOT": {
+      "Id": 93,
+      "Value": 522,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_BOILER_POWER": {
+      "Id": 98,
+      "Value": 0,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_BOILER_HEAT": {
+      "Id": 99,
+      "Value": 0,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_BOILER": {
+      "Id": 100,
+      "Value": 245,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_BOILER_IN": {
+      "Id": 101,
+      "Value": 235,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_BOILER_OUT": {
+      "Id": 102,
+      "Value": 244,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_TANK_IN_H": {
+      "Id": 103,
+      "Value": 388,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_TANK_OUT_H": {
+      "Id": 104,
+      "Value": 429,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_TANK_1": {
+      "Id": 105,
+      "Value": 384,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_TANK_2": {
+      "Id": 106,
+      "Value": 537,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_TANK_3": {
+      "Id": 107,
+      "Value": 580,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_TANK_4": {
+      "Id": 108,
+      "Value": 595,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_TANK_5": {
+      "Id": 109,
+      "Value": 599,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_TANK_6": {
+      "Id": 110,
+      "Value": 591,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_WALL_IN": {
+      "Id": 111,
+      "Value": 246,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_WALL_OUT": {
+      "Id": 112,
+      "Value": 247,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_BOILER_EXHAUST": {
+      "Id": 113,
+      "Value": 280,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_RAD_H": {
+      "Id": 114,
+      "Value": 263,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_RAD_C": {
+      "Id": 115,
+      "Value": 268,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_TANK_IN_C": {
+      "Id": 116,
+      "Value": 322,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_TANK_OUT_C": {
+      "Id": 117,
+      "Value": 313,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_TECHM_BOARD": {
+      "Id": 120,
+      "Value": 282,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_IOBOARD_D": {
+      "Id": 121,
+      "Value": 267,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_IOBOARD_U": {
+      "Id": 122,
+      "Value": 278,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_ELECON_BOARD": {
+      "Id": 123,
+      "Value": 272,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_DOWNSTAIRS": {
+      "Id": 124,
+      "Value": 227,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_OFFICE": {
+      "Id": 125,
+      "Value": 271,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_KIDROOM": {
+      "Id": 126,
+      "Value": 220,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_OUTSIDE": {
+      "Id": 127,
+      "Value": 80,
+      "AgeS": 2,
+      "LastRxUnix": 1793538646,
+      "Count": 5570,
+      "Count2": 0
+    },
+    "VAR_TEMP_RECU_FC": {
+      "Id": 128,
+      "Value": 78,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 5013,
+      "Count2": 0
+    },
+    "VAR_TEMP_RECU_FH": {
+      "Id": 129,
+      "Value": 208,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 5013,
+      "Count2": 0
+    },
+    "VAR_TEMP_RECU_WH": {
+      "Id": 130,
+      "Value": 242,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 5013,
+      "Count2": 0
+    },
+    "VAR_TEMP_RECU_WC": {
+      "Id": 131,
+      "Value": 117,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 5013,
+      "Count2": 0
+    },
+    "VAR_RH_RECU_FH": {
+      "Id": 132,
+      "Value": 32,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 5013,
+      "Count2": 0
+    },
+    "VAR_RH_RECU_WH": {
+      "Id": 133,
+      "Value": 48,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 5013,
+      "Count2": 0
+    },
+    "VAR_CO2_RECU": {
+      "Id": 137,
+      "Value": 764,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 5013,
+      "Count2": 0
+    },
+    "VAR_DP_RECU_F": {
+      "Id": 138,
+      "Value": 2,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 5012,
+      "Count2": 0
+    },
+    "VAR_DP_RECU_W": {
+      "Id": 139,
+      "Value": 11,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 5012,
+      "Count2": 0
+    },
+    "VAR_RECU_FAN_F": {
+      "Id": 140,
+      "Value": 20,
+      "AgeS": 3,
+      "LastRxUnix": 1793538646,
+      "Count": 5012,
+      "Count2": 0
+    },
+    "VAR_RECU_FAN_W": {
+      "Id": 141,
+      "Value": 20,
+      "AgeS": 2,
+      "LastRxUnix": 1793538646,
+      "Count": 5012,
+      "Count2": 0
+    },
+    "VAR_CURR_RECU_A": {
+      "Id": 142,
+      "Value": 0,
+      "AgeS": 2,
+      "LastRxUnix": 1793538646,
+      "Count": 5012,
+      "Count2": 0
+    },
+    "VAR_TEMP_DILNA": {
+      "Id": 144,
+      "Value": 168,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_TEMP_AKUPACK1": {
+      "Id": 145,
+      "Value": 177,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_TEMP_BOARD_ELECON_D": {
+      "Id": 146,
+      "Value": -32768,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_METEO_WIND_BURST": {
+      "Id": 161,
+      "Value": 27,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 13367,
+      "Count2": 0
+    },
+    "VAR_METEO_WIND_AVG": {
+      "Id": 162,
+      "Value": 27,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 13367,
+      "Count2": 0
+    },
+    "VAR_METEO_WIND_POW": {
+      "Id": 163,
+      "Value": 2,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_METEO_WIND_ENERGY": {
+      "Id": 164,
+      "Value": 3,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL1_MV": {
+      "Id": 180,
+      "Value": 3300,
+      "AgeS": 2,
+      "LastRxUnix": 1793538646,
+      "Count": 5012,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL2_MV": {
+      "Id": 181,
+      "Value": 3302,
+      "AgeS": 2,
+      "LastRxUnix": 1793538646,
+      "Count": 5012,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL3_MV": {
+      "Id": 182,
+      "Value": 3302,
+      "AgeS": 2,
+      "LastRxUnix": 1793538646,
+      "Count": 5012,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL4_MV": {
+      "Id": 183,
+      "Value": 3303,
+      "AgeS": 2,
+      "LastRxUnix": 1793538646,
+      "Count": 5012,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL5_MV": {
+      "Id": 184,
+      "Value": 3302,
+      "AgeS": 2,
+      "LastRxUnix": 1793538646,
+      "Count": 5012,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL6_MV": {
+      "Id": 185,
+      "Value": 3304,
+      "AgeS": 2,
+      "LastRxUnix": 1793538646,
+      "Count": 5012,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL7_MV": {
+      "Id": 186,
+      "Value": 3303,
+      "AgeS": 2,
+      "LastRxUnix": 1793538646,
+      "Count": 5012,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL8_MV": {
+      "Id": 187,
+      "Value": 3303,
+      "AgeS": 2,
+      "LastRxUnix": 1793538646,
+      "Count": 5012,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL9_MV": {
+      "Id": 188,
+      "Value": 3303,
+      "AgeS": 2,
+      "LastRxUnix": 1793538646,
+      "Count": 5012,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL10_MV": {
+      "Id": 189,
+      "Value": 3302,
+      "AgeS": 2,
+      "LastRxUnix": 1793538646,
+      "Count": 5012,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL11_MV": {
+      "Id": 190,
+      "Value": 3302,
+      "AgeS": 2,
+      "LastRxUnix": 1793538646,
+      "Count": 5012,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL12_MV": {
+      "Id": 191,
+      "Value": 3302,
+      "AgeS": 2,
+      "LastRxUnix": 1793538646,
+      "Count": 5012,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL13_MV": {
+      "Id": 192,
+      "Value": 3304,
+      "AgeS": 2,
+      "LastRxUnix": 1793538646,
+      "Count": 5012,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL14_MV": {
+      "Id": 193,
+      "Value": 3303,
+      "AgeS": 2,
+      "LastRxUnix": 1793538646,
+      "Count": 5013,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL15_MV": {
+      "Id": 194,
+      "Value": 3303,
+      "AgeS": 2,
+      "LastRxUnix": 1793538646,
+      "Count": 5013,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL16_MV": {
+      "Id": 195,
+      "Value": 3302,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5013,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL1_C": {
+      "Id": 196,
+      "Value": 18,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5013,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL2_C": {
+      "Id": 197,
+      "Value": 18,
+      "AgeS": 2,
+      "LastRxUnix": 1793538647,
+      "Count": 5013,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL3_C": {
+      "Id": 198,
+      "Value": 18,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 5013,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL4_C": {
+      "Id": 199,
+      "Value": 18,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 5013,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL5_C": {
+      "Id": 200,
+      "Value": 18,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 5013,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL6_C": {
+      "Id": 201,
+      "Value": 18,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 5013,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL7_C": {
+      "Id": 202,
+      "Value": 18,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4456,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL8_C": {
+      "Id": 203,
+      "Value": 18,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4456,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL9_C": {
+      "Id": 204,
+      "Value": 18,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4456,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL10_C": {
+      "Id": 205,
+      "Value": 18,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4456,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL11_C": {
+      "Id": 206,
+      "Value": 18,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL12_C": {
+      "Id": 207,
+      "Value": 18,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL13_C": {
+      "Id": 208,
+      "Value": 18,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL14_C": {
+      "Id": 209,
+      "Value": 18,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL15_C": {
+      "Id": 210,
+      "Value": 18,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS1_CELL16_C": {
+      "Id": 211,
+      "Value": 18,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL1_MV": {
+      "Id": 220,
+      "Value": 3315,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL2_MV": {
+      "Id": 221,
+      "Value": 3300,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL3_MV": {
+      "Id": 222,
+      "Value": 3310,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL4_MV": {
+      "Id": 223,
+      "Value": 3300,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4178,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL5_MV": {
+      "Id": 224,
+      "Value": 3300,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4178,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL6_MV": {
+      "Id": 225,
+      "Value": 3310,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4178,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL7_MV": {
+      "Id": 226,
+      "Value": 3300,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4178,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL8_MV": {
+      "Id": 227,
+      "Value": 3300,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4178,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL9_MV": {
+      "Id": 228,
+      "Value": 3295,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4178,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL10_MV": {
+      "Id": 229,
+      "Value": 3300,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4178,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL11_MV": {
+      "Id": 230,
+      "Value": 3300,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4178,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL12_MV": {
+      "Id": 231,
+      "Value": 3310,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4178,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL13_MV": {
+      "Id": 232,
+      "Value": 3320,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 4178,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL14_MV": {
+      "Id": 233,
+      "Value": 3305,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL15_MV": {
+      "Id": 234,
+      "Value": 3295,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL16_MV": {
+      "Id": 235,
+      "Value": 3305,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL1_C": {
+      "Id": 236,
+      "Value": 22,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL2_C": {
+      "Id": 237,
+      "Value": 21,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL3_C": {
+      "Id": 238,
+      "Value": 21,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL4_C": {
+      "Id": 239,
+      "Value": 22,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL5_C": {
+      "Id": 240,
+      "Value": 21,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL6_C": {
+      "Id": 241,
+      "Value": 21,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL7_C": {
+      "Id": 242,
+      "Value": 20,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL8_C": {
+      "Id": 243,
+      "Value": 21,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL9_C": {
+      "Id": 244,
+      "Value": 21,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL10_C": {
+      "Id": 245,
+      "Value": 22,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL11_C": {
+      "Id": 246,
+      "Value": 21,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL12_C": {
+      "Id": 247,
+      "Value": 22,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL13_C": {
+      "Id": 248,
+      "Value": 22,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL14_C": {
+      "Id": 249,
+      "Value": 21,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL15_C": {
+      "Id": 250,
+      "Value": 22,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_BMS2_CELL16_C": {
+      "Id": 251,
+      "Value": 22,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 4177,
+      "Count2": 0
+    },
+    "VAR_CONS_AXPERT_WH": {
+      "Id": 260,
+      "Value": 5093,
+      "AgeS": 4,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_CONS_EVSE_WH": {
+      "Id": 261,
+      "Value": 3935,
+      "AgeS": 4,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_CONS_WS_HEATING_WH": {
+      "Id": 262,
+      "Value": 3058,
+      "AgeS": 4,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_POW_AXPERT_W": {
+      "Id": 270,
+      "Value": 0,
+      "AgeS": 4,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_POW_EVSE_W": {
+      "Id": 271,
+      "Value": 0,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_POW_WS_HEATING_W": {
+      "Id": 272,
+      "Value": 0,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_AXPERT_TEMP_C": {
+      "Id": 278,
+      "Value": 34,
+      "AgeS": 0,
+      "LastRxUnix": 1793538649,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_AXPERT_AC_POWER_W": {
+      "Id": 279,
+      "Value": 0,
+      "AgeS": 4,
+      "LastRxUnix": 1793538644,
+      "Count": 3341,
+      "Count2": 0
+    },
+    "VAR_AXPERT_BAT_CHARGING_A": {
+      "Id": 280,
+      "Value": 10,
+      "AgeS": 4,
+      "LastRxUnix": 1793538644,
+      "Count": 3341,
+      "Count2": 0
+    },
+    "VAR_AXPERT_BAT_DISCHARGING_A": {
+      "Id": 281,
+      "Value": 0,
+      "AgeS": 4,
+      "LastRxUnix": 1793538644,
+      "Count": 3341,
+      "Count2": 0
+    },
+    "VAR_AXPERT_BAT_VOLTAGE_V10": {
+      "Id": 282,
+      "Value": 529,
+      "AgeS": 4,
+      "LastRxUnix": 1793538644,
+      "Count": 3341,
+      "Count2": 0
+    },
+    "VAR_AXPERT_PVS1_W": {
+      "Id": 283,
+      "Value": 319,
+      "AgeS": 4,
+      "LastRxUnix": 1793538644,
+      "Count": 3341,
+      "Count2": 0
+    },
+    "VAR_AXPERT_PVS1_V10": {
+      "Id": 284,
+      "Value": 2560,
+      "AgeS": 4,
+      "LastRxUnix": 1793538644,
+      "Count": 3341,
+      "Count2": 0
+    },
+    "VAR_AXPERT_PVS1_A10": {
+      "Id": 285,
+      "Value": 12,
+      "AgeS": 4,
+      "LastRxUnix": 1793538644,
+      "Count": 3341,
+      "Count2": 0
+    },
+    "VAR_AXPERT_PVS2_W": {
+      "Id": 286,
+      "Value": 309,
+      "AgeS": 4,
+      "LastRxUnix": 1793538644,
+      "Count": 3341,
+      "Count2": 0
+    },
+    "VAR_AXPERT_PVS2_V10": {
+      "Id": 287,
+      "Value": 2609,
+      "AgeS": 4,
+      "LastRxUnix": 1793538644,
+      "Count": 3341,
+      "Count2": 0
+    },
+    "VAR_AXPERT_PVS2_A10": {
+      "Id": 288,
+      "Value": 11,
+      "AgeS": 4,
+      "LastRxUnix": 1793538644,
+      "Count": 3341,
+      "Count2": 0
+    },
+    "VAR_AXPERT_BAT_POWER_W": {
+      "Id": 290,
+      "Value": 529,
+      "AgeS": 4,
+      "LastRxUnix": 1793538644,
+      "Count": 3341,
+      "Count2": 0
+    },
+    "VAR_AXPERT_BAT_CURRENT_A": {
+      "Id": 291,
+      "Value": 10,
+      "AgeS": 4,
+      "LastRxUnix": 1793538644,
+      "Count": 3341,
+      "Count2": 0
+    },
+    "VAR_AXPERT_SOLAR_W": {
+      "Id": 292,
+      "Value": 624,
+      "AgeS": 4,
+      "LastRxUnix": 1793538644,
+      "Count": 3341,
+      "Count2": 0
+    },
+    "VAR_AXPERT_ENERGY_TODAY_WH": {
+      "Id": 293,
+      "Value": -642,
+      "AgeS": 4,
+      "LastRxUnix": 1793538644,
+      "Count": 3341,
+      "Count2": 0
+    },
+    "VAR_AXPERT_LOAD_W": {
+      "Id": 294,
+      "Value": 95,
+      "AgeS": 4,
+      "LastRxUnix": 1793538644,
+      "Count": 3341,
+      "Count2": 0
+    },
+    "VAR_AXPERT_DISCHARGING_W": {
+      "Id": 295,
+      "Value": 0,
+      "AgeS": 4,
+      "LastRxUnix": 1793538644,
+      "Count": 3341,
+      "Count2": 0
+    },
+    "VAR_STRG1_SOC": {
+      "Id": 300,
+      "Value": 5700,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_STRG1_POWER_W": {
+      "Id": 301,
+      "Value": 279,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_STRG1_CURRENT_A10": {
+      "Id": 302,
+      "Value": 52,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_STRG1_ENERGY_WH": {
+      "Id": 303,
+      "Value": 9068,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_STRG1_OPT_CHARGING_A": {
+      "Id": 304,
+      "Value": 150,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_STRG1_CAPACITY_AH": {
+      "Id": 305,
+      "Value": 300,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_STRG1_BALANCED_TODAY": {
+      "Id": 306,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_STRG1_VOLTAGE_V10": {
+      "Id": 307,
+      "Value": 528,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LLOAD1_POWER_W": {
+      "Id": 308,
+      "Value": 208,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LLOAD1_CONS_WH": {
+      "Id": 309,
+      "Value": 7863,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LPV1_POWER_W": {
+      "Id": 310,
+      "Value": 488,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LPV1_PROD_WH": {
+      "Id": 311,
+      "Value": 5740,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LPV1_S1_POWER_W": {
+      "Id": 312,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LPV1_S1_CURRENT_A10": {
+      "Id": 313,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LPV1_S1_VOLTAGE_V": {
+      "Id": 314,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LPV1_S2_POWER_W": {
+      "Id": 315,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LPV1_S2_CURRENT_A10": {
+      "Id": 316,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LPV1_S2_VOLTAGE_V": {
+      "Id": 317,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_STRG2_SOC": {
+      "Id": 320,
+      "Value": 3400,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_STRG2_POWER_W": {
+      "Id": 321,
+      "Value": 472,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_STRG2_CURRENT_A10": {
+      "Id": 322,
+      "Value": 89,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_STRG2_ENERGY_WH": {
+      "Id": 323,
+      "Value": 4508,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_STRG2_OPT_CHARGING_A": {
+      "Id": 324,
+      "Value": 62,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_STRG2_CAPACITY_AH": {
+      "Id": 325,
+      "Value": 251,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_STRG2_BALANCED_TODAY": {
+      "Id": 326,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_STRG2_VOLTAGE_V10": {
+      "Id": 327,
+      "Value": 528,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LLOAD2_POWER_W": {
+      "Id": 328,
+      "Value": 145,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LLOAD2_CONS_WH": {
+      "Id": 329,
+      "Value": 7853,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LPV2_POWER_W": {
+      "Id": 330,
+      "Value": 618,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LPV2_PROD_WH": {
+      "Id": 331,
+      "Value": 5402,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LPV2_S1_POWER_W": {
+      "Id": 332,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LPV2_S1_CURRENT_A20": {
+      "Id": 333,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LPV2_S1_VOLTAGE_V": {
+      "Id": 334,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LPV2_S2_POWER_W": {
+      "Id": 335,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LPV2_S2_CURRENT_A20": {
+      "Id": 336,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LPV2_S2_VOLTAGE_V": {
+      "Id": 337,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LVDC_VDIFF_V100": {
+      "Id": 340,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LVDC_VDIFF_MAX": {
+      "Id": 341,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LVDC_CURRENT_A": {
+      "Id": 342,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LVDC_LOSS_W": {
+      "Id": 343,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_LVDC_LOSS_CONS_WH": {
+      "Id": 344,
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1793538648,
+      "Count": 8355,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL1_MV": {
+      "Id": 350,
+      "Value": 3290,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3899,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL2_MV": {
+      "Id": 351,
+      "Value": 3295,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3899,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL3_MV": {
+      "Id": 352,
+      "Value": 3300,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3899,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL4_MV": {
+      "Id": 353,
+      "Value": 3295,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3899,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL5_MV": {
+      "Id": 354,
+      "Value": 3305,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL6_MV": {
+      "Id": 355,
+      "Value": 3305,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL7_MV": {
+      "Id": 356,
+      "Value": 3300,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL8_MV": {
+      "Id": 357,
+      "Value": 3295,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL9_MV": {
+      "Id": 358,
+      "Value": 3300,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL10_MV": {
+      "Id": 359,
+      "Value": 3300,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL11_MV": {
+      "Id": 360,
+      "Value": 3315,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL12_MV": {
+      "Id": 361,
+      "Value": 3290,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL13_MV": {
+      "Id": 362,
+      "Value": 3285,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL14_MV": {
+      "Id": 363,
+      "Value": 3310,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL15_MV": {
+      "Id": 364,
+      "Value": 3305,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL16_MV": {
+      "Id": 365,
+      "Value": 3320,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL1_C": {
+      "Id": 366,
+      "Value": 22,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL2_C": {
+      "Id": 367,
+      "Value": 19,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL3_C": {
+      "Id": 368,
+      "Value": 21,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL4_C": {
+      "Id": 369,
+      "Value": 19,
+      "AgeS": 3,
+      "LastRxUnix": 1793538645,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL5_C": {
+      "Id": 370,
+      "Value": 18,
+      "AgeS": 3,
+      "LastRxUnix": 1793538646,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL6_C": {
+      "Id": 371,
+      "Value": 18,
+      "AgeS": 3,
+      "LastRxUnix": 1793538646,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL7_C": {
+      "Id": 372,
+      "Value": 20,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL8_C": {
+      "Id": 373,
+      "Value": 18,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL9_C": {
+      "Id": 374,
+      "Value": 18,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL10_C": {
+      "Id": 375,
+      "Value": 17,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL11_C": {
+      "Id": 376,
+      "Value": 19,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL12_C": {
+      "Id": 377,
+      "Value": 18,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL13_C": {
+      "Id": 378,
+      "Value": 18,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL14_C": {
+      "Id": 379,
+      "Value": 20,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL15_C": {
+      "Id": 380,
+      "Value": 19,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 3342,
+      "Count2": 0
+    },
+    "VAR_BMS3_CELL16_C": {
+      "Id": 381,
+      "Value": 17,
+      "AgeS": 1,
+      "LastRxUnix": 1793538647,
+      "Count": 3342,
+      "Count2": 0
+    }
+  }
+}
