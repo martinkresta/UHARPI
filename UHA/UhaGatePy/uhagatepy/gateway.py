@@ -335,7 +335,7 @@ class Gateway:
             "uha.json": lambda: outputs.build_uha_json(raw, unix),
             "bms.json": lambda: outputs.build_bms_json(raw, unix),
             "uha2.json": lambda: outputs.build_uha2_json(self.store, self.defs, mono, unix),
-            "uha_status.json": lambda: outputs.to_json(status.build(self, unix, mono)),
+            "uha_status.json": lambda: outputs.to_json_compact(status.build(self, unix, mono, raw)),
         }
         for name, build in builders.items():
             path = os.path.join(self.cfg.out_dir, name)

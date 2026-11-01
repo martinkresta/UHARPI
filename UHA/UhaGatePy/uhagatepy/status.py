@@ -25,7 +25,8 @@ def rss_kb() -> int:
         return -1
 
 
-def build(g: "Gateway", unix_time: int, mono: float) -> dict:
+def build(g: "Gateway", unix_time: int, mono: float, raw: dict) -> dict:
+    """`raw` = Store.snapshot(), the values just published (so they are not computed twice)."""
     store = g.store
     parser = g.parser
     c = g.counters
@@ -62,7 +63,7 @@ def build(g: "Gateway", unix_time: int, mono: float) -> dict:
         last = max((x.mono for x in (old, v2) if x is not None), default=None)
         last_unix = max((x.unix for x in (old, v2) if x is not None), default=None)
         variables[name] = {
-            "Id": var_id, "Value": store.legacy_raw(var_id, mono),
+            "Id": var_id, "Value": raw[name],
             "AgeS": None if last is None else _age(mono, last), "LastRxUnix": last_unix,
             "Count": old.count if old else 0, "Count2": v2.count if v2 else 0,
         }

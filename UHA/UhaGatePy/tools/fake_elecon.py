@@ -78,6 +78,7 @@ def main() -> None:
     rng = random.Random(1)
     master, slave = pty.openpty()
     tty.setraw(slave)
+    os.set_blocking(master, False)       # nobody reading (gateway stopped): drop frames like a real UART, do not hang
     if os.path.lexists(args.link):
         os.unlink(args.link)
     os.symlink(os.ttyname(slave), args.link)
@@ -86,7 +87,7 @@ def main() -> None:
     values = {i: start_value(rng, d) for i, d in defs.by_id.items()}
     now = time.monotonic()
     due = {i: now + rng.uniform(0, d.period_ms / 1000) for i, d in defs.by_id.items()}
-    sent = {"old": 0, "tunnel": 0, "log": 0}
+    sent = {"old": 0, "tunnel": 0, "log": 0, "dropped": 0}
     rtc_seen = 0
     next_log = now + 5
     end = now + args.seconds if args.seconds else None
@@ -110,7 +111,10 @@ def main() -> None:
                 sent["log"] += 1
                 next_log = now + 20
             for frame in frames:
-                os.write(master, frame)
+                try:
+                    os.write(master, frame)
+                except BlockingIOError:
+                    sent["dropped"] += 1
                 time.sleep(0.001)                        # ~115200 Bd: about one 14-byte frame per millisecond
             readable, _, _ = select.select([master], [], [], 0.005)
             if readable:

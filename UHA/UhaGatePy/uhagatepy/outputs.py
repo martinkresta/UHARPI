@@ -27,8 +27,14 @@ def _plain(node):
 
 
 def to_json(data: dict) -> str:
-    """Tab indentation like cJSON; the key order of `data` is kept."""
+    """Tab indentation like cJSON; the key order of `data` is kept. For the small old-format files."""
     return json.dumps(_plain(data), indent="\t")
+
+
+def to_json_compact(data: dict) -> str:
+    """One line. Used for the big diagnostic files: with `indent` Python cannot use its fast C encoder
+    and the Pi spent 7 % of a core on it. View them with a browser or `python3 -m json.tool`."""
+    return json.dumps(data, separators=(",", ":"))
 
 
 def write_atomic(path: str, text: str) -> None:
@@ -118,4 +124,4 @@ def build_uha2_json(store: Store, defs: VarsFile, mono: float, unix_time: int) -
         if d.type == "enum":
             entry["enum_name"] = defs.enums[d.enum].get(reading.value) if reading.value is not None else None
         variables[d.name] = entry
-    return to_json({"UnixTime": unix_time, "YamlVersion": defs.version, "Vars": variables})
+    return to_json_compact({"UnixTime": unix_time, "YamlVersion": defs.version, "Vars": variables})
