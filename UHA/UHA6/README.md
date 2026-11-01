@@ -1,6 +1,7 @@
 # UhaGate6 — findings and plan
 
-Status (2026-11-01): **implemented and tested in a 10-min window; production still runs UhaGate5.**
+Status: **PRODUCTION runs UhaGate6 since 2026-11-01 07:01** (switched on Martin's request; UhaGate5 disabled, kept as backup).
+Tested before in a 10-min window.
 Plan approved by Martin on 2026-10-31 incl. tmpfs. Installed on the Pi: `/home/pi/UHA6`,
 `uhagate6.service` (disabled), tmpfs symlinks in `/home/pi/Web`. Results in §5.
 
@@ -191,7 +192,7 @@ status JSON every second; status every 5 s or reading in batches would lower it 
 | Node last seen | from log messages only |
 | USB unplug test | not now; later only if link problems appear |
 | FTP upload (`ftpupload.sh`) | hosting ends soon; upload will be removed and moved to another hosting later. Change the password regardless (it was exposed in a session log) |
-| Switch to UhaGate6 | open: Martin decides (`switch_to_v6.sh`) |
+| Switch to UhaGate6 | done 2026-11-01 07:01 (`switch_to_v6.sh`); rollback: `sudo /home/pi/UHA6/rollback_to_v5.sh` |
 
 Open, outside this task (Martin's decision):
 - UhaGate5 is OOM-killed every 2–3 days; until the switch, v5 keeps restarting itself.

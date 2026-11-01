@@ -12,11 +12,11 @@ A Raspberry Pi C++ application that acts as a gateway between the STM32 CAN node
 UHARPI/
 ├── UHA/
 │   ├── UHA/ UHA2/ UHA3/ UHA4/   (legacy versions)
-│   ├── UHA6/                    ← NEW: UhaGate6 (robust rewrite, see "UhaGate6" below)
+│   ├── UHA6/                    ← PRODUCTION: UhaGate6 (since 2026-11-01, see "UhaGate6" below)
 │   │   ├── src/                 ← sources, CMake target UhaGate6, unit + golden tests
 │   │   ├── *.sh / uhatest.py    ← deploy, test window, switch/rollback, tmpfs links
 │   │   └── README.md            ← Pi findings, design, test results
-│   └── UHA5/                    ← PRODUCTION VERSION (kept as backup)
+│   └── UHA5/                    ← previous version, backup (disabled since 2026-11-01)
 │       ├── src/                 ← source files (if reorganised on Pi)
 │       ├── Main.cpp
 │       ├── UHA.h / UHA.cpp      ← main logic + VAR defines
