@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UHA Energy</title>
+  <link rel="stylesheet" href="css/uha.css">
+</head>
+<body>
+<script src="js/uha-common.js"></script>
+<script>
+UHA.start(U => {
+  const soc = n => { const v = U.num(n); return `<div class="meter"><div class="head"><span class="l">State of charge</span><span class="v">${v === null ? '–' : v.toFixed(0) + ' %'}</span></div>${U.socBar(v)}</div>`; };
+
+  const storage = (n, title) => U.card(title,
+    soc(`STRG${n}_SOC`) +
+    `<div class="tiles">${U.tile('Power', `STRG${n}_POWER_W`)}${U.tile('Current', `STRG${n}_CURRENT_A`)}${U.tile('Voltage', `STRG${n}_VOLTAGE_V`)}</div>` +
+    U.row('Stored energy', `STRG${n}_ENERGY_WH`) + U.row('Capacity', `STRG${n}_CAPACITY_AH`) +
+    U.row('Optimal charging current', `STRG${n}_OPT_CHARGING_A`) + U.row('Balanced today', `STRG${n}_BALANCED_TODAY`) +
+    `<h3>Local load / local PV</h3>` +
+    U.row('Load power', `LLOAD${n}_POWER_W`) + U.row('Load today', `LLOAD${n}_CONS_WH`) +
+    U.row('PV power', `LPV${n}_POWER_W`) + U.row('PV today', `LPV${n}_PROD_WH`), { cls: 'bat' });
+
+  return `<h1 class="pagetitle">Energy</h1><p class="pagesub">Solar, storage and power balance</p><div class="grid wide">` +
+    U.card('Global balance',
+      `<div class="tiles">${U.tile('Solar', 'SOLAR_POWER_W')}${U.tile('Load', 'LOAD_W')}${U.tile('Battery', 'BAT_POWER_W', { sub: 'positive = charging' })}</div>` +
+      soc('BAT_SOC') +
+      U.row('Stored energy', 'BAT_ENERGY_WH') + U.row('Battery voltage', 'BAT_VOLTAGE_V') + U.row('Battery current', 'BAT_CURRENT_A') +
+      U.row('Charging current', 'CHARGING_A') + U.row('Load current', 'LOAD_A') +
+      `<h3>Today</h3>` + U.row('Solar energy', 'SOLAR_ENERGY_TODAY_WH') + U.row('Consumption', 'CONS_TODAY_WH'), { cls: 'solar' }) +
+    storage(1, 'Storage 1 – house') +
+    storage(2, 'Storage 2 – workshop') +
+    U.card('Solar charger (MPPT)',
+      `<div class="tiles">${U.tile('PV power', 'MPPT_SOLAR_POWER_W')}${U.tile('PV voltage', 'MPPT_SOLAR_VOLTAGE_V')}${U.tile('PV current', 'MPPT_SOLAR_CURRENT_A')}</div>` +
+      U.row('Battery voltage', 'MPPT_BAT_VOLTAGE_V') + U.row('Battery current', 'MPPT_BAT_CURRENT_A') +
+      U.row('Yield today', 'MPPT_YIELD_TODAY_WH') + U.row('Max power today', 'MPPT_MAX_TODAY_W') +
+      U.row('Max PV voltage', 'MPPT_SOLAR_MAX_VOLTAGE_V') + U.row('Max battery current', 'MPPT_MAX_BAT_CURRENT_A') +
+      U.row('Temperature', 'MPPT_TEMP_C'), { cls: 'solar' }) +
+    U.card('Axpert 8 kW inverter',
+      `<div class="tiles">${U.tile('AC power', 'AXPERT_AC_POWER_W')}${U.tile('Load', 'AXPERT_LOAD_W')}${U.tile('Solar', 'AXPERT_SOLAR_W')}</div>` +
+      U.row('Battery power', 'AXPERT_BAT_POWER_W') + U.row('Battery voltage', 'AXPERT_BAT_VOLTAGE_V') + U.row('Battery current', 'AXPERT_BAT_CURRENT_A') +
+      U.row('Charging current', 'AXPERT_BAT_CHARGING_A') + U.row('Discharging current', 'AXPERT_BAT_DISCHARGING_A') +
+      `<h3>PV inputs</h3>` +
+      U.rowText('PV1', `${U.show('AXPERT_PVS1_W')} · ${U.show('AXPERT_PVS1_V')} · ${U.show('AXPERT_PVS1_A')}`) +
+      U.rowText('PV2', `${U.show('AXPERT_PVS2_W')} · ${U.show('AXPERT_PVS2_V')} · ${U.show('AXPERT_PVS2_A')}`) +
+      U.row('Energy today', 'AXPERT_ENERGY_TODAY_WH') + U.row('Temperature', 'AXPERT_TEMP_C'), { cls: 'solar' }) +
+    U.card('Shunts',
+      U.row('Pack 1 current', 'SHUNT_PCK1_CURRENT_A') + U.row('Pack 2 current', 'SHUNT_PCK2_CURRENT_A'), { cls: 'bat' }) +
+    `</div><p class="note"><a href="uha-detail.html#energy">All energy variables →</a></p>`;
+});
+</script>
+</body>
+</html>

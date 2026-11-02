@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UHA Loads</title>
+  <link rel="stylesheet" href="css/uha.css">
+</head>
+<body>
+<script src="js/uha-common.js"></script>
+<script>
+// [id in variable names, label, rated power W]
+const INVERTERS = [['AC300', 'Inverter 300 W', 300], ['AC3KW', 'Inverter 3 kW', 3000], ['AC5KW', 'Inverter 5 kW', 5000], ['AXPERT', 'Axpert 8 kW', 8000]];
+const CIRCUITS = [['FRIDGE', 'Fridge'], ['KITCHEN', 'Kitchen'], ['KITCHEN_A', 'Kitchen A'], ['KITCHEN_B', 'Kitchen B'],
+  ['WASCHMACHINE', 'Washing machine'], ['TECHM', 'Technical room'], ['EVSE', 'EV charger'], ['WS_HEATING', 'Workshop heating'], ['OTHER', 'Other']];
+
+UHA.start(U => {
+  const inv = INVERTERS.map(([id, label, rated]) => {
+    const w = U.num(`POW_${id}_W`);
+    return `<div class="meter"><div class="head"><span class="l">${label}</span><span class="v">${U.show(`POW_${id}_W`)}</span></div>` +
+      U.loadBar(w, rated) +
+      `<div class="foot"><span>${w === null ? '–' : (w / rated * 100).toFixed(0)} % of ${rated >= 1000 ? rated / 1000 + ' kW' : rated + ' W'}</span><span>today ${U.show(`CONS_${id}_WH`)}</span></div></div>`;
+  }).join('');
+
+  const rows = CIRCUITS.filter(([id]) => U.get(`POW_${id}_W`) && U.get(`POW_${id}_W`).value !== null).map(([id, label]) =>
+    `<tr class="${U.ageClass(`POW_${id}_W`)}"><td>${label}</td><td class="n">${U.show(`POW_${id}_W`)}</td><td class="n">${U.show(`CONS_${id}_WH`)}</td></tr>`).join('');
+
+  return `<h1 class="pagetitle">Loads</h1><p class="pagesub">Inverter load and consumption per circuit</p><div class="grid wide">` +
+    U.card('Total', `<div class="tiles">${U.tile('Consumption now', 'LOAD_W', { big: true })}${U.tile('Today', 'CONS_TODAY_WH', { big: true })}</div>`, { cls: 'load' }) +
+    U.card('Inverters', inv, { cls: 'load' }) +
+    U.card('Circuits', `<table class="t"><tr><th>Circuit</th><th class="n">Power</th><th class="n">Today</th></tr>${rows}</table>`, { cls: 'load' }) +
+    `</div><p class="note">Bars show load against the assumed rated power of each inverter. <a href="uha-detail.html#loads">All meter values →</a></p>`;
+});
+</script>
+</body>
+</html>

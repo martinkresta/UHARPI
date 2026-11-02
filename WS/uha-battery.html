@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UHA Battery</title>
+  <link rel="stylesheet" href="css/uha.css">
+</head>
+<body>
+<script src="js/uha-common.js"></script>
+<script>
+const V_LO = 2.8, V_HI = 3.65;       // bar scale for LiFePO4 cells
+
+UHA.start(U => {
+  const pack = (n, title) => {
+    const cells = [], temps = [];
+    for (let i = 1; i <= 16; i++) { cells.push(U.num(`BMS${n}_CELL_V_${i}`)); temps.push(U.num(`BMS${n}_CELL_TEMP_C_${i}`)); }
+    const ok = cells.filter(x => x !== null), tk = temps.filter(x => x !== null);
+    const lo = ok.length ? Math.min(...ok) : null, hi = ok.length ? Math.max(...ok) : null;
+    const delta = ok.length ? (hi - lo) * 1000 : null;
+    const bars = cells.map((v, i) => {
+      const h = v === null ? 0 : Math.max(0, Math.min(1, (v - V_LO) / (V_HI - V_LO))) * 100;
+      const cls = v === null ? 'bad' : v === lo && lo !== hi ? 'min' : v === hi && lo !== hi ? 'max' : '';
+      return `<div class="cell ${cls}" title="Cell ${i + 1}: ${v === null ? '–' : v.toFixed(3) + ' V'}"><div class="cb" style="height:${h.toFixed(1)}%"></div>${i + 1}</div>`;
+    }).join('');
+    const soc = U.num(`BMS${n}_SOC`);
+    return U.card(title,
+      `<div class="meter"><div class="head"><span class="l">State of charge</span><span class="v">${soc === null ? '–' : soc.toFixed(0) + ' %'}</span></div>${U.socBar(soc)}</div>` +
+      `<div class="tiles">${U.tile('Voltage', `BMS${n}_VOLTAGE_V`)}${U.tile('Current', `BMS${n}_CURRENT_A`)}${U.tile('Stored', `BMS${n}_ENERGY_STORED_WH`)}</div>` +
+      U.row('Energy today (diff)', `BMS${n}_TODAY_ENERGY_WH`) +
+      `<h3>Cell voltages (${V_LO}–${V_HI} V)</h3><div class="cells">${bars}</div>` +
+      U.rowText('Min / max cell', ok.length ? `${lo.toFixed(3)} V / ${hi.toFixed(3)} V` : '–') +
+      `<div class="row ${delta !== null && delta > 50 ? 'old' : ''}"><span class="l">Cell spread</span><span class="v">${delta === null ? '–' : delta.toFixed(0) + ' mV'}</span></div>` +
+      U.rowText('Cell temperature min / max', tk.length ? `${Math.min(...tk).toFixed(0)} / ${Math.max(...tk).toFixed(0)} °C` : '–'),
+      { cls: 'bat' });
+  };
+  return `<h1 class="pagetitle">Battery</h1><p class="pagesub">Three packs, one BMS each</p><div class="grid wide">` +
+    pack(1, 'BMS1 – workshop 251 Ah') + pack(2, 'BMS2 – house 220 Ah') + pack(3, 'BMS3 – house 80 Ah') +
+    `</div><p class="note">Blue bar = lowest cell, orange = highest. Spread above 50 mV is highlighted. <a href="uha-detail.html#battery">All cell values →</a></p>`;
+});
+</script>
+</body>
+</html>

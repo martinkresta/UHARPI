@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UHA Climate</title>
+  <link rel="stylesheet" href="css/uha.css">
+</head>
+<body>
+<script src="js/uha-common.js"></script>
+<script>
+UHA.start(U => {
+  const co2 = U.num('CO2_RECU');
+  return `<h1 class="pagetitle">Climate</h1><p class="pagesub">Temperatures, ventilation and weather</p><div class="grid wide">` +
+    U.card('Temperatures',
+      `<div class="tiles">${U.tile('Outside', 'TEMP_OUTSIDE_C')}${U.tile('Downstairs', 'TEMP_DOWNSTAIRS_C')}${U.tile('Office', 'TEMP_OFFICE_C')}${U.tile('Kids room', 'TEMP_KIDROOM_C')}</div>` +
+      U.row('Workshop', 'TEMP_DILNA_C') + U.row('Workshop battery pack', 'TEMP_AKUPACK1_C') + U.row('Solar field room', 'TEMP_KOLARNA_C'), { cls: 'home' }) +
+    U.card('Ventilation (recuperation)',
+      `<div class="tiles">${U.tile('CO₂', 'CO2_RECU', { cls: co2 !== null && co2 > 1000 ? 'old' : '' })}${U.tile('Humidity supply', 'RH_RECU_FH')}${U.tile('Humidity waste', 'RH_RECU_WASTE')}</div>` +
+      `<h3>Temperatures</h3>` + U.row('Fresh air cold side', 'TEMP_RECU_FC_C') + U.row('Fresh air warm side', 'TEMP_RECU_FH_C') +
+      U.row('Waste air warm side', 'TEMP_RECU_WH_C') + U.row('Waste air cold side', 'TEMP_RECU_WC_C') +
+      `<h3>Fans & pressure</h3>` + U.row('Fan fresh', 'RECU_FAN_F') + U.row('Fan waste', 'RECU_FAN_WASTE') +
+      U.row('Pressure fresh', 'DP_RECU_F') + U.row('Pressure waste', 'DP_RECU_WASTE'), { cls: 'home' }) +
+    U.card('Wind',
+      `<div class="tiles">${U.tile('Average', 'METEO_WIND_AVG')}${U.tile('Burst', 'METEO_WIND_BURST')}</div>` +
+      U.row('Wind turbine power', 'METEO_WIND_POW') + U.row('Wind turbine energy', 'METEO_WIND_ENERGY', { kwh: false }), { cls: 'home' }) +
+    U.card('Electronics temperature',
+      U.row('IO board down', 'TEMP_IOBOARD_D_C') + U.row('IO board up', 'TEMP_IOBOARD_U_C') + U.row('Technical room board', 'TEMP_TECHM_BOARD_C') +
+      U.row('ELECON board', 'TEMP_ELECON_BOARD_C') + U.row('ELECON_D board', 'TEMP_BOARD_ELECON_D_C'), { cls: 'home' }) +
+    `</div><p class="note"><a href="uha-detail.html#climate">All climate variables →</a></p>`;
+});
+</script>
+</body>
+</html>

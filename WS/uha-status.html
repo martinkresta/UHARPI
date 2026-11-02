@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UHA Status</title>
+  <link rel="stylesheet" href="css/uha.css">
+</head>
+<body>
+<script src="js/uha-common.js"></script>
+<script>
+UHA.start(U => {
+  const s = U.status();
+  if (!s) return '<div class="card"><h2>No data</h2><p>uha_status.json not available.</p></div>';
+  const n = x => (x === null || x === undefined) ? '–' : x.toLocaleString('en');
+  const link = s.Link || {}, c = s.Counters || {}, y = s.Yaml || {}, cmp = s.Comparison || {};
+  const up = link.State === 'up';
+
+  const nodes = Object.entries(s.Nodes || {}).map(([name, v]) =>
+    `<tr class="${v.AgeS === null ? 'bad' : ''}"><td>${name}</td><td class="n">${v.Id}</td>` +
+    `<td class="n">${v.AgeS === null ? 'never seen' : v.AgeS + ' s'}</td><td class="n hide-sm">${n(v.TunnelPackets)}</td>` +
+    `<td class="n hide-sm">${n(v.LogMessages)}</td><td class="hide-sm">${v.LastLogEvent || '–'}</td></tr>`).join('');
+
+  const errs = ['UnknownIds', 'Malformed', 'OutOfRangeVarIds', 'WrongProducer', 'ChecksumErrors', 'LengthErrors', 'DiscardedBytes', 'TxErrors', 'WriteErrors', 'EventLogErrors']
+    .map(k => `<tr class="${c[k] ? 'old' : ''}"><td>${k}</td><td class="n">${n(c[k])}</td></tr>`).join('');
+
+  // sources of variables in uha2.json (old 0x221 packets / VARS2 tunnel / stale / none)
+  const src = {};
+  Object.values(U.vars()).forEach(v => src[v.source] = (src[v.source] || 0) + 1);
+
+  return `<h1 class="pagetitle">Gateway status</h1><p class="pagesub">UhaGatePy ${s.Version || ''} · uptime ${U.fmtDuration(s.UptimeS)}</p><div class="grid wide">` +
+    U.card('Serial link',
+      U.rowText('State', `<span class="tag ${up ? 'ok' : 'bad'}">${link.State}</span>`) +
+      U.rowText('Last packet age', link.LastPacketAgeS + ' s', link.LastPacketAgeS > 5 ? 'old' : '') +
+      U.rowText('Reconnects', n(link.Reconnects)) + U.rowText('Port', `<span class="raw" style="font:11px monospace">${(link.Port || '').split('/').pop()}</span>`)) +
+    U.card('Traffic',
+      U.rowText('Packets received', n(c.RxPackets)) + U.rowText('Old 0x221 packets', n(c.OldPackets)) +
+      U.rowText('VARS2 tunnel packets', n(c.TunnelPackets)) + U.rowText('Log packets', n(c.LogPackets)) +
+      U.rowText('Sent (RTC sync)', n(c.TxPackets)) + U.rowText('Gateway memory', n(c.RssKb) + ' kB')) +
+    U.card('Variables',
+      U.rowText('YAML', `v${y.Version} · ${y.Sha} · ${y.Variables} vars`) +
+      Object.entries(src).map(([k, v]) => U.rowText('Source: ' + k, n(v))).join('') +
+      U.rowText('Old vs VARS2 compared', n(cmp.Compared) + ' (mismatched ' + n(cmp.Mismatched) + ')')) +
+    U.card('Error counters', `<table class="t">${errs}</table>`) +
+    `</div><h3 style="margin-top:20px">Nodes</h3>` +
+    `<table class="t"><tr><th>Node</th><th class="n">ID</th><th class="n">Last seen</th><th class="n hide-sm">Tunnel packets</th><th class="n hide-sm">Log msgs</th><th class="hide-sm">Last log event</th></tr>${nodes}</table>` +
+    `<p class="note">Nodes are seen through the VARS2 tunnel and log messages; "never seen" is expected until ELECON sends the tunnel.</p>`;
+}, { status: true });
+</script>
+</body>
+</html>

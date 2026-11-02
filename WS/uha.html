@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UHA Home</title>
+  <link rel="stylesheet" href="css/uha.css">
+</head>
+<body>
+<script src="js/uha-common.js"></script>
+<script>
+UHA.start(U => {
+  const soc = U.num('BAT_SOC');
+  const bp = U.num('BAT_POWER_W');
+  const state = bp === null ? '' : bp > 50 ? `Charging ${U.show('BAT_POWER_W', { d: 0 })}`
+    : bp < -50 ? `Discharging ${U.format(-bp, 'W', 0)}` : 'Idle';
+  const circ = 2 * Math.PI * 54;
+  const ring = `<div class="ring"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="54"/>` +
+    `<circle class="fg ${soc !== null && soc < 20 ? 'bad' : soc !== null && soc < 40 ? 'warn' : ''}" cx="60" cy="60" r="54" ` +
+    `stroke-dasharray="${(circ * (soc || 0) / 100).toFixed(1)} ${circ.toFixed(1)}"/></svg>` +
+    `<div><div class="pct">${soc === null ? '–' : soc.toFixed(0) + '%'}</div>` +
+    `<div class="txt"><b>${U.show('BAT_ENERGY_WH')}</b> stored<br>${state}</div></div></div>`;
+
+  const tanks = ['TEMP_TANK_1_C', 'TEMP_TANK_2_C', 'TEMP_TANK_3_C', 'TEMP_TANK_4_C', 'TEMP_TANK_5_C', 'TEMP_TANK_6_C'].map(U.num).filter(x => x !== null);
+  const tankMax = tanks.length ? Math.max(...tanks) : null;
+
+  return `<div class="grid">` +
+    U.card('Battery', ring, { href: 'uha-battery.html', cls: 'bat' }) +
+    U.card('Solar production',
+      `<div class="tiles">${U.tile('Now', 'SOLAR_POWER_W', { big: true })}${U.tile('Today', 'SOLAR_ENERGY_TODAY_WH', { big: true })}</div>`,
+      { href: 'uha-energy.html', cls: 'solar' }) +
+    U.card('Consumption',
+      `<div class="tiles">${U.tile('Now', 'LOAD_W', { big: true })}${U.tile('Today', 'CONS_TODAY_WH', { big: true })}</div>`,
+      { href: 'uha-loads.html', cls: 'load' }) +
+    U.card('Heat',
+      `<div class="tiles">${U.tile('Tank max', tankMax === null ? null : { num: tankMax.toFixed(1), unit: '°C' }, { big: true })}` +
+      `${U.tile('Heat energy', 'HEAT_TOTAL_WH', { big: true })}</div>`,
+      { href: 'uha-heat.html', cls: 'heat' }) +
+    U.card('House',
+      `<div class="tiles">${U.tile('Outside', 'TEMP_OUTSIDE_C')}${U.tile('Downstairs', 'TEMP_DOWNSTAIRS_C')}` +
+      `${U.tile('Kids room', 'TEMP_KIDROOM_C')}${U.tile('CO₂', 'CO2_RECU')}</div>`,
+      { href: 'uha-climate.html', cls: 'home' }) +
+    `</div>`;
+});
+</script>
+</body>
+</html>
