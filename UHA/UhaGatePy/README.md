@@ -238,6 +238,22 @@ The `/home/pi/Web/uha2.json` symlink to `/dev/shm` was created for this window (
 0 checksum errors, `uha.json` 1.0 s old with 256 keys, all four JSON files served by nginx (HTTP 200), CPU 9 %,
 RSS 24.7 MB. Only the old format arrives until ELECON step 2 is flashed.
 
+### VARS2 on the live link (2026-11-08, ELECON with the new bridge since 11:24)
+Tunnel ≈ 110 packets/s next to ≈ 94/s old (≈ 205/s total, CPU ≈ 10.6 % of a core, RSS 24.7 MB flat after 7 days
+without restart). 0 checksum / length errors, 0 dropped tunnel packets, 0 unknown ids, 0 wrong producers.
+All 249 delivered variables arrive at the rate of their `period_ms`; nothing stale.
+Not delivered in either format: `POW_KITCHEN_A/B_W`, `CONS_KITCHEN_A/B_WH` (IOBOARD_D). Flagged invalid by the
+firmware: `MPPT_SOLAR_MAX_VOLTAGE_V`, `MPPT_MAX_BAT_CURRENT_A`, `SHUNT_PCK1_CURRENT_A`, `TEMP_BOARD_ELECON_D_C` (-3276.8,
+sensor error value). Scales checked physically: sum of the 16 cells = pack voltage for BMS1/2/3, `LOAD_W` = A x V,
+MPPT battery power ≈ 96 % of solar power.
+
+The first comparison counted only differences beyond +-1 raw unit: 23 % "mismatches", concentrated in fast signals
+(load, battery current, wind), which says little. Comparison improved (bias, relative size, verdict per variable,
+slow variables compared within their own period). Result after 250 s on 248 variables:
+177 ok, 56 close, 14 noisy (mean difference ≈ 0 with alternating sign, samples 1-5 s apart: sampling time), 1 "offset".
+That one, `POW_WS_HEATING_W`, differs by +12.7 W on ≈ 1050 W (2.1 %, VARS2 is the newer sample, the heater was ramping) —
+not a scale or unit error, but worth a look in the next summaries. Only `TEMP_KOLARNA_C` is never compared (it has no
+old counterpart in the gateway's old table).
+
 ### Still to do
-1. **Test window 2** (now: a comparison on the live production service, no stop needed — read the journal summary
-   and `uha_status.json` `Comparison` after ELECON step 2 is flashed) after Martin flashes ELECON step 2: tunnel rates per node, mismatch summary ≈ 0.
+1. Watch the 10-minute summaries in the journal for `OFFSET` (a warning is logged) for a few days. after Martin flashes ELECON step 2: tunnel rates per node, mismatch summary ≈ 0.

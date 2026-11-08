@@ -1,8 +1,8 @@
 {
   "Version": "0.1.0",
-  "UnixTime": 1793538649,
-  "StartUnix": 1793521940,
-  "UptimeS": 16709,
+  "UnixTime": 1794136325,
+  "StartUnix": 1794136051,
+  "UptimeS": 274,
   "Yaml": {
     "Version": 0,
     "Sha": "c18686cc",
@@ -11,15 +11,15 @@
   "Link": {
     "Port": "/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0",
     "State": "up",
-    "SinceUnix": 1793521940,
+    "SinceUnix": 1794136051,
     "Reconnects": 0,
     "LastPacketAgeS": 0
   },
   "Counters": {
-    "RxBytes": 18874992,
-    "RxPackets": 1572916,
-    "OldPackets": 1572916,
-    "TunnelPackets": 0,
+    "RxBytes": 729086,
+    "RxPackets": 55763,
+    "OldPackets": 25798,
+    "TunnelPackets": 29965,
     "LogPackets": 0,
     "UnknownIds": 0,
     "Malformed": 0,
@@ -34,62 +34,3062 @@
     "LengthErrors": 0,
     "DiscardedBytes": 0,
     "ClampedToInt16": 0,
-    "TxPackets": 279,
+    "TxPackets": 6,
     "TxErrors": 0,
-    "RtcSyncSent": 279,
+    "RtcSyncSent": 6,
     "WriteErrors": 0,
     "EventLogErrors": 0,
-    "RssKb": 24696
+    "RssKb": 24948
+  },
+  "Vars2": {
+    "Fresh": 249,
+    "Invalid": [
+      "MPPT_SOLAR_MAX_VOLTAGE_V",
+      "MPPT_MAX_BAT_CURRENT_A",
+      "SHUNT_PCK1_CURRENT_A",
+      "TEMP_BOARD_ELECON_D_C"
+    ],
+    "Stale": [],
+    "NeverReceived": [
+      "CONS_KITCHEN_A_WH",
+      "CONS_KITCHEN_B_WH",
+      "POW_KITCHEN_A_W",
+      "POW_KITCHEN_B_W"
+    ]
   },
   "Comparison": {
-    "VariablesCompared": 0,
-    "Compared": 0,
-    "Mismatched": 0,
-    "Worst": {}
+    "VariablesCompared": 248,
+    "Compared": 25250,
+    "Mismatched": 5182,
+    "Verdicts": {
+      "ok": 177,
+      "close": 57,
+      "noisy": 14,
+      "offset": 0,
+      "few": 0
+    },
+    "Vars": {
+      "SOLAR_POWER_W": {
+        "Verdict": "ok",
+        "Compared": 92,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.02,
+        "LastVars2": 8025,
+        "LastOld": 8025
+      },
+      "SOLAR_ENERGY_TODAY_WH": {
+        "Verdict": "ok",
+        "Compared": 92,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.02,
+        "LastVars2": 1200,
+        "LastOld": 1200
+      },
+      "BAT_SOC": {
+        "Verdict": "ok",
+        "Compared": 273,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.98,
+        "LastVars2": 99,
+        "LastOld": 99
+      },
+      "BAT_VOLTAGE_V": {
+        "Verdict": "ok",
+        "Compared": 273,
+        "Mismatched": 0,
+        "MeanDiff": -0.0,
+        "MeanAbsDiff": 0.14,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.03,
+        "MeanGapS": 0.98,
+        "LastVars2": 534,
+        "LastOld": 534
+      },
+      "LOAD_A": {
+        "Verdict": "close",
+        "Compared": 273,
+        "Mismatched": 273,
+        "MeanDiff": 0.78,
+        "MeanAbsDiff": 293.57,
+        "MaxAbsDiff": 2001,
+        "RelativePct": 1.8,
+        "MeanGapS": 0.99,
+        "LastVars2": 16544,
+        "LastOld": 16671
+      },
+      "CHARGING_A": {
+        "Verdict": "close",
+        "Compared": 273,
+        "Mismatched": 59,
+        "MeanDiff": -0.13,
+        "MeanAbsDiff": 4.03,
+        "MaxAbsDiff": 241,
+        "RelativePct": 0.48,
+        "MeanGapS": 0.97,
+        "LastVars2": 812,
+        "LastOld": 808
+      },
+      "BAT_CURRENT_A": {
+        "Verdict": "noisy",
+        "Compared": 273,
+        "Mismatched": 239,
+        "MeanDiff": -0.46,
+        "MeanAbsDiff": 28.99,
+        "MaxAbsDiff": 317,
+        "RelativePct": 24.31,
+        "MeanGapS": 0.98,
+        "LastVars2": -154,
+        "LastOld": -174
+      },
+      "CONS_TODAY_WH": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": 0.73,
+        "MeanAbsDiff": 0.73,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.09,
+        "MeanGapS": 2.97,
+        "LastVars2": 809,
+        "LastOld": 809
+      },
+      "BAT_ENERGY_WH": {
+        "Verdict": "close",
+        "Compared": 91,
+        "Mismatched": 78,
+        "MeanDiff": -0.51,
+        "MeanAbsDiff": 9.41,
+        "MaxAbsDiff": 43,
+        "RelativePct": 0.03,
+        "MeanGapS": 2.97,
+        "LastVars2": 29288,
+        "LastOld": 29268
+      },
+      "LOAD_W": {
+        "Verdict": "close",
+        "Compared": 273,
+        "Mismatched": 271,
+        "MeanDiff": 0.39,
+        "MeanAbsDiff": 156.38,
+        "MaxAbsDiff": 1069,
+        "RelativePct": 1.79,
+        "MeanGapS": 0.97,
+        "LastVars2": 8843,
+        "LastOld": 8911
+      },
+      "BAT_POWER_W": {
+        "Verdict": "noisy",
+        "Compared": 53,
+        "Mismatched": 53,
+        "MeanDiff": -21.0,
+        "MeanAbsDiff": 402.92,
+        "MaxAbsDiff": 2341,
+        "RelativePct": 58.65,
+        "MeanGapS": 4.97,
+        "LastVars2": -718,
+        "LastOld": -307
+      },
+      "BMS1_SOC": {
+        "Verdict": "ok",
+        "Compared": 273,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.62,
+        "LastVars2": 99,
+        "LastOld": 99
+      },
+      "BMS1_CURRENT_A": {
+        "Verdict": "noisy",
+        "Compared": 182,
+        "Mismatched": 152,
+        "MeanDiff": -0.68,
+        "MeanAbsDiff": 8.75,
+        "MaxAbsDiff": 57,
+        "RelativePct": 9.8,
+        "MeanGapS": 1.12,
+        "LastVars2": -171,
+        "LastOld": -161
+      },
+      "BMS1_VOLTAGE_V": {
+        "Verdict": "ok",
+        "Compared": 182,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.12,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.02,
+        "MeanGapS": 1.12,
+        "LastVars2": 532,
+        "LastOld": 531
+      },
+      "BMS1_ENERGY_STORED_WH": {
+        "Verdict": "close",
+        "Compared": 182,
+        "Mismatched": 119,
+        "MeanDiff": -0.21,
+        "MeanAbsDiff": 2.69,
+        "MaxAbsDiff": 15,
+        "RelativePct": 0.02,
+        "MeanGapS": 1.12,
+        "LastVars2": 13224,
+        "LastOld": 13209
+      },
+      "BMS1_TODAY_ENERGY_WH": {
+        "Verdict": "ok",
+        "Compared": 182,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.12,
+        "LastVars2": 0,
+        "LastOld": 0
+      },
+      "BMS2_SOC": {
+        "Verdict": "ok",
+        "Compared": 273,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.92,
+        "LastVars2": 98,
+        "LastOld": 98
+      },
+      "BMS2_CURRENT_A": {
+        "Verdict": "noisy",
+        "Compared": 91,
+        "Mismatched": 49,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 34.35,
+        "MaxAbsDiff": 169,
+        "RelativePct": 84.65,
+        "MeanGapS": 2.92,
+        "LastVars2": 0,
+        "LastOld": 0
+      },
+      "BMS2_VOLTAGE_V": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.35,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.07,
+        "MeanGapS": 2.93,
+        "LastVars2": 537,
+        "LastOld": 536
+      },
+      "BMS2_ENERGY_STORED_WH": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": 0.01,
+        "MeanAbsDiff": 0.16,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.0,
+        "MeanGapS": 2.88,
+        "LastVars2": 11769,
+        "LastOld": 11769
+      },
+      "BMS2_TODAY_ENERGY_WH": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": 0.11,
+        "MeanAbsDiff": 0.11,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.0,
+        "MeanGapS": 2.87,
+        "LastVars2": 5345,
+        "LastOld": 5345
+      },
+      "BMS3_SOC": {
+        "Verdict": "ok",
+        "Compared": 274,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.89,
+        "LastVars2": 99,
+        "LastOld": 99
+      },
+      "BMS3_CURRENT_A": {
+        "Verdict": "noisy",
+        "Compared": 91,
+        "Mismatched": 37,
+        "MeanDiff": -0.16,
+        "MeanAbsDiff": 15.55,
+        "MaxAbsDiff": 105,
+        "RelativePct": 88.99,
+        "MeanGapS": 2.89,
+        "LastVars2": -5,
+        "LastOld": -15
+      },
+      "BMS3_VOLTAGE_V": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.18,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.03,
+        "MeanGapS": 2.9,
+        "LastVars2": 536,
+        "LastOld": 536
+      },
+      "BMS3_ENERGY_STORED_WH": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": -0.01,
+        "MeanAbsDiff": 0.05,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.0,
+        "MeanGapS": 2.91,
+        "LastVars2": 3990,
+        "LastOld": 3990
+      },
+      "BMS3_TODAY_ENERGY_WH": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 2.91,
+        "LastVars2": 0,
+        "LastOld": 0
+      },
+      "MPPT_BAT_CURRENT_A": {
+        "Verdict": "close",
+        "Compared": 274,
+        "Mismatched": 65,
+        "MeanDiff": -0.14,
+        "MeanAbsDiff": 4.08,
+        "MaxAbsDiff": 241,
+        "RelativePct": 0.49,
+        "MeanGapS": 0.92,
+        "LastVars2": 812,
+        "LastOld": 812
+      },
+      "MPPT_BAT_VOLTAGE_V": {
+        "Verdict": "close",
+        "Compared": 274,
+        "Mismatched": 88,
+        "MeanDiff": 0.22,
+        "MeanAbsDiff": 2.14,
+        "MaxAbsDiff": 29,
+        "RelativePct": 0.04,
+        "MeanGapS": 0.96,
+        "LastVars2": 5415,
+        "LastOld": 5406
+      },
+      "MPPT_YIELD_TODAY_WH": {
+        "Verdict": "ok",
+        "Compared": 90,
+        "Mismatched": 0,
+        "MeanDiff": 0.37,
+        "MeanAbsDiff": 0.37,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.02,
+        "MeanGapS": 2.97,
+        "LastVars2": 1619,
+        "LastOld": 1619
+      },
+      "MPPT_MAX_TODAY_W": {
+        "Verdict": "ok",
+        "Compared": 90,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 2.96,
+        "LastVars2": 4809,
+        "LastOld": 4809
+      },
+      "MPPT_SOLAR_POWER_W": {
+        "Verdict": "close",
+        "Compared": 273,
+        "Mismatched": 129,
+        "MeanDiff": -0.82,
+        "MeanAbsDiff": 20.81,
+        "MaxAbsDiff": 1693,
+        "RelativePct": 0.45,
+        "MeanGapS": 0.94,
+        "LastVars2": 4461,
+        "LastOld": 4413
+      },
+      "MPPT_SOLAR_VOLTAGE_V": {
+        "Verdict": "close",
+        "Compared": 274,
+        "Mismatched": 173,
+        "MeanDiff": -3.28,
+        "MeanAbsDiff": 40.78,
+        "MaxAbsDiff": 507,
+        "RelativePct": 0.41,
+        "MeanGapS": 0.74,
+        "LastVars2": 9676,
+        "LastOld": 9481
+      },
+      "MPPT_SOLAR_CURRENT_A": {
+        "Verdict": "close",
+        "Compared": 90,
+        "Mismatched": 32,
+        "MeanDiff": -0.07,
+        "MeanAbsDiff": 8.2,
+        "MaxAbsDiff": 242,
+        "RelativePct": 1.77,
+        "MeanGapS": 2.93,
+        "LastVars2": 447,
+        "LastOld": 460
+      },
+      "MPPT_TEMP_C": {
+        "Verdict": "ok",
+        "Compared": 90,
+        "Mismatched": 0,
+        "MeanDiff": 0.01,
+        "MeanAbsDiff": 0.12,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.21,
+        "MeanGapS": 2.91,
+        "LastVars2": 60,
+        "LastOld": 60
+      },
+      "SHUNT_PCK2_CURRENT_A": {
+        "Verdict": "noisy",
+        "Compared": 54,
+        "Mismatched": 54,
+        "MeanDiff": -8.69,
+        "MeanAbsDiff": 669.43,
+        "MaxAbsDiff": 4606,
+        "RelativePct": 116.64,
+        "MeanGapS": 4.9,
+        "LastVars2": 761,
+        "LastOld": 1113
+      },
+      "CONS_AC300_WH": {
+        "Verdict": "ok",
+        "Compared": 90,
+        "Mismatched": 0,
+        "MeanDiff": 0.01,
+        "MeanAbsDiff": 0.01,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.08,
+        "MeanGapS": 2.14,
+        "LastVars2": 15,
+        "LastOld": 15
+      },
+      "CONS_AC3KW_WH": {
+        "Verdict": "ok",
+        "Compared": 90,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 2.14,
+        "LastVars2": 0,
+        "LastOld": 0
+      },
+      "CONS_AC5KW_WH": {
+        "Verdict": "ok",
+        "Compared": 90,
+        "Mismatched": 0,
+        "MeanDiff": 0.18,
+        "MeanAbsDiff": 0.18,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.02,
+        "MeanGapS": 2.14,
+        "LastVars2": 726,
+        "LastOld": 726
+      },
+      "CONS_FRIDGE_WH": {
+        "Verdict": "ok",
+        "Compared": 182,
+        "Mismatched": 0,
+        "MeanDiff": 0.01,
+        "MeanAbsDiff": 0.01,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.03,
+        "MeanGapS": 1.27,
+        "LastVars2": 33,
+        "LastOld": 33
+      },
+      "CONS_KITCHEN_WH": {
+        "Verdict": "ok",
+        "Compared": 182,
+        "Mismatched": 0,
+        "MeanDiff": 0.12,
+        "MeanAbsDiff": 0.12,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.01,
+        "MeanGapS": 1.24,
+        "LastVars2": 1482,
+        "LastOld": 1481
+      },
+      "CONS_WASCHMACHINE_WH": {
+        "Verdict": "ok",
+        "Compared": 182,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.23,
+        "LastVars2": 154,
+        "LastOld": 154
+      },
+      "CONS_OTHER_WH": {
+        "Verdict": "ok",
+        "Compared": 182,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.24,
+        "LastVars2": 373,
+        "LastOld": 373
+      },
+      "CONS_TECHM_WH": {
+        "Verdict": "ok",
+        "Compared": 182,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.25,
+        "LastVars2": 0,
+        "LastOld": 0
+      },
+      "POW_AC300_W": {
+        "Verdict": "ok",
+        "Compared": 90,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 2.03,
+        "LastVars2": 31,
+        "LastOld": 31
+      },
+      "POW_AC3KW_W": {
+        "Verdict": "ok",
+        "Compared": 90,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 2.03,
+        "LastVars2": 0,
+        "LastOld": 0
+      },
+      "POW_AC5KW_W": {
+        "Verdict": "noisy",
+        "Compared": 90,
+        "Mismatched": 32,
+        "MeanDiff": -6.14,
+        "MeanAbsDiff": 15.81,
+        "MaxAbsDiff": 298,
+        "RelativePct": 5.48,
+        "MeanGapS": 2.01,
+        "LastVars2": 407,
+        "LastOld": 407
+      },
+      "POW_FRIDGE_W": {
+        "Verdict": "ok",
+        "Compared": 182,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.17,
+        "LastVars2": 30,
+        "LastOld": 30
+      },
+      "POW_KITCHEN_W": {
+        "Verdict": "noisy",
+        "Compared": 182,
+        "Mismatched": 50,
+        "MeanDiff": -3.64,
+        "MeanAbsDiff": 11.29,
+        "MaxAbsDiff": 291,
+        "RelativePct": 3.91,
+        "MeanGapS": 1.17,
+        "LastVars2": 648,
+        "LastOld": 404
+      },
+      "POW_WASCHMACHINE_W": {
+        "Verdict": "ok",
+        "Compared": 182,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.17,
+        "LastVars2": 0,
+        "LastOld": 0
+      },
+      "POW_OTHER_W": {
+        "Verdict": "ok",
+        "Compared": 182,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.54,
+        "LastVars2": 0,
+        "LastOld": 0
+      },
+      "POW_TECHM_W": {
+        "Verdict": "ok",
+        "Compared": 182,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.54,
+        "LastVars2": 0,
+        "LastOld": 0
+      },
+      "EL_HEATER_STATUS": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.98,
+        "LastVars2": 0,
+        "LastOld": 0
+      },
+      "EL_HEATER_LOAD_A": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 2,
+        "MeanDiff": -0.22,
+        "MeanAbsDiff": 0.22,
+        "MaxAbsDiff": 10,
+        "RelativePct": 0.39,
+        "MeanGapS": 0.98,
+        "LastVars2": 40,
+        "LastOld": 40
+      },
+      "EL_HEATER_CURRENT_A": {
+        "Verdict": "close",
+        "Compared": 91,
+        "Mismatched": 88,
+        "MeanDiff": -20.76,
+        "MeanAbsDiff": 86.03,
+        "MaxAbsDiff": 1121,
+        "RelativePct": 1.54,
+        "MeanGapS": 0.98,
+        "LastVars2": 4023,
+        "LastOld": 4077
+      },
+      "EL_HEATER_CONS_WH": {
+        "Verdict": "close",
+        "Compared": 91,
+        "Mismatched": 89,
+        "MeanDiff": 2.51,
+        "MeanAbsDiff": 2.51,
+        "MaxAbsDiff": 3,
+        "RelativePct": 0.37,
+        "MeanGapS": 0.98,
+        "LastVars2": 790,
+        "LastOld": 788
+      },
+      "HEAT_TOTAL_WH": {
+        "Verdict": "close",
+        "Compared": 91,
+        "Mismatched": 44,
+        "MeanDiff": 2.92,
+        "MeanAbsDiff": 5.91,
+        "MaxAbsDiff": 33,
+        "RelativePct": 0.74,
+        "MeanGapS": 1.12,
+        "LastVars2": 922,
+        "LastOld": 889
+      },
+      "HEAT_HEATING_WH": {
+        "Verdict": "close",
+        "Compared": 91,
+        "Mismatched": 27,
+        "MeanDiff": 2.57,
+        "MeanAbsDiff": 4.55,
+        "MaxAbsDiff": 27,
+        "RelativePct": 0.49,
+        "MeanGapS": 1.11,
+        "LastVars2": 1028,
+        "LastOld": 1005
+      },
+      "FLOW_COLD_LPM": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 2,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.95,
+        "MaxAbsDiff": 43,
+        "RelativePct": 33.99,
+        "MeanGapS": 0.97,
+        "LastVars2": 0,
+        "LastOld": 0
+      },
+      "FLOW_HOT_LPM": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 2,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.92,
+        "MaxAbsDiff": 42,
+        "RelativePct": 50.3,
+        "MeanGapS": 0.97,
+        "LastVars2": 0,
+        "LastOld": 0
+      },
+      "CONS_COLD_L": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 4,
+        "MeanDiff": 0.13,
+        "MeanAbsDiff": 0.13,
+        "MaxAbsDiff": 3,
+        "RelativePct": 0.02,
+        "MeanGapS": 0.93,
+        "LastVars2": 819,
+        "LastOld": 819
+      },
+      "CONS_HOT_L": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 3,
+        "MeanDiff": 0.1,
+        "MeanAbsDiff": 0.1,
+        "MaxAbsDiff": 3,
+        "RelativePct": 0.04,
+        "MeanGapS": 0.93,
+        "LastVars2": 237,
+        "LastOld": 237
+      },
+      "BOILER_POWER_W": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.23,
+        "LastVars2": 0,
+        "LastOld": 0
+      },
+      "BOILER_HEAT": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.17,
+        "LastVars2": 0,
+        "LastOld": 0
+      },
+      "TEMP_BOILER_C": {
+        "Verdict": "ok",
+        "Compared": 90,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 2.94,
+        "LastVars2": 233,
+        "LastOld": 233
+      },
+      "TEMP_BOILER_IN_C": {
+        "Verdict": "ok",
+        "Compared": 90,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 2.91,
+        "LastVars2": 220,
+        "LastOld": 220
+      },
+      "TEMP_BOILER_OUT_C": {
+        "Verdict": "ok",
+        "Compared": 90,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.16,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.07,
+        "MeanGapS": 2.91,
+        "LastVars2": 225,
+        "LastOld": 225
+      },
+      "TEMP_TANK_IN_H_C": {
+        "Verdict": "ok",
+        "Compared": 90,
+        "Mismatched": 0,
+        "MeanDiff": -0.01,
+        "MeanAbsDiff": 0.17,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.06,
+        "MeanGapS": 2.91,
+        "LastVars2": 280,
+        "LastOld": 280
+      },
+      "TEMP_TANK_OUT_H_C": {
+        "Verdict": "ok",
+        "Compared": 90,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.02,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.01,
+        "MeanGapS": 2.91,
+        "LastVars2": 268,
+        "LastOld": 268
+      },
+      "TEMP_TANK_1_C": {
+        "Verdict": "ok",
+        "Compared": 90,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 2.9,
+        "LastVars2": 306,
+        "LastOld": 306
+      },
+      "TEMP_TANK_2_C": {
+        "Verdict": "ok",
+        "Compared": 90,
+        "Mismatched": 0,
+        "MeanDiff": 0.1,
+        "MeanAbsDiff": 0.1,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.03,
+        "MeanGapS": 2.9,
+        "LastVars2": 320,
+        "LastOld": 320
+      },
+      "TEMP_TANK_3_C": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": 0.08,
+        "MeanAbsDiff": 0.21,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.06,
+        "MeanGapS": 2.86,
+        "LastVars2": 342,
+        "LastOld": 341
+      },
+      "TEMP_TANK_4_C": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": 0.05,
+        "MeanAbsDiff": 0.16,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.05,
+        "MeanGapS": 2.85,
+        "LastVars2": 347,
+        "LastOld": 346
+      },
+      "TEMP_TANK_5_C": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.02,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.01,
+        "MeanGapS": 2.86,
+        "LastVars2": 413,
+        "LastOld": 413
+      },
+      "TEMP_TANK_6_C": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.26,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.06,
+        "MeanGapS": 2.87,
+        "LastVars2": 435,
+        "LastOld": 435
+      },
+      "TEMP_WALL_IN_C": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 2.88,
+        "LastVars2": 236,
+        "LastOld": 236
+      },
+      "TEMP_WALL_OUT_C": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.13,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.06,
+        "MeanGapS": 2.88,
+        "LastVars2": 234,
+        "LastOld": 234
+      },
+      "TEMP_BOILER_EXHAUST_C": {
+        "Verdict": "close",
+        "Compared": 91,
+        "Mismatched": 60,
+        "MeanDiff": 0.02,
+        "MeanAbsDiff": 2.48,
+        "MaxAbsDiff": 6,
+        "RelativePct": 0.93,
+        "MeanGapS": 2.87,
+        "LastVars2": 269,
+        "LastOld": 267
+      },
+      "TEMP_RAD_H_C": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": -0.01,
+        "MeanAbsDiff": 0.21,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.08,
+        "MeanGapS": 2.87,
+        "LastVars2": 250,
+        "LastOld": 251
+      },
+      "TEMP_RAD_C_C": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.02,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.01,
+        "MeanGapS": 2.85,
+        "LastVars2": 256,
+        "LastOld": 256
+      },
+      "TEMP_TANK_IN_C_C": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": -0.01,
+        "MeanAbsDiff": 0.05,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.02,
+        "MeanGapS": 2.85,
+        "LastVars2": 250,
+        "LastOld": 250
+      },
+      "TEMP_TANK_OUT_C_C": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": -0.01,
+        "MeanAbsDiff": 0.32,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.12,
+        "MeanGapS": 2.85,
+        "LastVars2": 264,
+        "LastOld": 264
+      },
+      "TEMP_TECHM_BOARD_C": {
+        "Verdict": "ok",
+        "Compared": 183,
+        "Mismatched": 1,
+        "MeanDiff": 0.17,
+        "MeanAbsDiff": 0.19,
+        "MaxAbsDiff": 2,
+        "RelativePct": 0.05,
+        "MeanGapS": 1.07,
+        "LastVars2": 437,
+        "LastOld": 437
+      },
+      "TEMP_IOBOARD_D_C": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 2,
+        "MeanDiff": 0.01,
+        "MeanAbsDiff": 12.32,
+        "MaxAbsDiff": 558,
+        "RelativePct": 4.13,
+        "MeanGapS": 1.97,
+        "LastVars2": 293,
+        "LastOld": 293
+      },
+      "TEMP_IOBOARD_U_C": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": 0.01,
+        "MeanAbsDiff": 0.34,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.11,
+        "MeanGapS": 1.44,
+        "LastVars2": 300,
+        "LastOld": 300
+      },
+      "TEMP_ELECON_BOARD_C": {
+        "Verdict": "ok",
+        "Compared": 92,
+        "Mismatched": 0,
+        "MeanDiff": -0.01,
+        "MeanAbsDiff": 0.01,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.08,
+        "LastVars2": 300,
+        "LastOld": 300
+      },
+      "TEMP_DOWNSTAIRS_C": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 2,
+        "MeanDiff": 0.01,
+        "MeanAbsDiff": 13.35,
+        "MaxAbsDiff": 604,
+        "RelativePct": 5.3,
+        "MeanGapS": 1.95,
+        "LastVars2": 246,
+        "LastOld": 246
+      },
+      "TEMP_OFFICE_C": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": 0.01,
+        "MeanAbsDiff": 0.03,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.01,
+        "MeanGapS": 1.83,
+        "LastVars2": 293,
+        "LastOld": 293
+      },
+      "TEMP_KIDROOM_C": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": -0.01,
+        "MeanAbsDiff": 0.03,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.01,
+        "MeanGapS": 1.83,
+        "LastVars2": 223,
+        "LastOld": 223
+      },
+      "TEMP_OUTSIDE_C": {
+        "Verdict": "ok",
+        "Compared": 91,
+        "Mismatched": 0,
+        "MeanDiff": -0.02,
+        "MeanAbsDiff": 0.07,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.11,
+        "MeanGapS": 1.13,
+        "LastVars2": 60,
+        "LastOld": 60
+      },
+      "TEMP_RECU_FC_C": {
+        "Verdict": "ok",
+        "Compared": 78,
+        "Mismatched": 0,
+        "MeanDiff": 0.03,
+        "MeanAbsDiff": 0.18,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.3,
+        "MeanGapS": 1.42,
+        "LastVars2": 60,
+        "LastOld": 60
+      },
+      "TEMP_RECU_FH_C": {
+        "Verdict": "ok",
+        "Compared": 78,
+        "Mismatched": 0,
+        "MeanDiff": 0.03,
+        "MeanAbsDiff": 0.15,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.07,
+        "MeanGapS": 1.43,
+        "LastVars2": 223,
+        "LastOld": 223
+      },
+      "TEMP_RECU_WH_C": {
+        "Verdict": "ok",
+        "Compared": 79,
+        "Mismatched": 0,
+        "MeanDiff": 0.06,
+        "MeanAbsDiff": 0.14,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.05,
+        "MeanGapS": 1.42,
+        "LastVars2": 270,
+        "LastOld": 270
+      },
+      "TEMP_RECU_WC_C": {
+        "Verdict": "ok",
+        "Compared": 77,
+        "Mismatched": 0,
+        "MeanDiff": 0.04,
+        "MeanAbsDiff": 0.12,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.1,
+        "MeanGapS": 1.51,
+        "LastVars2": 117,
+        "LastOld": 117
+      },
+      "RH_RECU_FH": {
+        "Verdict": "ok",
+        "Compared": 77,
+        "Mismatched": 0,
+        "MeanDiff": -0.01,
+        "MeanAbsDiff": 0.01,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.05,
+        "MeanGapS": 1.42,
+        "LastVars2": 24,
+        "LastOld": 24
+      },
+      "RH_RECU_WASTE": {
+        "Verdict": "ok",
+        "Compared": 77,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.42,
+        "LastVars2": 44,
+        "LastOld": 44
+      },
+      "CO2_RECU": {
+        "Verdict": "close",
+        "Compared": 77,
+        "Mismatched": 20,
+        "MeanDiff": -0.3,
+        "MeanAbsDiff": 2.01,
+        "MaxAbsDiff": 30,
+        "RelativePct": 0.17,
+        "MeanGapS": 1.42,
+        "LastVars2": 1158,
+        "LastOld": 1162
+      },
+      "DP_RECU_F": {
+        "Verdict": "ok",
+        "Compared": 77,
+        "Mismatched": 0,
+        "MeanDiff": -0.01,
+        "MeanAbsDiff": 0.09,
+        "MaxAbsDiff": 1,
+        "RelativePct": 8.54,
+        "MeanGapS": 1.52,
+        "LastVars2": 1,
+        "LastOld": 1
+      },
+      "DP_RECU_WASTE": {
+        "Verdict": "ok",
+        "Compared": 77,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.03,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.22,
+        "MeanGapS": 1.52,
+        "LastVars2": 12,
+        "LastOld": 12
+      },
+      "RECU_FAN_F": {
+        "Verdict": "ok",
+        "Compared": 78,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.58,
+        "LastVars2": 20,
+        "LastOld": 20
+      },
+      "RECU_FAN_WASTE": {
+        "Verdict": "ok",
+        "Compared": 78,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.58,
+        "LastVars2": 20,
+        "LastOld": 20
+      },
+      "TEMP_DILNA_C": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.02,
+        "MeanAbsDiff": 0.24,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.14,
+        "MeanGapS": 3.25,
+        "LastVars2": 168,
+        "LastOld": 168
+      },
+      "TEMP_AKUPACK1_C": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.04,
+        "MeanAbsDiff": 0.11,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.06,
+        "MeanGapS": 3.25,
+        "LastVars2": 176,
+        "LastOld": 176
+      },
+      "METEO_WIND_BURST": {
+        "Verdict": "noisy",
+        "Compared": 273,
+        "Mismatched": 149,
+        "MeanDiff": -0.15,
+        "MeanAbsDiff": 2.42,
+        "MaxAbsDiff": 20,
+        "RelativePct": 8.87,
+        "MeanGapS": 0.48,
+        "LastVars2": 7,
+        "LastOld": 6
+      },
+      "METEO_WIND_AVG": {
+        "Verdict": "ok",
+        "Compared": 273,
+        "Mismatched": 7,
+        "MeanDiff": -0.01,
+        "MeanAbsDiff": 0.38,
+        "MaxAbsDiff": 2,
+        "RelativePct": 1.39,
+        "MeanGapS": 0.35,
+        "LastVars2": 31,
+        "LastOld": 32
+      },
+      "METEO_WIND_POW": {
+        "Verdict": "ok",
+        "Compared": 110,
+        "Mismatched": 0,
+        "MeanDiff": -0.02,
+        "MeanAbsDiff": 0.18,
+        "MaxAbsDiff": 1,
+        "RelativePct": 6.58,
+        "MeanGapS": 1.46,
+        "LastVars2": 3,
+        "LastOld": 4
+      },
+      "METEO_WIND_ENERGY": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 2.96,
+        "LastVars2": 6,
+        "LastOld": 6
+      },
+      "BMS1_CELL_V_1": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 43,
+        "MeanDiff": -0.24,
+        "MeanAbsDiff": 3.5,
+        "MaxAbsDiff": 10,
+        "RelativePct": 0.11,
+        "MeanGapS": 1.38,
+        "LastVars2": 3322,
+        "LastOld": 3325
+      },
+      "BMS1_CELL_V_2": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 45,
+        "MeanDiff": -0.26,
+        "MeanAbsDiff": 4.78,
+        "MaxAbsDiff": 12,
+        "RelativePct": 0.14,
+        "MeanGapS": 1.37,
+        "LastVars2": 3321,
+        "LastOld": 3319
+      },
+      "BMS1_CELL_V_3": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 45,
+        "MeanDiff": -0.28,
+        "MeanAbsDiff": 3.98,
+        "MaxAbsDiff": 10,
+        "RelativePct": 0.12,
+        "MeanGapS": 1.37,
+        "LastVars2": 3321,
+        "LastOld": 3316
+      },
+      "BMS1_CELL_V_4": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 41,
+        "MeanDiff": -0.28,
+        "MeanAbsDiff": 3.28,
+        "MaxAbsDiff": 11,
+        "RelativePct": 0.1,
+        "MeanGapS": 1.37,
+        "LastVars2": 3321,
+        "LastOld": 3316
+      },
+      "BMS1_CELL_V_5": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 36,
+        "MeanDiff": -0.22,
+        "MeanAbsDiff": 3.33,
+        "MaxAbsDiff": 13,
+        "RelativePct": 0.1,
+        "MeanGapS": 1.37,
+        "LastVars2": 3324,
+        "LastOld": 3321
+      },
+      "BMS1_CELL_V_6": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 39,
+        "MeanDiff": -0.24,
+        "MeanAbsDiff": 4.2,
+        "MaxAbsDiff": 12,
+        "RelativePct": 0.13,
+        "MeanGapS": 1.37,
+        "LastVars2": 3325,
+        "LastOld": 3325
+      },
+      "BMS1_CELL_V_7": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 45,
+        "MeanDiff": -0.26,
+        "MeanAbsDiff": 4.07,
+        "MaxAbsDiff": 9,
+        "RelativePct": 0.12,
+        "MeanGapS": 1.37,
+        "LastVars2": 3324,
+        "LastOld": 3329
+      },
+      "BMS1_CELL_V_8": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 32,
+        "MeanDiff": -0.19,
+        "MeanAbsDiff": 2.37,
+        "MaxAbsDiff": 10,
+        "RelativePct": 0.07,
+        "MeanGapS": 1.37,
+        "LastVars2": 3327,
+        "LastOld": 3330
+      },
+      "BMS1_CELL_V_9": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 35,
+        "MeanDiff": -0.2,
+        "MeanAbsDiff": 3.13,
+        "MaxAbsDiff": 10,
+        "RelativePct": 0.09,
+        "MeanGapS": 1.37,
+        "LastVars2": 3325,
+        "LastOld": 3329
+      },
+      "BMS1_CELL_V_10": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 46,
+        "MeanDiff": -0.28,
+        "MeanAbsDiff": 4.17,
+        "MaxAbsDiff": 12,
+        "RelativePct": 0.13,
+        "MeanGapS": 1.37,
+        "LastVars2": 3321,
+        "LastOld": 3327
+      },
+      "BMS1_CELL_V_11": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 38,
+        "MeanDiff": -0.24,
+        "MeanAbsDiff": 3.76,
+        "MaxAbsDiff": 12,
+        "RelativePct": 0.11,
+        "MeanGapS": 1.37,
+        "LastVars2": 3322,
+        "LastOld": 3325
+      },
+      "BMS1_CELL_V_12": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 41,
+        "MeanDiff": -0.28,
+        "MeanAbsDiff": 3.83,
+        "MaxAbsDiff": 11,
+        "RelativePct": 0.12,
+        "MeanGapS": 1.37,
+        "LastVars2": 3321,
+        "LastOld": 3318
+      },
+      "BMS1_CELL_V_13": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 40,
+        "MeanDiff": -0.28,
+        "MeanAbsDiff": 4.98,
+        "MaxAbsDiff": 14,
+        "RelativePct": 0.15,
+        "MeanGapS": 1.37,
+        "LastVars2": 3322,
+        "LastOld": 3311
+      },
+      "BMS1_CELL_V_14": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 39,
+        "MeanDiff": -0.22,
+        "MeanAbsDiff": 4.37,
+        "MaxAbsDiff": 10,
+        "RelativePct": 0.13,
+        "MeanGapS": 1.21,
+        "LastVars2": 3325,
+        "LastOld": 3316
+      },
+      "BMS1_CELL_V_15": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 40,
+        "MeanDiff": -0.24,
+        "MeanAbsDiff": 3.65,
+        "MaxAbsDiff": 11,
+        "RelativePct": 0.11,
+        "MeanGapS": 1.17,
+        "LastVars2": 3325,
+        "LastOld": 3321
+      },
+      "BMS1_CELL_V_16": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 38,
+        "MeanDiff": -0.22,
+        "MeanAbsDiff": 3.0,
+        "MaxAbsDiff": 9,
+        "RelativePct": 0.09,
+        "MeanGapS": 1.01,
+        "LastVars2": 3326,
+        "LastOld": 3326
+      },
+      "BMS1_CELL_TEMP_C_1": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.97,
+        "LastVars2": 17,
+        "LastOld": 17
+      },
+      "BMS1_CELL_TEMP_C_2": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.97,
+        "LastVars2": 17,
+        "LastOld": 17
+      },
+      "BMS1_CELL_TEMP_C_3": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.97,
+        "LastVars2": 17,
+        "LastOld": 17
+      },
+      "BMS1_CELL_TEMP_C_4": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.97,
+        "LastVars2": 17,
+        "LastOld": 17
+      },
+      "BMS1_CELL_TEMP_C_5": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.97,
+        "LastVars2": 17,
+        "LastOld": 17
+      },
+      "BMS1_CELL_TEMP_C_6": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.97,
+        "LastVars2": 17,
+        "LastOld": 17
+      },
+      "BMS1_CELL_TEMP_C_7": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.66,
+        "LastVars2": 17,
+        "LastOld": 17
+      },
+      "BMS1_CELL_TEMP_C_8": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.66,
+        "LastVars2": 17,
+        "LastOld": 17
+      },
+      "BMS1_CELL_TEMP_C_9": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.67,
+        "LastVars2": 17,
+        "LastOld": 17
+      },
+      "BMS1_CELL_TEMP_C_10": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.67,
+        "LastVars2": 17,
+        "LastOld": 17
+      },
+      "BMS1_CELL_TEMP_C_11": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 2.08,
+        "LastVars2": 17,
+        "LastOld": 17
+      },
+      "BMS1_CELL_TEMP_C_12": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 2.06,
+        "LastVars2": 17,
+        "LastOld": 17
+      },
+      "BMS1_CELL_TEMP_C_13": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 2.06,
+        "LastVars2": 17,
+        "LastOld": 17
+      },
+      "BMS1_CELL_TEMP_C_14": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 2.06,
+        "LastVars2": 17,
+        "LastOld": 17
+      },
+      "BMS1_CELL_TEMP_C_15": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 2.06,
+        "LastVars2": 17,
+        "LastOld": 17
+      },
+      "BMS1_CELL_TEMP_C_16": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 2.06,
+        "LastVars2": 17,
+        "LastOld": 17
+      },
+      "BMS2_CELL_V_1": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 3,
+        "MeanDiff": 0.07,
+        "MeanAbsDiff": 0.22,
+        "MaxAbsDiff": 5,
+        "RelativePct": 0.01,
+        "MeanGapS": 1.7,
+        "LastVars2": 3365,
+        "LastOld": 3365
+      },
+      "BMS2_CELL_V_2": {
+        "Verdict": "close",
+        "Compared": 68,
+        "Mismatched": 5,
+        "MeanDiff": 0.07,
+        "MeanAbsDiff": 0.37,
+        "MaxAbsDiff": 5,
+        "RelativePct": 0.01,
+        "MeanGapS": 1.7,
+        "LastVars2": 3340,
+        "LastOld": 3340
+      },
+      "BMS2_CELL_V_3": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 1,
+        "MeanDiff": 0.07,
+        "MeanAbsDiff": 0.07,
+        "MaxAbsDiff": 5,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.7,
+        "LastVars2": 3365,
+        "LastOld": 3365
+      },
+      "BMS2_CELL_V_4": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 2,
+        "MeanDiff": -0.07,
+        "MeanAbsDiff": 0.22,
+        "MaxAbsDiff": 10,
+        "RelativePct": 0.01,
+        "MeanGapS": 1.69,
+        "LastVars2": 3345,
+        "LastOld": 3345
+      },
+      "BMS2_CELL_V_5": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 3,
+        "MeanDiff": 0.22,
+        "MeanAbsDiff": 0.22,
+        "MaxAbsDiff": 5,
+        "RelativePct": 0.01,
+        "MeanGapS": 1.69,
+        "LastVars2": 3355,
+        "LastOld": 3355
+      },
+      "BMS2_CELL_V_6": {
+        "Verdict": "close",
+        "Compared": 68,
+        "Mismatched": 7,
+        "MeanDiff": -0.22,
+        "MeanAbsDiff": 0.66,
+        "MaxAbsDiff": 10,
+        "RelativePct": 0.02,
+        "MeanGapS": 1.68,
+        "LastVars2": 3360,
+        "LastOld": 3360
+      },
+      "BMS2_CELL_V_7": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 3,
+        "MeanDiff": -0.07,
+        "MeanAbsDiff": 0.22,
+        "MaxAbsDiff": 5,
+        "RelativePct": 0.01,
+        "MeanGapS": 1.71,
+        "LastVars2": 3350,
+        "LastOld": 3350
+      },
+      "BMS2_CELL_V_8": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 3,
+        "MeanDiff": -0.15,
+        "MeanAbsDiff": 0.29,
+        "MaxAbsDiff": 10,
+        "RelativePct": 0.01,
+        "MeanGapS": 1.7,
+        "LastVars2": 3360,
+        "LastOld": 3360
+      },
+      "BMS2_CELL_V_9": {
+        "Verdict": "close",
+        "Compared": 68,
+        "Mismatched": 4,
+        "MeanDiff": 0.15,
+        "MeanAbsDiff": 0.29,
+        "MaxAbsDiff": 5,
+        "RelativePct": 0.01,
+        "MeanGapS": 1.69,
+        "LastVars2": 3350,
+        "LastOld": 3350
+      },
+      "BMS2_CELL_V_10": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 2,
+        "MeanDiff": -0.22,
+        "MeanAbsDiff": 0.22,
+        "MaxAbsDiff": 10,
+        "RelativePct": 0.01,
+        "MeanGapS": 1.69,
+        "LastVars2": 3365,
+        "LastOld": 3365
+      },
+      "BMS2_CELL_V_11": {
+        "Verdict": "close",
+        "Compared": 68,
+        "Mismatched": 4,
+        "MeanDiff": -0.15,
+        "MeanAbsDiff": 0.29,
+        "MaxAbsDiff": 5,
+        "RelativePct": 0.01,
+        "MeanGapS": 1.68,
+        "LastVars2": 3360,
+        "LastOld": 3360
+      },
+      "BMS2_CELL_V_12": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 3,
+        "MeanDiff": -0.22,
+        "MeanAbsDiff": 0.22,
+        "MaxAbsDiff": 5,
+        "RelativePct": 0.01,
+        "MeanGapS": 1.68,
+        "LastVars2": 3355,
+        "LastOld": 3355
+      },
+      "BMS2_CELL_V_13": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 1,
+        "MeanDiff": -0.15,
+        "MeanAbsDiff": 0.15,
+        "MaxAbsDiff": 10,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.68,
+        "LastVars2": 3360,
+        "LastOld": 3360
+      },
+      "BMS2_CELL_V_14": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 3,
+        "MeanDiff": -0.15,
+        "MeanAbsDiff": 0.29,
+        "MaxAbsDiff": 10,
+        "RelativePct": 0.01,
+        "MeanGapS": 1.75,
+        "LastVars2": 3350,
+        "LastOld": 3350
+      },
+      "BMS2_CELL_V_15": {
+        "Verdict": "close",
+        "Compared": 68,
+        "Mismatched": 5,
+        "MeanDiff": -0.22,
+        "MeanAbsDiff": 0.51,
+        "MaxAbsDiff": 10,
+        "RelativePct": 0.02,
+        "MeanGapS": 1.73,
+        "LastVars2": 3365,
+        "LastOld": 3365
+      },
+      "BMS2_CELL_V_16": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 3,
+        "MeanDiff": 0.07,
+        "MeanAbsDiff": 0.22,
+        "MaxAbsDiff": 5,
+        "RelativePct": 0.01,
+        "MeanGapS": 1.73,
+        "LastVars2": 3360,
+        "LastOld": 3360
+      },
+      "BMS2_CELL_TEMP_C_1": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 0,
+        "MeanDiff": -0.01,
+        "MeanAbsDiff": 0.01,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.06,
+        "MeanGapS": 1.52,
+        "LastVars2": 25,
+        "LastOld": 25
+      },
+      "BMS2_CELL_TEMP_C_2": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 0,
+        "MeanDiff": -0.01,
+        "MeanAbsDiff": 0.01,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.06,
+        "MeanGapS": 1.73,
+        "LastVars2": 25,
+        "LastOld": 25
+      },
+      "BMS2_CELL_TEMP_C_3": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 0,
+        "MeanDiff": -0.01,
+        "MeanAbsDiff": 0.01,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.06,
+        "MeanGapS": 1.73,
+        "LastVars2": 25,
+        "LastOld": 25
+      },
+      "BMS2_CELL_TEMP_C_4": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 0,
+        "MeanDiff": -0.03,
+        "MeanAbsDiff": 0.03,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.11,
+        "MeanGapS": 1.72,
+        "LastVars2": 25,
+        "LastOld": 25
+      },
+      "BMS2_CELL_TEMP_C_5": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 0,
+        "MeanDiff": -0.01,
+        "MeanAbsDiff": 0.01,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.06,
+        "MeanGapS": 1.72,
+        "LastVars2": 24,
+        "LastOld": 24
+      },
+      "BMS2_CELL_TEMP_C_6": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 0,
+        "MeanDiff": -0.03,
+        "MeanAbsDiff": 0.03,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.11,
+        "MeanGapS": 1.72,
+        "LastVars2": 25,
+        "LastOld": 25
+      },
+      "BMS2_CELL_TEMP_C_7": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 0,
+        "MeanDiff": -0.01,
+        "MeanAbsDiff": 0.01,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.06,
+        "MeanGapS": 1.72,
+        "LastVars2": 23,
+        "LastOld": 23
+      },
+      "BMS2_CELL_TEMP_C_8": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 0,
+        "MeanDiff": -0.03,
+        "MeanAbsDiff": 0.03,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.12,
+        "MeanGapS": 1.72,
+        "LastVars2": 23,
+        "LastOld": 23
+      },
+      "BMS2_CELL_TEMP_C_9": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 0,
+        "MeanDiff": -0.03,
+        "MeanAbsDiff": 0.03,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.12,
+        "MeanGapS": 1.71,
+        "LastVars2": 24,
+        "LastOld": 24
+      },
+      "BMS2_CELL_TEMP_C_10": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 0,
+        "MeanDiff": -0.06,
+        "MeanAbsDiff": 0.06,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.22,
+        "MeanGapS": 1.71,
+        "LastVars2": 25,
+        "LastOld": 25
+      },
+      "BMS2_CELL_TEMP_C_11": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 0,
+        "MeanDiff": -0.01,
+        "MeanAbsDiff": 0.01,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.06,
+        "MeanGapS": 1.5,
+        "LastVars2": 25,
+        "LastOld": 25
+      },
+      "BMS2_CELL_TEMP_C_12": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 0,
+        "MeanDiff": -0.01,
+        "MeanAbsDiff": 0.01,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.06,
+        "MeanGapS": 1.5,
+        "LastVars2": 25,
+        "LastOld": 25
+      },
+      "BMS2_CELL_TEMP_C_13": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 0,
+        "MeanDiff": -0.03,
+        "MeanAbsDiff": 0.03,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.11,
+        "MeanGapS": 1.71,
+        "LastVars2": 25,
+        "LastOld": 25
+      },
+      "BMS2_CELL_TEMP_C_14": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 0,
+        "MeanDiff": -0.03,
+        "MeanAbsDiff": 0.03,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.11,
+        "MeanGapS": 1.71,
+        "LastVars2": 25,
+        "LastOld": 25
+      },
+      "BMS2_CELL_TEMP_C_15": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 0,
+        "MeanDiff": -0.01,
+        "MeanAbsDiff": 0.01,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.06,
+        "MeanGapS": 1.71,
+        "LastVars2": 25,
+        "LastOld": 25
+      },
+      "BMS2_CELL_TEMP_C_16": {
+        "Verdict": "ok",
+        "Compared": 68,
+        "Mismatched": 0,
+        "MeanDiff": -0.03,
+        "MeanAbsDiff": 0.03,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.11,
+        "MeanGapS": 1.71,
+        "LastVars2": 26,
+        "LastOld": 26
+      },
+      "CONS_AXPERT_WH": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 54,
+        "MeanDiff": 5.28,
+        "MeanAbsDiff": 5.28,
+        "MaxAbsDiff": 6,
+        "RelativePct": 0.13,
+        "MeanGapS": 3.4,
+        "LastVars2": 4322,
+        "LastOld": 4317
+      },
+      "CONS_EVSE_WH": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 54,
+        "MeanDiff": 5.26,
+        "MeanAbsDiff": 5.26,
+        "MaxAbsDiff": 6,
+        "RelativePct": 0.13,
+        "MeanGapS": 3.15,
+        "LastVars2": 4300,
+        "LastOld": 4295
+      },
+      "CONS_WS_HEATING_WH": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 10,
+        "MeanDiff": 1.02,
+        "MeanAbsDiff": 1.02,
+        "MaxAbsDiff": 2,
+        "RelativePct": 0.05,
+        "MeanGapS": 3.15,
+        "LastVars2": 1990,
+        "LastOld": 1988
+      },
+      "POW_AXPERT_W": {
+        "Verdict": "close",
+        "Compared": 110,
+        "Mismatched": 95,
+        "MeanDiff": 0.11,
+        "MeanAbsDiff": 10.07,
+        "MaxAbsDiff": 32,
+        "RelativePct": 0.26,
+        "MeanGapS": 0.59,
+        "LastVars2": 3805,
+        "LastOld": 3805
+      },
+      "POW_EVSE_W": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 47,
+        "MeanDiff": -0.07,
+        "MeanAbsDiff": 9.41,
+        "MaxAbsDiff": 24,
+        "RelativePct": 0.25,
+        "MeanGapS": 3.09,
+        "LastVars2": 3785,
+        "LastOld": 3789
+      },
+      "POW_WS_HEATING_W": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 30,
+        "MeanDiff": 11.87,
+        "MeanAbsDiff": 13.43,
+        "MaxAbsDiff": 80,
+        "RelativePct": 1.87,
+        "MeanGapS": 3.09,
+        "LastVars2": 1052,
+        "LastOld": 1052
+      },
+      "AXPERT_TEMP_C": {
+        "Verdict": "ok",
+        "Compared": 55,
+        "Mismatched": 0,
+        "MeanDiff": 0.02,
+        "MeanAbsDiff": 0.13,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.28,
+        "MeanGapS": 1.15,
+        "LastVars2": 46,
+        "LastOld": 46
+      },
+      "AXPERT_AC_POWER_W": {
+        "Verdict": "close",
+        "Compared": 55,
+        "Mismatched": 41,
+        "MeanDiff": 3.38,
+        "MeanAbsDiff": 22.58,
+        "MaxAbsDiff": 98,
+        "RelativePct": 0.59,
+        "MeanGapS": 1.15,
+        "LastVars2": 3832,
+        "LastOld": 3829
+      },
+      "AXPERT_BAT_CHARGING_A": {
+        "Verdict": "ok",
+        "Compared": 55,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.15,
+        "LastVars2": 0,
+        "LastOld": 0
+      },
+      "AXPERT_BAT_DISCHARGING_A": {
+        "Verdict": "noisy",
+        "Compared": 55,
+        "Mismatched": 4,
+        "MeanDiff": 0.15,
+        "MeanAbsDiff": 0.4,
+        "MaxAbsDiff": 3,
+        "RelativePct": 23.91,
+        "MeanGapS": 1.15,
+        "LastVars2": 8,
+        "LastOld": 8
+      },
+      "AXPERT_BAT_VOLTAGE_V": {
+        "Verdict": "ok",
+        "Compared": 55,
+        "Mismatched": 0,
+        "MeanDiff": -0.09,
+        "MeanAbsDiff": 0.24,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.04,
+        "MeanGapS": 1.15,
+        "LastVars2": 532,
+        "LastOld": 532
+      },
+      "AXPERT_PVS1_W": {
+        "Verdict": "close",
+        "Compared": 55,
+        "Mismatched": 35,
+        "MeanDiff": -4.55,
+        "MeanAbsDiff": 9.13,
+        "MaxAbsDiff": 51,
+        "RelativePct": 0.49,
+        "MeanGapS": 1.15,
+        "LastVars2": 1721,
+        "LastOld": 1721
+      },
+      "AXPERT_PVS1_V": {
+        "Verdict": "close",
+        "Compared": 55,
+        "Mismatched": 39,
+        "MeanDiff": 2.07,
+        "MeanAbsDiff": 13.85,
+        "MaxAbsDiff": 115,
+        "RelativePct": 0.51,
+        "MeanGapS": 1.15,
+        "LastVars2": 2735,
+        "LastOld": 2727
+      },
+      "AXPERT_PVS1_A": {
+        "Verdict": "close",
+        "Compared": 55,
+        "Mismatched": 5,
+        "MeanDiff": -0.27,
+        "MeanAbsDiff": 0.56,
+        "MaxAbsDiff": 3,
+        "RelativePct": 0.82,
+        "MeanGapS": 1.15,
+        "LastVars2": 62,
+        "LastOld": 63
+      },
+      "AXPERT_PVS2_W": {
+        "Verdict": "close",
+        "Compared": 55,
+        "Mismatched": 32,
+        "MeanDiff": -3.42,
+        "MeanAbsDiff": 10.04,
+        "MaxAbsDiff": 67,
+        "RelativePct": 0.52,
+        "MeanGapS": 1.15,
+        "LastVars2": 1799,
+        "LastOld": 1792
+      },
+      "AXPERT_PVS2_V": {
+        "Verdict": "close",
+        "Compared": 55,
+        "Mismatched": 32,
+        "MeanDiff": 0.11,
+        "MeanAbsDiff": 14.0,
+        "MaxAbsDiff": 84,
+        "RelativePct": 0.51,
+        "MeanGapS": 1.15,
+        "LastVars2": 2759,
+        "LastOld": 2731
+      },
+      "AXPERT_PVS2_A": {
+        "Verdict": "close",
+        "Compared": 55,
+        "Mismatched": 9,
+        "MeanDiff": -0.05,
+        "MeanAbsDiff": 0.6,
+        "MaxAbsDiff": 3,
+        "RelativePct": 0.86,
+        "MeanGapS": 1.15,
+        "LastVars2": 65,
+        "LastOld": 65
+      },
+      "AXPERT_BAT_POWER_W": {
+        "Verdict": "noisy",
+        "Compared": 54,
+        "Mismatched": 21,
+        "MeanDiff": -6.89,
+        "MeanAbsDiff": 28.52,
+        "MaxAbsDiff": 160,
+        "RelativePct": 32.61,
+        "MeanGapS": 4.15,
+        "LastVars2": -425,
+        "LastOld": -319
+      },
+      "AXPERT_BAT_CURRENT_A": {
+        "Verdict": "noisy",
+        "Compared": 54,
+        "Mismatched": 6,
+        "MeanDiff": -0.13,
+        "MeanAbsDiff": 0.54,
+        "MaxAbsDiff": 3,
+        "RelativePct": 32.58,
+        "MeanGapS": 4.15,
+        "LastVars2": -8,
+        "LastOld": -6
+      },
+      "AXPERT_SOLAR_W": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 53,
+        "MeanDiff": -7.19,
+        "MeanAbsDiff": 24.22,
+        "MaxAbsDiff": 104,
+        "RelativePct": 0.64,
+        "MeanGapS": 4.15,
+        "LastVars2": 3513,
+        "LastOld": 3586
+      },
+      "AXPERT_ENERGY_TODAY_WH": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": -0.13,
+        "MeanAbsDiff": 0.13,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.0,
+        "MeanGapS": 4.15,
+        "LastVars2": 3595,
+        "LastOld": 3596
+      },
+      "AXPERT_LOAD_W": {
+        "Verdict": "close",
+        "Compared": 54,
+        "Mismatched": 52,
+        "MeanDiff": -0.3,
+        "MeanAbsDiff": 28.3,
+        "MaxAbsDiff": 96,
+        "RelativePct": 0.73,
+        "MeanGapS": 4.15,
+        "LastVars2": 3938,
+        "LastOld": 3905
+      },
+      "STRG1_SOC": {
+        "Verdict": "ok",
+        "Compared": 137,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.11,
+        "LastVars2": 9966,
+        "LastOld": 9966
+      },
+      "STRG1_POWER_W": {
+        "Verdict": "ok",
+        "Compared": 137,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.11,
+        "LastVars2": -19,
+        "LastOld": -19
+      },
+      "STRG1_CURRENT_A": {
+        "Verdict": "ok",
+        "Compared": 137,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.11,
+        "LastVars2": -3,
+        "LastOld": -3
+      },
+      "STRG1_ENERGY_WH": {
+        "Verdict": "ok",
+        "Compared": 137,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.11,
+        "LastVars2": 16064,
+        "LastOld": 16064
+      },
+      "STRG1_OPT_CHARGING_A": {
+        "Verdict": "ok",
+        "Compared": 137,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.12,
+        "LastVars2": 150,
+        "LastOld": 150
+      },
+      "STRG1_CAPACITY_AH": {
+        "Verdict": "ok",
+        "Compared": 137,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.11,
+        "LastVars2": 300,
+        "LastOld": 300
+      },
+      "STRG1_BALANCED_TODAY": {
+        "Verdict": "ok",
+        "Compared": 137,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.11,
+        "LastVars2": 0,
+        "LastOld": 0
+      },
+      "STRG1_VOLTAGE_V": {
+        "Verdict": "ok",
+        "Compared": 137,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.11,
+        "LastVars2": 537,
+        "LastOld": 537
+      },
+      "LLOAD1_POWER_W": {
+        "Verdict": "ok",
+        "Compared": 137,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.11,
+        "LastVars2": 4480,
+        "LastOld": 4480
+      },
+      "LLOAD1_CONS_WH": {
+        "Verdict": "ok",
+        "Compared": 137,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.11,
+        "LastVars2": 2643,
+        "LastOld": 2643
+      },
+      "LPV1_POWER_W": {
+        "Verdict": "ok",
+        "Compared": 137,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.11,
+        "LastVars2": 4461,
+        "LastOld": 4461
+      },
+      "LPV1_PROD_WH": {
+        "Verdict": "ok",
+        "Compared": 137,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 0.11,
+        "LastVars2": 3582,
+        "LastOld": 3582
+      },
+      "STRG2_SOC": {
+        "Verdict": "ok",
+        "Compared": 272,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.11,
+        "LastVars2": 9900,
+        "LastOld": 9900
+      },
+      "STRG2_POWER_W": {
+        "Verdict": "noisy",
+        "Compared": 272,
+        "Mismatched": 256,
+        "MeanDiff": -4.92,
+        "MeanAbsDiff": 46.61,
+        "MaxAbsDiff": 387,
+        "RelativePct": 9.73,
+        "MeanGapS": 1.11,
+        "LastVars2": -955,
+        "LastOld": -885
+      },
+      "STRG2_CURRENT_A": {
+        "Verdict": "noisy",
+        "Compared": 272,
+        "Mismatched": 228,
+        "MeanDiff": -0.92,
+        "MeanAbsDiff": 8.64,
+        "MaxAbsDiff": 72,
+        "RelativePct": 9.64,
+        "MeanGapS": 1.11,
+        "LastVars2": -179,
+        "LastOld": -166
+      },
+      "STRG2_ENERGY_WH": {
+        "Verdict": "close",
+        "Compared": 272,
+        "Mismatched": 187,
+        "MeanDiff": -0.35,
+        "MeanAbsDiff": 2.85,
+        "MaxAbsDiff": 17,
+        "RelativePct": 0.02,
+        "MeanGapS": 1.11,
+        "LastVars2": 13224,
+        "LastOld": 13219
+      },
+      "STRG2_OPT_CHARGING_A": {
+        "Verdict": "ok",
+        "Compared": 272,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.11,
+        "LastVars2": 62,
+        "LastOld": 62
+      },
+      "STRG2_CAPACITY_AH": {
+        "Verdict": "ok",
+        "Compared": 272,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.11,
+        "LastVars2": 251,
+        "LastOld": 251
+      },
+      "STRG2_BALANCED_TODAY": {
+        "Verdict": "ok",
+        "Compared": 272,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.11,
+        "LastVars2": 0,
+        "LastOld": 0
+      },
+      "STRG2_VOLTAGE_V": {
+        "Verdict": "ok",
+        "Compared": 272,
+        "Mismatched": 0,
+        "MeanDiff": -0.01,
+        "MeanAbsDiff": 0.12,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.02,
+        "MeanGapS": 1.11,
+        "LastVars2": 532,
+        "LastOld": 532
+      },
+      "LLOAD2_POWER_W": {
+        "Verdict": "close",
+        "Compared": 272,
+        "Mismatched": 266,
+        "MeanDiff": 3.04,
+        "MeanAbsDiff": 47.02,
+        "MaxAbsDiff": 387,
+        "RelativePct": 1.13,
+        "MeanGapS": 1.11,
+        "LastVars2": 4497,
+        "LastOld": 4405
+      },
+      "LLOAD2_CONS_WH": {
+        "Verdict": "close",
+        "Compared": 272,
+        "Mismatched": 158,
+        "MeanDiff": 1.74,
+        "MeanAbsDiff": 1.74,
+        "MaxAbsDiff": 3,
+        "RelativePct": 0.03,
+        "MeanGapS": 1.11,
+        "LastVars2": 5454,
+        "LastOld": 5451
+      },
+      "LPV2_POWER_W": {
+        "Verdict": "close",
+        "Compared": 272,
+        "Mismatched": 169,
+        "MeanDiff": -1.88,
+        "MeanAbsDiff": 10.4,
+        "MaxAbsDiff": 69,
+        "RelativePct": 0.27,
+        "MeanGapS": 1.11,
+        "LastVars2": 3542,
+        "LastOld": 3520
+      },
+      "LPV2_PROD_WH": {
+        "Verdict": "close",
+        "Compared": 272,
+        "Mismatched": 142,
+        "MeanDiff": 1.58,
+        "MeanAbsDiff": 1.58,
+        "MaxAbsDiff": 3,
+        "RelativePct": 0.02,
+        "MeanGapS": 1.11,
+        "LastVars2": 8423,
+        "LastOld": 8421
+      },
+      "BMS3_CELL_V_1": {
+        "Verdict": "ok",
+        "Compared": 63,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.03,
+        "LastVars2": 3350,
+        "LastOld": 3350
+      },
+      "BMS3_CELL_V_2": {
+        "Verdict": "ok",
+        "Compared": 63,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.03,
+        "LastVars2": 3345,
+        "LastOld": 3345
+      },
+      "BMS3_CELL_V_3": {
+        "Verdict": "ok",
+        "Compared": 64,
+        "Mismatched": 1,
+        "MeanDiff": 0.08,
+        "MeanAbsDiff": 0.08,
+        "MaxAbsDiff": 5,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.35,
+        "LastVars2": 3360,
+        "LastOld": 3360
+      },
+      "BMS3_CELL_V_4": {
+        "Verdict": "ok",
+        "Compared": 64,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.34,
+        "LastVars2": 3350,
+        "LastOld": 3350
+      },
+      "BMS3_CELL_V_5": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 1,
+        "MeanDiff": 0.09,
+        "MeanAbsDiff": 0.09,
+        "MaxAbsDiff": 5,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.1,
+        "LastVars2": 3360,
+        "LastOld": 3360
+      },
+      "BMS3_CELL_V_6": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.09,
+        "LastVars2": 3350,
+        "LastOld": 3350
+      },
+      "BMS3_CELL_V_7": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.09,
+        "LastVars2": 3355,
+        "LastOld": 3355
+      },
+      "BMS3_CELL_V_8": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 1,
+        "MeanDiff": 0.09,
+        "MeanAbsDiff": 0.09,
+        "MaxAbsDiff": 5,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.09,
+        "LastVars2": 3355,
+        "LastOld": 3350
+      },
+      "BMS3_CELL_V_9": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.09,
+        "LastVars2": 3355,
+        "LastOld": 3355
+      },
+      "BMS3_CELL_V_10": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.09,
+        "LastVars2": 3340,
+        "LastOld": 3340
+      },
+      "BMS3_CELL_V_11": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.09,
+        "LastVars2": 3350,
+        "LastOld": 3350
+      },
+      "BMS3_CELL_V_12": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 1,
+        "MeanDiff": -0.09,
+        "MeanAbsDiff": 0.09,
+        "MaxAbsDiff": 5,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.09,
+        "LastVars2": 3350,
+        "LastOld": 3350
+      },
+      "BMS3_CELL_V_13": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.11,
+        "LastVars2": 3340,
+        "LastOld": 3340
+      },
+      "BMS3_CELL_V_14": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 1,
+        "MeanDiff": -0.09,
+        "MeanAbsDiff": 0.09,
+        "MaxAbsDiff": 5,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.1,
+        "LastVars2": 3350,
+        "LastOld": 3350
+      },
+      "BMS3_CELL_V_15": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.09,
+        "LastVars2": 3355,
+        "LastOld": 3355
+      },
+      "BMS3_CELL_V_16": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 2,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.19,
+        "MaxAbsDiff": 5,
+        "RelativePct": 0.01,
+        "MeanGapS": 1.09,
+        "LastVars2": 3360,
+        "LastOld": 3360
+      },
+      "BMS3_CELL_TEMP_C_1": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": -0.02,
+        "MeanAbsDiff": 0.02,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.08,
+        "MeanGapS": 1.09,
+        "LastVars2": 22,
+        "LastOld": 22
+      },
+      "BMS3_CELL_TEMP_C_2": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.09,
+        "LastVars2": 19,
+        "LastOld": 19
+      },
+      "BMS3_CELL_TEMP_C_3": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.09,
+        "LastVars2": 20,
+        "LastOld": 20
+      },
+      "BMS3_CELL_TEMP_C_4": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.09,
+        "LastVars2": 18,
+        "LastOld": 18
+      },
+      "BMS3_CELL_TEMP_C_5": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": -0.02,
+        "MeanAbsDiff": 0.02,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.1,
+        "MeanGapS": 1.57,
+        "LastVars2": 18,
+        "LastOld": 18
+      },
+      "BMS3_CELL_TEMP_C_6": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.53,
+        "LastVars2": 18,
+        "LastOld": 18
+      },
+      "BMS3_CELL_TEMP_C_7": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.51,
+        "LastVars2": 19,
+        "LastOld": 19
+      },
+      "BMS3_CELL_TEMP_C_8": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": -0.02,
+        "MeanAbsDiff": 0.02,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.1,
+        "MeanGapS": 1.46,
+        "LastVars2": 18,
+        "LastOld": 18
+      },
+      "BMS3_CELL_TEMP_C_9": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": -0.02,
+        "MeanAbsDiff": 0.02,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.1,
+        "MeanGapS": 1.24,
+        "LastVars2": 19,
+        "LastOld": 19
+      },
+      "BMS3_CELL_TEMP_C_10": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.24,
+        "LastVars2": 17,
+        "LastOld": 17
+      },
+      "BMS3_CELL_TEMP_C_11": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.24,
+        "LastVars2": 19,
+        "LastOld": 19
+      },
+      "BMS3_CELL_TEMP_C_12": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.24,
+        "LastVars2": 17,
+        "LastOld": 17
+      },
+      "BMS3_CELL_TEMP_C_13": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": -0.02,
+        "MeanAbsDiff": 0.02,
+        "MaxAbsDiff": 1,
+        "RelativePct": 0.1,
+        "MeanGapS": 1.24,
+        "LastVars2": 18,
+        "LastOld": 18
+      },
+      "BMS3_CELL_TEMP_C_14": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.24,
+        "LastVars2": 20,
+        "LastOld": 20
+      },
+      "BMS3_CELL_TEMP_C_15": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.24,
+        "LastVars2": 19,
+        "LastOld": 19
+      },
+      "BMS3_CELL_TEMP_C_16": {
+        "Verdict": "ok",
+        "Compared": 54,
+        "Mismatched": 0,
+        "MeanDiff": 0.0,
+        "MeanAbsDiff": 0.0,
+        "MaxAbsDiff": 0,
+        "RelativePct": 0.0,
+        "MeanGapS": 1.24,
+        "LastVars2": 16,
+        "LastOld": 16
+      }
+    }
   },
   "Nodes": {
     "IOBOARD_D": {
       "Id": 1,
-      "LastSeenUnix": null,
-      "AgeS": null,
-      "TunnelPackets": 0,
-      "TunnelAvgPerS": 0,
+      "LastSeenUnix": 1794136325,
+      "AgeS": 0,
+      "TunnelPackets": 2922,
+      "TunnelAvgPerS": 10.69,
       "LogMessages": 0,
       "LastLogEvent": null
     },
     "IOBOARD_U": {
       "Id": 2,
-      "LastSeenUnix": null,
-      "AgeS": null,
-      "TunnelPackets": 0,
-      "TunnelAvgPerS": 0,
+      "LastSeenUnix": 1794136325,
+      "AgeS": 0,
+      "TunnelPackets": 967,
+      "TunnelAvgPerS": 3.53,
       "LogMessages": 0,
       "LastLogEvent": null
     },
     "TECHM": {
       "Id": 3,
-      "LastSeenUnix": null,
-      "AgeS": null,
-      "TunnelPackets": 0,
-      "TunnelAvgPerS": 0,
+      "LastSeenUnix": 1794136325,
+      "AgeS": 0,
+      "TunnelPackets": 3009,
+      "TunnelAvgPerS": 10.98,
       "LogMessages": 0,
       "LastLogEvent": null
     },
     "ELECON": {
       "Id": 4,
-      "LastSeenUnix": null,
-      "AgeS": null,
-      "TunnelPackets": 0,
-      "TunnelAvgPerS": 0,
+      "LastSeenUnix": 1794136325,
+      "AgeS": 0,
+      "TunnelPackets": 13430,
+      "TunnelAvgPerS": 49.02,
       "LogMessages": 0,
       "LastLogEvent": null
     },
     "RECU": {
       "Id": 5,
-      "LastSeenUnix": null,
-      "AgeS": null,
-      "TunnelPackets": 0,
-      "TunnelAvgPerS": 0,
+      "LastSeenUnix": 1794136324,
+      "AgeS": 1,
+      "TunnelPackets": 946,
+      "TunnelAvgPerS": 3.46,
       "LogMessages": 0,
       "LastLogEvent": null
     },
@@ -104,10 +3104,10 @@
     },
     "ELECON_D": {
       "Id": 7,
-      "LastSeenUnix": null,
-      "AgeS": null,
-      "TunnelPackets": 0,
-      "TunnelAvgPerS": 0,
+      "LastSeenUnix": 1794136325,
+      "AgeS": 0,
+      "TunnelPackets": 8691,
+      "TunnelAvgPerS": 31.74,
       "LogMessages": 0,
       "LastLogEvent": null
     },
@@ -126,377 +3126,377 @@
       "Id": 1,
       "Value": 174,
       "AgeS": 3,
-      "LastRxUnix": 1793538646,
-      "Count": 3335,
+      "LastRxUnix": 1794136322,
+      "Count": 54,
       "Count2": 0
     },
     "VAR_SOLAR_POWER_W": {
       "Id": 8,
-      "Value": 1111,
-      "AgeS": 1,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 8025,
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 92,
+      "Count2": 92
     },
     "VAR_SOLAR_ENERGY_TODAY_10WH": {
       "Id": 9,
-      "Value": 1114,
-      "AgeS": 1,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 1200,
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 92,
+      "Count2": 92
     },
     "VAR_BAT_SOC": {
       "Id": 10,
-      "Value": 46,
+      "Value": 99,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 16710,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 274,
+      "Count2": 274
     },
     "VAR_BAT_VOLTAGE_V10": {
       "Id": 11,
-      "Value": 528,
+      "Value": 534,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 16710,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 274,
+      "Count2": 274
     },
     "VAR_LOAD_A100": {
       "Id": 12,
-      "Value": 676,
+      "Value": 16544,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 16710,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 274,
+      "Count2": 274
     },
     "VAR_CHARGING_A10": {
       "Id": 13,
-      "Value": 90,
+      "Value": 812,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 16710,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 274,
+      "Count2": 274
     },
     "VAR_BAT_CURRENT_A10": {
       "Id": 14,
-      "Value": 141,
+      "Value": -154,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 16710,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 274,
+      "Count2": 274
     },
     "VAR_CONS_TODAY_10WH": {
       "Id": 15,
-      "Value": 1571,
-      "AgeS": 1,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 809,
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 92,
+      "Count2": 92
     },
     "VAR_BAT_ENERGY_WH": {
       "Id": 16,
-      "Value": 13577,
-      "AgeS": 1,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 29288,
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 92,
+      "Count2": 92
     },
     "VAR_LOAD_W": {
       "Id": 17,
-      "Value": 357,
+      "Value": 8843,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 16710,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 274,
+      "Count2": 274
     },
     "VAR_BAT_POWER_W": {
       "Id": 18,
-      "Value": 747,
-      "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 3342,
-      "Count2": 0
+      "Value": -718,
+      "AgeS": 4,
+      "LastRxUnix": 1794136321,
+      "Count": 54,
+      "Count2": 54
     },
     "VAR_BMS1_SOC": {
       "Id": 20,
-      "Value": 34,
+      "Value": 99,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 16710,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 274,
+      "Count2": 274
     },
     "VAR_BMS1_CURRENT_A10": {
       "Id": 21,
-      "Value": 89,
-      "AgeS": 1,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "Value": -179,
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 92,
+      "Count2": 274
     },
     "VAR_BMS1_VOLTAGE_V10": {
       "Id": 22,
-      "Value": 528,
-      "AgeS": 1,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 532,
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 92,
+      "Count2": 274
     },
     "VAR_BMS1_ENERGY_STORED_WH": {
       "Id": 23,
-      "Value": 4509,
-      "AgeS": 1,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 13224,
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 92,
+      "Count2": 274
     },
     "VAR_BMS1_TODAY_ENERGY_WH": {
       "Id": 24,
       "Value": 0,
-      "AgeS": 1,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 92,
+      "Count2": 274
     },
     "VAR_BMS2_SOC": {
       "Id": 30,
-      "Value": 49,
+      "Value": 98,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 16710,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 274,
+      "Count2": 274
     },
     "VAR_BMS2_CURRENT_A10": {
       "Id": 31,
-      "Value": 37,
-      "AgeS": 1,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 0,
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 92,
+      "Count2": 92
     },
     "VAR_BMS2_VOLTAGE_V10": {
       "Id": 32,
-      "Value": 528,
-      "AgeS": 1,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 537,
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 92,
+      "Count2": 92
     },
     "VAR_BMS2_ENERGY_STORED_WH": {
       "Id": 33,
-      "Value": 5935,
-      "AgeS": 1,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 11769,
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 92,
+      "Count2": 92
     },
     "VAR_BMS2_TODAY_ENERGY_WH": {
       "Id": 34,
-      "Value": 1826,
-      "AgeS": 1,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 5345,
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 91,
+      "Count2": 92
     },
     "VAR_BMS3_SOC": {
       "Id": 35,
-      "Value": 83,
+      "Value": 99,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 16710,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 274,
+      "Count2": 274
     },
     "VAR_BMS3_CURRENT_A10": {
       "Id": 36,
-      "Value": 15,
-      "AgeS": 1,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "Value": -5,
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 91,
+      "Count2": 92
     },
     "VAR_BMS3_VOLTAGE_V10": {
       "Id": 37,
-      "Value": 528,
-      "AgeS": 1,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 536,
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 91,
+      "Count2": 92
     },
     "VAR_BMS3_ENERGY_STORED_WH": {
       "Id": 38,
-      "Value": 3343,
-      "AgeS": 1,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 3990,
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 91,
+      "Count2": 92
     },
     "VAR_BMS3_TODAY_ENERGY_WH": {
       "Id": 39,
       "Value": 0,
-      "AgeS": 1,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 91,
+      "Count2": 92
     },
     "VAR_MPPT_BAT_CURRENT_A10": {
       "Id": 40,
-      "Value": 90,
+      "Value": 812,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 16710,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 274,
+      "Count2": 274
     },
     "VAR_MPPT_BAT_VOLTAGE_V100": {
       "Id": 41,
-      "Value": 5307,
+      "Value": 5415,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 16710,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 274,
+      "Count2": 275
     },
     "VAR_MPPT_YIELD_TODAY_10WH": {
       "Id": 42,
-      "Value": 562,
-      "AgeS": 1,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 1619,
+      "AgeS": 2,
+      "LastRxUnix": 1794136322,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_MPPT_MAX_TODAY_W": {
       "Id": 43,
-      "Value": 4741,
-      "AgeS": 1,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 4809,
+      "AgeS": 2,
+      "LastRxUnix": 1794136322,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_MPPT_SOLAR_POWER_W": {
       "Id": 44,
-      "Value": 487,
+      "Value": 4461,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 16710,
-      "Count2": 0
+      "LastRxUnix": 1794136324,
+      "Count": 274,
+      "Count2": 274
     },
     "VAR_MPPT_SOLAR_VOLTAGE_V100": {
       "Id": 45,
-      "Value": 9816,
+      "Value": 9676,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 16710,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 274,
+      "Count2": 274
     },
     "VAR_MPPT_SOLAR_CURRENT_A10": {
       "Id": 46,
-      "Value": 49,
-      "AgeS": 1,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 447,
+      "AgeS": 2,
+      "LastRxUnix": 1794136322,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_MPPT_SOLAR_MAX_VOLTAGE_V100": {
       "Id": 47,
       "Value": 0,
-      "AgeS": 1,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "AgeS": 2,
+      "LastRxUnix": 1794136322,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_MPPT_MAX_BAT_CURRENT_A10": {
       "Id": 48,
       "Value": 0,
-      "AgeS": 1,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "AgeS": 2,
+      "LastRxUnix": 1794136322,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_MPPT_ENERGY_TODAY_WH": {
       "Id": 49,
-      "Value": 37,
-      "AgeS": 1,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 60,
+      "AgeS": 2,
+      "LastRxUnix": 1794136322,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_SHUNT_PCK1_CURRENT_A100": {
       "Id": 50,
-      "Value": -622,
+      "Value": 0,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 3342,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 55,
+      "Count2": 274
     },
     "VAR_SHUNT_PCK2_CURRENT_A100": {
       "Id": 51,
-      "Value": 523,
-      "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 761,
+      "AgeS": 3,
+      "LastRxUnix": 1794136321,
+      "Count": 55,
+      "Count2": 55
     },
     "VAR_CONS_AC300_WH": {
       "Id": 60,
-      "Value": 162,
-      "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 15,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_CONS_AC3KW_WH": {
       "Id": 61,
-      "Value": 1280,
-      "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 0,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_CONS_AC5KW_WH": {
       "Id": 62,
-      "Value": 2256,
-      "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 726,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_CONS_FRIDGE_WH": {
       "Id": 63,
-      "Value": 129,
+      "Value": 33,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 5570,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 91,
+      "Count2": 274
     },
     "VAR_CONS_KITCHEN_WH": {
       "Id": 64,
-      "Value": 2033,
+      "Value": 1482,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 5570,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 91,
+      "Count2": 274
     },
     "VAR_CONS_WASCHMACHINE_WH": {
       "Id": 65,
-      "Value": 1270,
+      "Value": 154,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 5570,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 91,
+      "Count2": 274
     },
     "VAR_CONS_OTHER_WH": {
       "Id": 66,
-      "Value": 150,
+      "Value": 373,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 5570,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 91,
+      "Count2": 274
     },
     "VAR_CONS_TECHM_WH": {
       "Id": 67,
-      "Value": 5,
+      "Value": 0,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 5570,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 91,
+      "Count2": 274
     },
     "VAR_CONS_KITCHEN_A_WH": {
       "Id": 68,
@@ -516,67 +3516,67 @@
     },
     "VAR_POW_AC300_W": {
       "Id": 70,
-      "Value": 0,
-      "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 31,
+      "AgeS": 1,
+      "LastRxUnix": 1794136323,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_POW_AC3KW_W": {
       "Id": 71,
       "Value": 0,
-      "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 5570,
-      "Count2": 0
+      "AgeS": 1,
+      "LastRxUnix": 1794136323,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_POW_AC5KW_W": {
       "Id": 72,
-      "Value": 0,
-      "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 407,
+      "AgeS": 1,
+      "LastRxUnix": 1794136323,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_POW_FRIDGE_W": {
       "Id": 73,
-      "Value": 0,
+      "Value": 30,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 5570,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 91,
+      "Count2": 274
     },
     "VAR_POW_KITCHEN_W": {
       "Id": 74,
-      "Value": 0,
+      "Value": 648,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 5570,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 91,
+      "Count2": 274
     },
     "VAR_POW_WASCHMACHINE_W": {
       "Id": 75,
       "Value": 0,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 5570,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 91,
+      "Count2": 274
     },
     "VAR_POW_OTHER_W": {
       "Id": 76,
       "Value": 0,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 91,
+      "Count2": 274
     },
     "VAR_POW_TECHM_W": {
       "Id": 77,
       "Value": 0,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 91,
+      "Count2": 274
     },
     "VAR_POW_KITCHEN_A_W": {
       "Id": 78,
@@ -596,1739 +3596,1739 @@
     },
     "VAR_EL_HEATER_STATUS": {
       "Id": 80,
-      "Value": 10,
-      "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 0,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_EL_HEATER_POWER": {
       "Id": 81,
-      "Value": 0,
-      "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 40,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_EL_HEATER_CURRENT": {
       "Id": 82,
-      "Value": 119,
-      "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 4023,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_EL_HEATER_CONS": {
       "Id": 83,
-      "Value": 46,
-      "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 790,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_HEAT_TOTAL_WH": {
       "Id": 85,
-      "Value": 11504,
+      "Value": 922,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 5570,
-      "Count2": 0
+      "LastRxUnix": 1794136324,
+      "Count": 91,
+      "Count2": 92
     },
     "VAR_HEAT_HEATING_WH": {
       "Id": 86,
-      "Value": 8480,
+      "Value": 1028,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 5570,
-      "Count2": 0
+      "LastRxUnix": 1794136324,
+      "Count": 91,
+      "Count2": 92
     },
     "VAR_FLOW_COLD": {
       "Id": 90,
       "Value": 0,
-      "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 5570,
-      "Count2": 0
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_FLOW_HOT": {
       "Id": 91,
       "Value": 0,
-      "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 5570,
-      "Count2": 0
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_CONS_COLD": {
       "Id": 92,
-      "Value": 1287,
-      "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 819,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_CONS_HOT": {
       "Id": 93,
-      "Value": 522,
-      "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 237,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_BOILER_POWER": {
       "Id": 98,
       "Value": 0,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "AgeS": 0,
+      "LastRxUnix": 1794136324,
+      "Count": 91,
+      "Count2": 92
     },
     "VAR_BOILER_HEAT": {
       "Id": 99,
       "Value": 0,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "AgeS": 0,
+      "LastRxUnix": 1794136324,
+      "Count": 91,
+      "Count2": 92
     },
     "VAR_TEMP_BOILER": {
       "Id": 100,
-      "Value": 245,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 233,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_TEMP_BOILER_IN": {
       "Id": 101,
-      "Value": 235,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 220,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_TEMP_BOILER_OUT": {
       "Id": 102,
-      "Value": 244,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 225,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_TEMP_TANK_IN_H": {
       "Id": 103,
-      "Value": 388,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 280,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_TEMP_TANK_OUT_H": {
       "Id": 104,
-      "Value": 429,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 268,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_TEMP_TANK_1": {
       "Id": 105,
-      "Value": 384,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 306,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_TEMP_TANK_2": {
       "Id": 106,
-      "Value": 537,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 320,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 91,
+      "Count2": 91
     },
     "VAR_TEMP_TANK_3": {
       "Id": 107,
-      "Value": 580,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 342,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 92,
+      "Count2": 91
     },
     "VAR_TEMP_TANK_4": {
       "Id": 108,
-      "Value": 595,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 347,
+      "AgeS": 0,
+      "LastRxUnix": 1794136324,
+      "Count": 92,
+      "Count2": 91
     },
     "VAR_TEMP_TANK_5": {
       "Id": 109,
-      "Value": 599,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 413,
+      "AgeS": 0,
+      "LastRxUnix": 1794136324,
+      "Count": 92,
+      "Count2": 91
     },
     "VAR_TEMP_TANK_6": {
       "Id": 110,
-      "Value": 591,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 435,
+      "AgeS": 0,
+      "LastRxUnix": 1794136324,
+      "Count": 92,
+      "Count2": 91
     },
     "VAR_TEMP_WALL_IN": {
       "Id": 111,
-      "Value": 246,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 236,
+      "AgeS": 0,
+      "LastRxUnix": 1794136324,
+      "Count": 92,
+      "Count2": 91
     },
     "VAR_TEMP_WALL_OUT": {
       "Id": 112,
-      "Value": 247,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 234,
+      "AgeS": 0,
+      "LastRxUnix": 1794136324,
+      "Count": 92,
+      "Count2": 91
     },
     "VAR_TEMP_BOILER_EXHAUST": {
       "Id": 113,
-      "Value": 280,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 269,
+      "AgeS": 0,
+      "LastRxUnix": 1794136324,
+      "Count": 92,
+      "Count2": 91
     },
     "VAR_TEMP_RAD_H": {
       "Id": 114,
-      "Value": 263,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 250,
+      "AgeS": 0,
+      "LastRxUnix": 1794136324,
+      "Count": 92,
+      "Count2": 91
     },
     "VAR_TEMP_RAD_C": {
       "Id": 115,
-      "Value": 268,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 256,
+      "AgeS": 0,
+      "LastRxUnix": 1794136324,
+      "Count": 92,
+      "Count2": 91
     },
     "VAR_TEMP_TANK_IN_C": {
       "Id": 116,
-      "Value": 322,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 250,
+      "AgeS": 0,
+      "LastRxUnix": 1794136324,
+      "Count": 92,
+      "Count2": 91
     },
     "VAR_TEMP_TANK_OUT_C": {
       "Id": 117,
-      "Value": 313,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 264,
+      "AgeS": 0,
+      "LastRxUnix": 1794136324,
+      "Count": 92,
+      "Count2": 92
     },
     "VAR_TEMP_TECHM_BOARD": {
       "Id": 120,
-      "Value": 282,
-      "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 437,
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 92,
+      "Count2": 274
     },
     "VAR_TEMP_IOBOARD_D": {
       "Id": 121,
-      "Value": 267,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 293,
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 92,
+      "Count2": 91
     },
     "VAR_TEMP_IOBOARD_U": {
       "Id": 122,
-      "Value": 278,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 300,
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 92,
+      "Count2": 91
     },
     "VAR_TEMP_ELECON_BOARD": {
       "Id": 123,
-      "Value": 272,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 300,
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 92,
+      "Count2": 92
     },
     "VAR_TEMP_DOWNSTAIRS": {
       "Id": 124,
-      "Value": 227,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 246,
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 92,
+      "Count2": 91
     },
     "VAR_TEMP_OFFICE": {
       "Id": 125,
-      "Value": 271,
+      "Value": 293,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 5570,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 91,
+      "Count2": 92
     },
     "VAR_TEMP_KIDROOM": {
       "Id": 126,
-      "Value": 220,
+      "Value": 223,
       "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 5570,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 91,
+      "Count2": 92
     },
     "VAR_TEMP_OUTSIDE": {
       "Id": 127,
-      "Value": 80,
-      "AgeS": 2,
-      "LastRxUnix": 1793538646,
-      "Count": 5570,
-      "Count2": 0
+      "Value": 60,
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 91,
+      "Count2": 92
     },
     "VAR_TEMP_RECU_FC": {
       "Id": 128,
-      "Value": 78,
-      "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 5013,
-      "Count2": 0
+      "Value": 60,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 82,
+      "Count2": 86
     },
     "VAR_TEMP_RECU_FH": {
       "Id": 129,
-      "Value": 208,
-      "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 5013,
-      "Count2": 0
+      "Value": 223,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 82,
+      "Count2": 86
     },
     "VAR_TEMP_RECU_WH": {
       "Id": 130,
-      "Value": 242,
-      "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 5013,
-      "Count2": 0
+      "Value": 270,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 82,
+      "Count2": 86
     },
     "VAR_TEMP_RECU_WC": {
       "Id": 131,
       "Value": 117,
-      "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 5013,
-      "Count2": 0
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 82,
+      "Count2": 86
     },
     "VAR_RH_RECU_FH": {
       "Id": 132,
-      "Value": 32,
-      "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 5013,
-      "Count2": 0
+      "Value": 24,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 82,
+      "Count2": 86
     },
     "VAR_RH_RECU_WH": {
       "Id": 133,
-      "Value": 48,
-      "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 5013,
-      "Count2": 0
+      "Value": 44,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 82,
+      "Count2": 86
     },
     "VAR_CO2_RECU": {
       "Id": 137,
-      "Value": 764,
-      "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 5013,
-      "Count2": 0
+      "Value": 1158,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 82,
+      "Count2": 86
     },
     "VAR_DP_RECU_F": {
       "Id": 138,
-      "Value": 2,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 5012,
-      "Count2": 0
+      "Value": 1,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 82,
+      "Count2": 86
     },
     "VAR_DP_RECU_W": {
       "Id": 139,
-      "Value": 11,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 5012,
-      "Count2": 0
+      "Value": 12,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 82,
+      "Count2": 86
     },
     "VAR_RECU_FAN_F": {
       "Id": 140,
       "Value": 20,
-      "AgeS": 3,
-      "LastRxUnix": 1793538646,
-      "Count": 5012,
-      "Count2": 0
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 82,
+      "Count2": 86
     },
     "VAR_RECU_FAN_W": {
       "Id": 141,
       "Value": 20,
-      "AgeS": 2,
-      "LastRxUnix": 1793538646,
-      "Count": 5012,
-      "Count2": 0
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 82,
+      "Count2": 86
     },
     "VAR_CURR_RECU_A": {
       "Id": 142,
       "Value": 0,
-      "AgeS": 2,
-      "LastRxUnix": 1793538646,
-      "Count": 5012,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 82,
       "Count2": 0
     },
     "VAR_TEMP_DILNA": {
       "Id": 144,
       "Value": 168,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 55,
+      "Count2": 54
     },
     "VAR_TEMP_AKUPACK1": {
       "Id": 145,
-      "Value": 177,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 176,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 55,
+      "Count2": 54
     },
     "VAR_TEMP_BOARD_ELECON_D": {
       "Id": 146,
       "Value": -32768,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 55,
+      "Count2": 54
     },
     "VAR_METEO_WIND_BURST": {
       "Id": 161,
-      "Value": 27,
+      "Value": 7,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 13367,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 220,
+      "Count2": 274
     },
     "VAR_METEO_WIND_AVG": {
       "Id": 162,
-      "Value": 27,
+      "Value": 31,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 13367,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 219,
+      "Count2": 274
     },
     "VAR_METEO_WIND_POW": {
       "Id": 163,
-      "Value": 2,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 3,
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 55,
+      "Count2": 274
     },
     "VAR_METEO_WIND_ENERGY": {
       "Id": 164,
-      "Value": 3,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 6,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 55,
+      "Count2": 54
     },
     "VAR_BMS1_CELL1_MV": {
       "Id": 180,
-      "Value": 3300,
-      "AgeS": 2,
-      "LastRxUnix": 1793538646,
-      "Count": 5012,
-      "Count2": 0
+      "Value": 3322,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 82,
+      "Count2": 54
     },
     "VAR_BMS1_CELL2_MV": {
       "Id": 181,
-      "Value": 3302,
-      "AgeS": 2,
-      "LastRxUnix": 1793538646,
-      "Count": 5012,
-      "Count2": 0
+      "Value": 3321,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 82,
+      "Count2": 54
     },
     "VAR_BMS1_CELL3_MV": {
       "Id": 182,
-      "Value": 3302,
-      "AgeS": 2,
-      "LastRxUnix": 1793538646,
-      "Count": 5012,
-      "Count2": 0
+      "Value": 3321,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 82,
+      "Count2": 54
     },
     "VAR_BMS1_CELL4_MV": {
       "Id": 183,
-      "Value": 3303,
-      "AgeS": 2,
-      "LastRxUnix": 1793538646,
-      "Count": 5012,
-      "Count2": 0
+      "Value": 3321,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 82,
+      "Count2": 54
     },
     "VAR_BMS1_CELL5_MV": {
       "Id": 184,
-      "Value": 3302,
-      "AgeS": 2,
-      "LastRxUnix": 1793538646,
-      "Count": 5012,
-      "Count2": 0
+      "Value": 3324,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 82,
+      "Count2": 54
     },
     "VAR_BMS1_CELL6_MV": {
       "Id": 185,
-      "Value": 3304,
-      "AgeS": 2,
-      "LastRxUnix": 1793538646,
-      "Count": 5012,
-      "Count2": 0
+      "Value": 3325,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 82,
+      "Count2": 54
     },
     "VAR_BMS1_CELL7_MV": {
       "Id": 186,
-      "Value": 3303,
-      "AgeS": 2,
-      "LastRxUnix": 1793538646,
-      "Count": 5012,
-      "Count2": 0
+      "Value": 3324,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 82,
+      "Count2": 54
     },
     "VAR_BMS1_CELL8_MV": {
       "Id": 187,
-      "Value": 3303,
-      "AgeS": 2,
-      "LastRxUnix": 1793538646,
-      "Count": 5012,
-      "Count2": 0
+      "Value": 3327,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 82,
+      "Count2": 54
     },
     "VAR_BMS1_CELL9_MV": {
       "Id": 188,
-      "Value": 3303,
-      "AgeS": 2,
-      "LastRxUnix": 1793538646,
-      "Count": 5012,
-      "Count2": 0
+      "Value": 3325,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 82,
+      "Count2": 54
     },
     "VAR_BMS1_CELL10_MV": {
       "Id": 189,
-      "Value": 3302,
-      "AgeS": 2,
-      "LastRxUnix": 1793538646,
-      "Count": 5012,
-      "Count2": 0
+      "Value": 3321,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 82,
+      "Count2": 54
     },
     "VAR_BMS1_CELL11_MV": {
       "Id": 190,
-      "Value": 3302,
-      "AgeS": 2,
-      "LastRxUnix": 1793538646,
-      "Count": 5012,
-      "Count2": 0
+      "Value": 3322,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 82,
+      "Count2": 54
     },
     "VAR_BMS1_CELL12_MV": {
       "Id": 191,
-      "Value": 3302,
-      "AgeS": 2,
-      "LastRxUnix": 1793538646,
-      "Count": 5012,
-      "Count2": 0
+      "Value": 3321,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 82,
+      "Count2": 54
     },
     "VAR_BMS1_CELL13_MV": {
       "Id": 192,
-      "Value": 3304,
-      "AgeS": 2,
-      "LastRxUnix": 1793538646,
-      "Count": 5012,
-      "Count2": 0
+      "Value": 3322,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 82,
+      "Count2": 54
     },
     "VAR_BMS1_CELL14_MV": {
       "Id": 193,
-      "Value": 3303,
+      "Value": 3325,
       "AgeS": 2,
-      "LastRxUnix": 1793538646,
-      "Count": 5013,
-      "Count2": 0
+      "LastRxUnix": 1794136323,
+      "Count": 82,
+      "Count2": 54
     },
     "VAR_BMS1_CELL15_MV": {
       "Id": 194,
-      "Value": 3303,
+      "Value": 3325,
       "AgeS": 2,
-      "LastRxUnix": 1793538646,
-      "Count": 5013,
-      "Count2": 0
+      "LastRxUnix": 1794136323,
+      "Count": 82,
+      "Count2": 54
     },
     "VAR_BMS1_CELL16_MV": {
       "Id": 195,
-      "Value": 3302,
+      "Value": 3326,
       "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5013,
-      "Count2": 0
+      "LastRxUnix": 1794136323,
+      "Count": 82,
+      "Count2": 54
     },
     "VAR_BMS1_CELL1_C": {
       "Id": 196,
-      "Value": 18,
+      "Value": 17,
       "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5013,
-      "Count2": 0
+      "LastRxUnix": 1794136323,
+      "Count": 82,
+      "Count2": 54
     },
     "VAR_BMS1_CELL2_C": {
       "Id": 197,
-      "Value": 18,
+      "Value": 17,
       "AgeS": 2,
-      "LastRxUnix": 1793538647,
-      "Count": 5013,
-      "Count2": 0
+      "LastRxUnix": 1794136323,
+      "Count": 82,
+      "Count2": 54
     },
     "VAR_BMS1_CELL3_C": {
       "Id": 198,
-      "Value": 18,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 5013,
-      "Count2": 0
+      "Value": 17,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 82,
+      "Count2": 54
     },
     "VAR_BMS1_CELL4_C": {
       "Id": 199,
-      "Value": 18,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 5013,
-      "Count2": 0
+      "Value": 17,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 82,
+      "Count2": 54
     },
     "VAR_BMS1_CELL5_C": {
       "Id": 200,
-      "Value": 18,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 5013,
-      "Count2": 0
+      "Value": 17,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 82,
+      "Count2": 54
     },
     "VAR_BMS1_CELL6_C": {
       "Id": 201,
-      "Value": 18,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 5013,
-      "Count2": 0
+      "Value": 17,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 82,
+      "Count2": 54
     },
     "VAR_BMS1_CELL7_C": {
       "Id": 202,
-      "Value": 18,
+      "Value": 17,
       "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4456,
-      "Count2": 0
+      "LastRxUnix": 1794136324,
+      "Count": 73,
+      "Count2": 54
     },
     "VAR_BMS1_CELL8_C": {
       "Id": 203,
-      "Value": 18,
+      "Value": 17,
       "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4456,
-      "Count2": 0
+      "LastRxUnix": 1794136324,
+      "Count": 73,
+      "Count2": 54
     },
     "VAR_BMS1_CELL9_C": {
       "Id": 204,
-      "Value": 18,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4456,
-      "Count2": 0
+      "Value": 17,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 73,
+      "Count2": 54
     },
     "VAR_BMS1_CELL10_C": {
       "Id": 205,
-      "Value": 18,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4456,
-      "Count2": 0
+      "Value": 17,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 73,
+      "Count2": 54
     },
     "VAR_BMS1_CELL11_C": {
       "Id": 206,
-      "Value": 18,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 17,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 68,
+      "Count2": 54
     },
     "VAR_BMS1_CELL12_C": {
       "Id": 207,
-      "Value": 18,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 17,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 68,
+      "Count2": 54
     },
     "VAR_BMS1_CELL13_C": {
       "Id": 208,
-      "Value": 18,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 17,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 68,
+      "Count2": 54
     },
     "VAR_BMS1_CELL14_C": {
       "Id": 209,
-      "Value": 18,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 17,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 68,
+      "Count2": 54
     },
     "VAR_BMS1_CELL15_C": {
       "Id": 210,
-      "Value": 18,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 17,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 68,
+      "Count2": 54
     },
     "VAR_BMS1_CELL16_C": {
       "Id": 211,
-      "Value": 18,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 17,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 68,
+      "Count2": 54
     },
     "VAR_BMS2_CELL1_MV": {
       "Id": 220,
-      "Value": 3315,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 3365,
+      "AgeS": 2,
+      "LastRxUnix": 1794136322,
+      "Count": 68,
+      "Count2": 91
     },
     "VAR_BMS2_CELL2_MV": {
       "Id": 221,
-      "Value": 3300,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 3340,
+      "AgeS": 2,
+      "LastRxUnix": 1794136322,
+      "Count": 68,
+      "Count2": 91
     },
     "VAR_BMS2_CELL3_MV": {
       "Id": 222,
-      "Value": 3310,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 3365,
+      "AgeS": 2,
+      "LastRxUnix": 1794136322,
+      "Count": 68,
+      "Count2": 91
     },
     "VAR_BMS2_CELL4_MV": {
       "Id": 223,
-      "Value": 3300,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4178,
-      "Count2": 0
+      "Value": 3345,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 68,
+      "Count2": 91
     },
     "VAR_BMS2_CELL5_MV": {
       "Id": 224,
-      "Value": 3300,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4178,
-      "Count2": 0
+      "Value": 3355,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 68,
+      "Count2": 91
     },
     "VAR_BMS2_CELL6_MV": {
       "Id": 225,
-      "Value": 3310,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4178,
-      "Count2": 0
+      "Value": 3360,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 68,
+      "Count2": 91
     },
     "VAR_BMS2_CELL7_MV": {
       "Id": 226,
-      "Value": 3300,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4178,
-      "Count2": 0
+      "Value": 3350,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 68,
+      "Count2": 91
     },
     "VAR_BMS2_CELL8_MV": {
       "Id": 227,
-      "Value": 3300,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4178,
-      "Count2": 0
+      "Value": 3360,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 68,
+      "Count2": 91
     },
     "VAR_BMS2_CELL9_MV": {
       "Id": 228,
-      "Value": 3295,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4178,
-      "Count2": 0
+      "Value": 3350,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 68,
+      "Count2": 91
     },
     "VAR_BMS2_CELL10_MV": {
       "Id": 229,
-      "Value": 3300,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4178,
-      "Count2": 0
+      "Value": 3365,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 68,
+      "Count2": 91
     },
     "VAR_BMS2_CELL11_MV": {
       "Id": 230,
-      "Value": 3300,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4178,
-      "Count2": 0
+      "Value": 3360,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 68,
+      "Count2": 91
     },
     "VAR_BMS2_CELL12_MV": {
       "Id": 231,
-      "Value": 3310,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4178,
-      "Count2": 0
+      "Value": 3355,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 68,
+      "Count2": 91
     },
     "VAR_BMS2_CELL13_MV": {
       "Id": 232,
-      "Value": 3320,
-      "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 4178,
-      "Count2": 0
+      "Value": 3360,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 68,
+      "Count2": 91
     },
     "VAR_BMS2_CELL14_MV": {
       "Id": 233,
-      "Value": 3305,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 3350,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 69,
+      "Count2": 91
     },
     "VAR_BMS2_CELL15_MV": {
       "Id": 234,
-      "Value": 3295,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 3365,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 69,
+      "Count2": 91
     },
     "VAR_BMS2_CELL16_MV": {
       "Id": 235,
-      "Value": 3305,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 3360,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 69,
+      "Count2": 91
     },
     "VAR_BMS2_CELL1_C": {
       "Id": 236,
-      "Value": 22,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 25,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 69,
+      "Count2": 91
     },
     "VAR_BMS2_CELL2_C": {
       "Id": 237,
-      "Value": 21,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 25,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 69,
+      "Count2": 91
     },
     "VAR_BMS2_CELL3_C": {
       "Id": 238,
-      "Value": 21,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 25,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 69,
+      "Count2": 91
     },
     "VAR_BMS2_CELL4_C": {
       "Id": 239,
-      "Value": 22,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 25,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 69,
+      "Count2": 91
     },
     "VAR_BMS2_CELL5_C": {
       "Id": 240,
-      "Value": 21,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 24,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 69,
+      "Count2": 91
     },
     "VAR_BMS2_CELL6_C": {
       "Id": 241,
-      "Value": 21,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 25,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 69,
+      "Count2": 91
     },
     "VAR_BMS2_CELL7_C": {
       "Id": 242,
-      "Value": 20,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 23,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 69,
+      "Count2": 91
     },
     "VAR_BMS2_CELL8_C": {
       "Id": 243,
-      "Value": 21,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 23,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 69,
+      "Count2": 91
     },
     "VAR_BMS2_CELL9_C": {
       "Id": 244,
-      "Value": 21,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 24,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 69,
+      "Count2": 91
     },
     "VAR_BMS2_CELL10_C": {
       "Id": 245,
-      "Value": 22,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 25,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 69,
+      "Count2": 91
     },
     "VAR_BMS2_CELL11_C": {
       "Id": 246,
-      "Value": 21,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 25,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 69,
+      "Count2": 91
     },
     "VAR_BMS2_CELL12_C": {
       "Id": 247,
-      "Value": 22,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 25,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 69,
+      "Count2": 91
     },
     "VAR_BMS2_CELL13_C": {
       "Id": 248,
-      "Value": 22,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 25,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 69,
+      "Count2": 91
     },
     "VAR_BMS2_CELL14_C": {
       "Id": 249,
-      "Value": 21,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 25,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 69,
+      "Count2": 91
     },
     "VAR_BMS2_CELL15_C": {
       "Id": 250,
-      "Value": 22,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 25,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 69,
+      "Count2": 91
     },
     "VAR_BMS2_CELL16_C": {
       "Id": 251,
-      "Value": 22,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 4177,
-      "Count2": 0
+      "Value": 26,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 69,
+      "Count2": 91
     },
     "VAR_CONS_AXPERT_WH": {
       "Id": 260,
-      "Value": 5093,
-      "AgeS": 4,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 4322,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 55,
+      "Count2": 54
     },
     "VAR_CONS_EVSE_WH": {
       "Id": 261,
-      "Value": 3935,
-      "AgeS": 4,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 4300,
+      "AgeS": 2,
+      "LastRxUnix": 1794136322,
+      "Count": 55,
+      "Count2": 54
     },
     "VAR_CONS_WS_HEATING_WH": {
       "Id": 262,
-      "Value": 3058,
-      "AgeS": 4,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 1990,
+      "AgeS": 2,
+      "LastRxUnix": 1794136322,
+      "Count": 55,
+      "Count2": 54
     },
     "VAR_POW_AXPERT_W": {
       "Id": 270,
-      "Value": 0,
-      "AgeS": 4,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 3797,
+      "AgeS": 0,
+      "LastRxUnix": 1794136325,
+      "Count": 55,
+      "Count2": 274
     },
     "VAR_POW_EVSE_W": {
       "Id": 271,
-      "Value": 0,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 3785,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 55,
+      "Count2": 54
     },
     "VAR_POW_WS_HEATING_W": {
       "Id": 272,
-      "Value": 0,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 1052,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 55,
+      "Count2": 54
     },
     "VAR_AXPERT_TEMP_C": {
       "Id": 278,
-      "Value": 34,
-      "AgeS": 0,
-      "LastRxUnix": 1793538649,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 46,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_AXPERT_AC_POWER_W": {
       "Id": 279,
-      "Value": 0,
-      "AgeS": 4,
-      "LastRxUnix": 1793538644,
-      "Count": 3341,
-      "Count2": 0
+      "Value": 3832,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_AXPERT_BAT_CHARGING_A": {
       "Id": 280,
-      "Value": 10,
-      "AgeS": 4,
-      "LastRxUnix": 1793538644,
-      "Count": 3341,
-      "Count2": 0
+      "Value": 0,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_AXPERT_BAT_DISCHARGING_A": {
       "Id": 281,
-      "Value": 0,
-      "AgeS": 4,
-      "LastRxUnix": 1793538644,
-      "Count": 3341,
-      "Count2": 0
+      "Value": 8,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_AXPERT_BAT_VOLTAGE_V10": {
       "Id": 282,
-      "Value": 529,
-      "AgeS": 4,
-      "LastRxUnix": 1793538644,
-      "Count": 3341,
-      "Count2": 0
+      "Value": 532,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_AXPERT_PVS1_W": {
       "Id": 283,
-      "Value": 319,
-      "AgeS": 4,
-      "LastRxUnix": 1793538644,
-      "Count": 3341,
-      "Count2": 0
+      "Value": 1721,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_AXPERT_PVS1_V10": {
       "Id": 284,
-      "Value": 2560,
-      "AgeS": 4,
-      "LastRxUnix": 1793538644,
-      "Count": 3341,
-      "Count2": 0
+      "Value": 2735,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_AXPERT_PVS1_A10": {
       "Id": 285,
-      "Value": 12,
-      "AgeS": 4,
-      "LastRxUnix": 1793538644,
-      "Count": 3341,
-      "Count2": 0
+      "Value": 62,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_AXPERT_PVS2_W": {
       "Id": 286,
-      "Value": 309,
-      "AgeS": 4,
-      "LastRxUnix": 1793538644,
-      "Count": 3341,
-      "Count2": 0
+      "Value": 1799,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_AXPERT_PVS2_V10": {
       "Id": 287,
-      "Value": 2609,
-      "AgeS": 4,
-      "LastRxUnix": 1793538644,
-      "Count": 3341,
-      "Count2": 0
+      "Value": 2759,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_AXPERT_PVS2_A10": {
       "Id": 288,
-      "Value": 11,
-      "AgeS": 4,
-      "LastRxUnix": 1793538644,
-      "Count": 3341,
-      "Count2": 0
+      "Value": 65,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_AXPERT_BAT_POWER_W": {
       "Id": 290,
-      "Value": 529,
-      "AgeS": 4,
-      "LastRxUnix": 1793538644,
-      "Count": 3341,
-      "Count2": 0
+      "Value": -425,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 55,
+      "Count2": 54
     },
     "VAR_AXPERT_BAT_CURRENT_A": {
       "Id": 291,
-      "Value": 10,
-      "AgeS": 4,
-      "LastRxUnix": 1793538644,
-      "Count": 3341,
-      "Count2": 0
+      "Value": -8,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 55,
+      "Count2": 54
     },
     "VAR_AXPERT_SOLAR_W": {
       "Id": 292,
-      "Value": 624,
-      "AgeS": 4,
-      "LastRxUnix": 1793538644,
-      "Count": 3341,
-      "Count2": 0
+      "Value": 3513,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 55,
+      "Count2": 54
     },
     "VAR_AXPERT_ENERGY_TODAY_WH": {
       "Id": 293,
-      "Value": -642,
-      "AgeS": 4,
-      "LastRxUnix": 1793538644,
-      "Count": 3341,
-      "Count2": 0
+      "Value": 3595,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 55,
+      "Count2": 54
     },
     "VAR_AXPERT_LOAD_W": {
       "Id": 294,
-      "Value": 95,
-      "AgeS": 4,
-      "LastRxUnix": 1793538644,
-      "Count": 3341,
-      "Count2": 0
+      "Value": 3938,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 55,
+      "Count2": 54
     },
     "VAR_AXPERT_DISCHARGING_W": {
       "Id": 295,
       "Value": 0,
-      "AgeS": 4,
-      "LastRxUnix": 1793538644,
-      "Count": 3341,
+      "AgeS": 3,
+      "LastRxUnix": 1794136322,
+      "Count": 55,
       "Count2": 0
     },
     "VAR_STRG1_SOC": {
       "Id": 300,
-      "Value": 5700,
+      "Value": 9966,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 137
     },
     "VAR_STRG1_POWER_W": {
       "Id": 301,
-      "Value": 279,
+      "Value": -19,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 137
     },
     "VAR_STRG1_CURRENT_A10": {
       "Id": 302,
-      "Value": 52,
+      "Value": -3,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 137
     },
     "VAR_STRG1_ENERGY_WH": {
       "Id": 303,
-      "Value": 9068,
+      "Value": 16064,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 137
     },
     "VAR_STRG1_OPT_CHARGING_A": {
       "Id": 304,
       "Value": 150,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 137
     },
     "VAR_STRG1_CAPACITY_AH": {
       "Id": 305,
       "Value": 300,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 137
     },
     "VAR_STRG1_BALANCED_TODAY": {
       "Id": 306,
       "Value": 0,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 137
     },
     "VAR_STRG1_VOLTAGE_V10": {
       "Id": 307,
-      "Value": 528,
+      "Value": 537,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 137
     },
     "VAR_LLOAD1_POWER_W": {
       "Id": 308,
-      "Value": 208,
+      "Value": 4480,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 137
     },
     "VAR_LLOAD1_CONS_WH": {
       "Id": 309,
-      "Value": 7863,
+      "Value": 2643,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 137
     },
     "VAR_LPV1_POWER_W": {
       "Id": 310,
-      "Value": 488,
+      "Value": 4461,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 137
     },
     "VAR_LPV1_PROD_WH": {
       "Id": 311,
-      "Value": 5740,
+      "Value": 3582,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 137
     },
     "VAR_LPV1_S1_POWER_W": {
       "Id": 312,
       "Value": 0,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
+      "LastRxUnix": 1794136325,
+      "Count": 137,
       "Count2": 0
     },
     "VAR_LPV1_S1_CURRENT_A10": {
       "Id": 313,
       "Value": 0,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
+      "LastRxUnix": 1794136325,
+      "Count": 137,
       "Count2": 0
     },
     "VAR_LPV1_S1_VOLTAGE_V": {
       "Id": 314,
       "Value": 0,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
+      "LastRxUnix": 1794136325,
+      "Count": 137,
       "Count2": 0
     },
     "VAR_LPV1_S2_POWER_W": {
       "Id": 315,
       "Value": 0,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
+      "LastRxUnix": 1794136325,
+      "Count": 137,
       "Count2": 0
     },
     "VAR_LPV1_S2_CURRENT_A10": {
       "Id": 316,
       "Value": 0,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
+      "LastRxUnix": 1794136325,
+      "Count": 137,
       "Count2": 0
     },
     "VAR_LPV1_S2_VOLTAGE_V": {
       "Id": 317,
       "Value": 0,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
+      "LastRxUnix": 1794136325,
+      "Count": 137,
       "Count2": 0
     },
     "VAR_STRG2_SOC": {
       "Id": 320,
-      "Value": 3400,
+      "Value": 9900,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 274
     },
     "VAR_STRG2_POWER_W": {
       "Id": 321,
-      "Value": 472,
+      "Value": -955,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 274
     },
     "VAR_STRG2_CURRENT_A10": {
       "Id": 322,
-      "Value": 89,
+      "Value": -179,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 274
     },
     "VAR_STRG2_ENERGY_WH": {
       "Id": 323,
-      "Value": 4508,
+      "Value": 13224,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 274
     },
     "VAR_STRG2_OPT_CHARGING_A": {
       "Id": 324,
       "Value": 62,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 274
     },
     "VAR_STRG2_CAPACITY_AH": {
       "Id": 325,
       "Value": 251,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 274
     },
     "VAR_STRG2_BALANCED_TODAY": {
       "Id": 326,
       "Value": 0,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 274
     },
     "VAR_STRG2_VOLTAGE_V10": {
       "Id": 327,
-      "Value": 528,
+      "Value": 532,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 274
     },
     "VAR_LLOAD2_POWER_W": {
       "Id": 328,
-      "Value": 145,
+      "Value": 4497,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 274
     },
     "VAR_LLOAD2_CONS_WH": {
       "Id": 329,
-      "Value": 7853,
+      "Value": 5454,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 274
     },
     "VAR_LPV2_POWER_W": {
       "Id": 330,
-      "Value": 618,
+      "Value": 3542,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 274
     },
     "VAR_LPV2_PROD_WH": {
       "Id": 331,
-      "Value": 5402,
+      "Value": 8423,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
-      "Count2": 0
+      "LastRxUnix": 1794136325,
+      "Count": 137,
+      "Count2": 274
     },
     "VAR_LPV2_S1_POWER_W": {
       "Id": 332,
       "Value": 0,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
+      "LastRxUnix": 1794136325,
+      "Count": 137,
       "Count2": 0
     },
     "VAR_LPV2_S1_CURRENT_A20": {
       "Id": 333,
       "Value": 0,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
+      "LastRxUnix": 1794136325,
+      "Count": 137,
       "Count2": 0
     },
     "VAR_LPV2_S1_VOLTAGE_V": {
       "Id": 334,
       "Value": 0,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
+      "LastRxUnix": 1794136325,
+      "Count": 137,
       "Count2": 0
     },
     "VAR_LPV2_S2_POWER_W": {
       "Id": 335,
       "Value": 0,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
+      "LastRxUnix": 1794136325,
+      "Count": 137,
       "Count2": 0
     },
     "VAR_LPV2_S2_CURRENT_A20": {
       "Id": 336,
       "Value": 0,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
+      "LastRxUnix": 1794136325,
+      "Count": 137,
       "Count2": 0
     },
     "VAR_LPV2_S2_VOLTAGE_V": {
       "Id": 337,
       "Value": 0,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
+      "LastRxUnix": 1794136325,
+      "Count": 137,
       "Count2": 0
     },
     "VAR_LVDC_VDIFF_V100": {
       "Id": 340,
       "Value": 0,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
+      "LastRxUnix": 1794136325,
+      "Count": 137,
       "Count2": 0
     },
     "VAR_LVDC_VDIFF_MAX": {
       "Id": 341,
       "Value": 0,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
+      "LastRxUnix": 1794136325,
+      "Count": 137,
       "Count2": 0
     },
     "VAR_LVDC_CURRENT_A": {
       "Id": 342,
       "Value": 0,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
+      "LastRxUnix": 1794136325,
+      "Count": 137,
       "Count2": 0
     },
     "VAR_LVDC_LOSS_W": {
       "Id": 343,
       "Value": 0,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
+      "LastRxUnix": 1794136325,
+      "Count": 137,
       "Count2": 0
     },
     "VAR_LVDC_LOSS_CONS_WH": {
       "Id": 344,
       "Value": 0,
       "AgeS": 0,
-      "LastRxUnix": 1793538648,
-      "Count": 8355,
+      "LastRxUnix": 1794136325,
+      "Count": 137,
       "Count2": 0
     },
     "VAR_BMS3_CELL1_MV": {
       "Id": 350,
-      "Value": 3290,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3899,
-      "Count2": 0
+      "Value": 3350,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 64,
+      "Count2": 91
     },
     "VAR_BMS3_CELL2_MV": {
       "Id": 351,
-      "Value": 3295,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3899,
-      "Count2": 0
+      "Value": 3345,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 64,
+      "Count2": 91
     },
     "VAR_BMS3_CELL3_MV": {
       "Id": 352,
-      "Value": 3300,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3899,
-      "Count2": 0
+      "Value": 3360,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 64,
+      "Count2": 91
     },
     "VAR_BMS3_CELL4_MV": {
       "Id": 353,
-      "Value": 3295,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3899,
-      "Count2": 0
+      "Value": 3350,
+      "AgeS": 2,
+      "LastRxUnix": 1794136323,
+      "Count": 64,
+      "Count2": 91
     },
     "VAR_BMS3_CELL5_MV": {
       "Id": 354,
-      "Value": 3305,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 3360,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL6_MV": {
       "Id": 355,
-      "Value": 3305,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 3350,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL7_MV": {
       "Id": 356,
-      "Value": 3300,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 3355,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL8_MV": {
       "Id": 357,
-      "Value": 3295,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 3355,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL9_MV": {
       "Id": 358,
-      "Value": 3300,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 3360,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL10_MV": {
       "Id": 359,
-      "Value": 3300,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 3345,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL11_MV": {
       "Id": 360,
-      "Value": 3315,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 3350,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL12_MV": {
       "Id": 361,
-      "Value": 3290,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 3350,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL13_MV": {
       "Id": 362,
-      "Value": 3285,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 3340,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL14_MV": {
       "Id": 363,
-      "Value": 3310,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 3350,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL15_MV": {
       "Id": 364,
-      "Value": 3305,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 3355,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL16_MV": {
       "Id": 365,
-      "Value": 3320,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 3360,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL1_C": {
       "Id": 366,
       "Value": 22,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL2_C": {
       "Id": 367,
       "Value": 19,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL3_C": {
       "Id": 368,
-      "Value": 21,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 20,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL4_C": {
       "Id": 369,
-      "Value": 19,
-      "AgeS": 3,
-      "LastRxUnix": 1793538645,
-      "Count": 3342,
-      "Count2": 0
+      "Value": 18,
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL5_C": {
       "Id": 370,
       "Value": 18,
-      "AgeS": 3,
-      "LastRxUnix": 1793538646,
-      "Count": 3342,
-      "Count2": 0
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL6_C": {
       "Id": 371,
       "Value": 18,
-      "AgeS": 3,
-      "LastRxUnix": 1793538646,
-      "Count": 3342,
-      "Count2": 0
+      "AgeS": 1,
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL7_C": {
       "Id": 372,
-      "Value": 20,
+      "Value": 19,
       "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 3342,
-      "Count2": 0
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL8_C": {
       "Id": 373,
       "Value": 18,
       "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 3342,
-      "Count2": 0
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL9_C": {
       "Id": 374,
       "Value": 18,
       "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 3342,
-      "Count2": 0
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL10_C": {
       "Id": 375,
       "Value": 17,
       "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 3342,
-      "Count2": 0
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL11_C": {
       "Id": 376,
       "Value": 19,
       "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 3342,
-      "Count2": 0
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL12_C": {
       "Id": 377,
-      "Value": 18,
+      "Value": 17,
       "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 3342,
-      "Count2": 0
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL13_C": {
       "Id": 378,
       "Value": 18,
       "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 3342,
-      "Count2": 0
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL14_C": {
       "Id": 379,
       "Value": 20,
       "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 3342,
-      "Count2": 0
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL15_C": {
       "Id": 380,
       "Value": 19,
       "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 3342,
-      "Count2": 0
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     },
     "VAR_BMS3_CELL16_C": {
       "Id": 381,
-      "Value": 17,
+      "Value": 16,
       "AgeS": 1,
-      "LastRxUnix": 1793538647,
-      "Count": 3342,
-      "Count2": 0
+      "LastRxUnix": 1794136324,
+      "Count": 55,
+      "Count2": 91
     }
   }
 }
