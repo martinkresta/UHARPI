@@ -155,12 +155,17 @@ class Store:
         raw, clamped = to_legacy_raw(tv.value, definition.legacy_scale)
         if clamped:
             self.clamped += 1                     # counted once per received value, not per output
-        return self._compare(tv, raw, mono)
+        return self._compare(definition, tv, raw, mono)
 
-    def _compare(self, tv: TunnelValue, expected: int, mono: float) -> Optional[Tuple[int, int]]:
-        """Old and VARS2 are both sent by the nodes, so they must agree (this checks the migration)."""
+    def _compare(self, definition: VarDef, tv: TunnelValue, expected: int, mono: float) -> Optional[Tuple[int, int]]:
+        """Old and VARS2 are both sent by the nodes, so they must agree (this checks the migration).
+
+        The old value may be at most one publish period old: slow variables (3 s, 5 s) would never be
+        compared within the short default window, and they change slowly anyway.
+        """
         old = self.old.get(tv.var_id)
-        if old is None or not (tv.valid and old.valid) or mono - old.mono > self.compare_window_s:
+        window = max(self.compare_window_s, definition.period_ms / 1000)
+        if old is None or not (tv.valid and old.valid) or mono - old.mono > window:
             return None
         gap = mono - old.mono
         self.compared.setdefault(tv.var_id, CompareStats()).add(expected, old.raw, gap)

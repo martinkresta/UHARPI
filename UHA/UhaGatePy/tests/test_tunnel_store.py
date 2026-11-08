@@ -125,6 +125,15 @@ class StoreTest(unittest.TestCase):
         self.assertEqual(self.v2(11, 54.0, 1.4), (540, 532))         # mismatch
         self.assertEqual((self.store.compared[11].compared, self.store.compared[11].mismatched), (3, 1))
 
+    def test_slow_variables_are_compared_within_their_period(self):
+        self.store.set_old(180, 3305, True, 1.0, 1000)                # cell 1, published every 5 s
+        tv = tunnel.decode(float_packet(7, 180, 3.305), self.defs)
+        self.assertIsNone(self.store.set_v2(tv, 5.5, 1000))           # old value is 4.5 s old: still compared
+        self.assertEqual(self.store.compared[180].compared, 1)
+        self.store.set_old(11, 532, True, 1.0, 1000)                  # BAT_VOLTAGE_V, published every 1 s
+        self.v2(11, 53.2, 4.5)                                        # 3.5 s old: too old for a 1 s variable
+        self.assertNotIn(11, self.store.compared)
+
     def test_comparison_needs_both_close_in_time_and_valid(self):
         self.store.set_old(11, 532, True, 1.0, 1000)
         self.assertIsNone(self.v2(11, 99.0, 10.0))                   # old value is too old to compare
