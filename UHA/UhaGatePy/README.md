@@ -256,4 +256,4 @@ not a scale or unit error, but worth a look in the next summaries. Only `TEMP_KO
 old counterpart in the gateway's old table).
 
 ### Still to do
-1. Watch the 10-minute summaries in the journal for `OFFSET` (a warning is logged) for a few days. after Martin flashes ELECON step 2: tunnel rates per node, mismatch summary ≈ 0.
+1. Watch the 10-minute summaries in the journal for `OFFSET` (a warning is logged) for a few days.
