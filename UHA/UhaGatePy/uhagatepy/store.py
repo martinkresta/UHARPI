@@ -18,6 +18,12 @@ from .vars_def import VarDef, VarsFile
 INT16_MIN, INT16_MAX = -32768, 32767
 TOLERANCE = 1            # old-vs-VARS2 comparison: allowed difference of the raw values
 
+# Verdict thresholds (see CompareStats.verdict)
+MIN_SAMPLES = 20         # fewer comparisons than this: no verdict yet
+OK_MISMATCH_RATE = 0.05  # up to 5 % of the pairs beyond TOLERANCE is still "ok"
+CLOSE_RELATIVE = 0.02    # mean difference below 2 % of the value: the sampling time explains it
+OFFSET_BIAS = 0.8        # |mean difference| >= 80 % of the mean |difference|: nearly always the same sign
+
 
 def round_half_away(x: float) -> int:
     """Like C round(): 2.5 -> 3, -2.5 -> -3 (Python's round() would give 2 and -2)."""
@@ -54,6 +60,67 @@ class V2Value:
 
 
 @dataclass
+class CompareStats:
+    """Old-vs-VARS2 comparison of one variable, in old raw units (VARS2 value converted back minus old value).
+
+    Counting only "beyond +-1" is too crude for values that change quickly: the two formats are sampled at
+    different moments, so a noisy signal differs by more than 1 almost every time. These sums tell noise from
+    a real error: noise has a mean difference near zero and small compared to the value, a wrong scale, unit
+    or id gives a large difference that nearly always has the same sign.
+    """
+    compared: int = 0
+    mismatched: int = 0        # pairs with |difference| > TOLERANCE
+    sum_diff: int = 0          # sum of (VARS2 - old): the bias
+    sum_abs_diff: int = 0
+    max_abs_diff: int = 0
+    sum_abs_old: int = 0       # to put the difference into proportion to the value
+    sum_gap_s: float = 0.0     # time between the two samples [s]
+    last_v2: int = 0
+    last_old: int = 0
+
+    def add(self, v2_raw: int, old_raw: int, gap_s: float) -> None:
+        diff = v2_raw - old_raw
+        self.compared += 1
+        if abs(diff) > TOLERANCE:
+            self.mismatched += 1
+        self.sum_diff += diff
+        self.sum_abs_diff += abs(diff)
+        self.max_abs_diff = max(self.max_abs_diff, abs(diff))
+        self.sum_abs_old += abs(old_raw)
+        self.sum_gap_s += gap_s
+        self.last_v2, self.last_old = v2_raw, old_raw
+
+    @property
+    def mean_diff(self) -> float:
+        return self.sum_diff / self.compared if self.compared else 0.0
+
+    @property
+    def mean_abs_diff(self) -> float:
+        return self.sum_abs_diff / self.compared if self.compared else 0.0
+
+    @property
+    def relative(self) -> float:
+        """Mean |difference| as a fraction of the mean |old value| (at least 1 raw unit)."""
+        return self.mean_abs_diff / max(self.sum_abs_old / self.compared, 1.0) if self.compared else 0.0
+
+    @property
+    def mean_gap_s(self) -> float:
+        return self.sum_gap_s / self.compared if self.compared else 0.0
+
+    def verdict(self) -> str:
+        """few | ok | close | offset | noisy"""
+        if self.compared < MIN_SAMPLES:
+            return "few"
+        if self.mismatched <= OK_MISMATCH_RATE * self.compared:
+            return "ok"
+        if self.relative <= CLOSE_RELATIVE:
+            return "close"        # differs by some raw units but only a tiny part of the value
+        if abs(self.mean_diff) >= OFFSET_BIAS * self.mean_abs_diff:
+            return "offset"       # always the same direction: look for a scale / unit / id problem
+        return "noisy"            # large but random: a fast signal sampled at different times
+
+
+@dataclass
 class Reading:
     """What is published for one variable (used by uha2.json)."""
     value: object                # physical value (float / int / bool) or None
@@ -69,7 +136,8 @@ class Store:
         self.compare_window_s = compare_window_s
         self.old: Dict[int, OldValue] = {}
         self.v2: Dict[int, V2Value] = {}
-        self.compared: Dict[int, List[int]] = {}      # var id -> [compared, mismatched]
+        self.compared: Dict[int, CompareStats] = {}   # since start, for the status file
+        self.window: Dict[int, CompareStats] = {}     # since the last summary, for the journal
         self.clamped = 0                              # values that did not fit into int16
 
     # ---- receiving -------------------------------------------------------------------------
@@ -94,12 +162,33 @@ class Store:
         old = self.old.get(tv.var_id)
         if old is None or not (tv.valid and old.valid) or mono - old.mono > self.compare_window_s:
             return None
-        stats = self.compared.setdefault(tv.var_id, [0, 0])
-        stats[0] += 1
-        if abs(expected - old.raw) > TOLERANCE:
-            stats[1] += 1
-            return expected, old.raw
-        return None
+        gap = mono - old.mono
+        self.compared.setdefault(tv.var_id, CompareStats()).add(expected, old.raw, gap)
+        self.window.setdefault(tv.var_id, CompareStats()).add(expected, old.raw, gap)
+        return (expected, old.raw) if abs(expected - old.raw) > TOLERANCE else None
+
+    def take_window(self) -> Dict[int, CompareStats]:
+        """The comparison statistics since the previous call (they start again from zero)."""
+        window, self.window = self.window, {}
+        return window
+
+    # ---- health of the VARS2 stream --------------------------------------------------------
+
+    def vars2_health(self, mono: float) -> Dict[str, List[str]]:
+        """YAML variables by state: fresh | invalid (producer says so) | stale (too old) | never received."""
+        health: Dict[str, List[str]] = {"fresh": [], "invalid": [], "stale": [], "never": []}
+        for var_id, definition in self.defs.by_id.items():
+            v2 = self.v2.get(var_id)
+            if v2 is None:
+                state = "never"
+            elif not v2.valid:
+                state = "invalid"
+            elif (mono - v2.mono) * 1000 > definition.timeout_ms:
+                state = "stale"
+            else:
+                state = "fresh"
+            health[state].append(definition.name)
+        return health
 
     # ---- publishing ------------------------------------------------------------------------
 

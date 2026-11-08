@@ -3,7 +3,7 @@ import unittest
 
 from uhagatepy import tunnel
 from uhagatepy.rpiserp import Packet
-from uhagatepy.store import Store, round_half_away, to_legacy_raw
+from uhagatepy.store import CompareStats, Store, round_half_away, to_legacy_raw
 
 from .helpers import float_packet, mini_defs, tunnel_packet
 
@@ -123,7 +123,7 @@ class StoreTest(unittest.TestCase):
         self.assertIsNone(self.v2(11, 53.2, 1.2))                    # equal
         self.assertIsNone(self.v2(11, 53.3, 1.3))                    # off by one raw unit is tolerated
         self.assertEqual(self.v2(11, 54.0, 1.4), (540, 532))         # mismatch
-        self.assertEqual(self.store.compared[11], [3, 1])
+        self.assertEqual((self.store.compared[11].compared, self.store.compared[11].mismatched), (3, 1))
 
     def test_comparison_needs_both_close_in_time_and_valid(self):
         self.store.set_old(11, 532, True, 1.0, 1000)
@@ -137,6 +137,64 @@ class StoreTest(unittest.TestCase):
         self.store.snapshot(1.5)
         self.store.snapshot(2.5)
         self.assertEqual(self.store.clamped, 1)
+
+
+class CompareStatsTest(unittest.TestCase):
+    """Telling noise from a real error: what the verdict of the old-vs-VARS2 comparison means."""
+
+    def stats(self, pairs):
+        s = CompareStats()
+        for v2, old in pairs:
+            s.add(v2, old, 0.5)
+        return s
+
+    def test_numbers(self):
+        s = self.stats([(105, 100), (95, 100), (110, 100)])
+        self.assertEqual((s.compared, s.mismatched, s.max_abs_diff), (3, 3, 10))
+        self.assertAlmostEqual(s.mean_diff, 3.33, 2)
+        self.assertAlmostEqual(s.mean_abs_diff, 6.67, 2)
+        self.assertAlmostEqual(s.relative, 0.0667, 3)
+        self.assertEqual((s.last_v2, s.last_old, s.mean_gap_s), (110, 100, 0.5))
+
+    def test_few_samples_give_no_verdict(self):
+        self.assertEqual(self.stats([(5, 100)] * 19).verdict(), "few")
+
+    def test_equal_values_are_ok(self):
+        self.assertEqual(self.stats([(100 + i % 2, 100) for i in range(40)]).verdict(), "ok")
+
+    def test_small_differences_of_a_big_value_are_close(self):
+        # 5400 W changing by +-40 W between the two samples: far beyond +-1, but under 2 % of the value
+        pairs = [(5400 + (40 if i % 2 else -40), 5400) for i in range(40)]
+        self.assertEqual(self.stats(pairs).verdict(), "close")
+
+    def test_random_large_differences_are_noisy(self):
+        pairs = [(100 + (30 if i % 2 else -30), 100) for i in range(40)]
+        self.assertEqual(self.stats(pairs).verdict(), "noisy")
+
+    def test_wrong_scale_is_an_offset(self):
+        # VARS2 gives 10 times the old raw value: always the same direction, large
+        pairs = [(10 * old, old) for old in range(50, 90)]
+        self.assertEqual(self.stats(pairs).verdict(), "offset")
+
+    def test_window_starts_again_from_zero(self):
+        store = Store(mini_defs(), 2.0)
+        store.set_old(11, 532, True, 1.0, 1)
+        store.set_v2(tunnel.decode(float_packet(4, 11, 54.0), store.defs), 1.1, 1)
+        first = store.take_window()
+        self.assertEqual(first[11].compared, 1)
+        self.assertEqual(store.take_window(), {})
+        self.assertEqual(store.compared[11].compared, 1)          # the total since start stays
+
+    def test_vars2_health(self):
+        store = Store(mini_defs(), 2.0)
+        store.set_v2(tunnel.decode(float_packet(4, 10, 50.0), store.defs), 10.0, 1)               # BAT_SOC fresh
+        store.set_v2(tunnel.decode(float_packet(4, 11, 53.0, flags=0), store.defs), 10.0, 1)      # invalid flag
+        store.set_v2(tunnel.decode(float_packet(4, 9, 100.0), store.defs), 10.0, 1)               # timeout 9 s
+        health = store.vars2_health(25.0)                                                         # 15 s later
+        self.assertEqual(health["invalid"], ["BAT_VOLTAGE_V"])
+        self.assertEqual(sorted(health["stale"]), ["BAT_SOC", "SOLAR_ENERGY_TODAY_WH"])
+        self.assertIn("SOLAR_POWER_W", health["never"])
+        self.assertEqual(health["fresh"], [])
 
 
 if __name__ == "__main__":

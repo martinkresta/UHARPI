@@ -51,6 +51,8 @@ class GatewayTest(unittest.TestCase):
         self.assertEqual(status["Counters"]["TunnelPackets"], 1)
         self.assertEqual(status["Nodes"]["ELECON"]["TunnelPackets"], 1)
         self.assertEqual(status["Comparison"]["Mismatched"], 1)      # 532 against the old 500
+        self.assertEqual(status["Comparison"]["Vars"]["BAT_VOLTAGE_V"]["MeanDiff"], 32)
+        self.assertIn("BAT_SOC", status["Vars2"]["NeverReceived"])
 
     def test_bad_packets_are_counted_not_fatal(self):
         self.gateway._on_packet(Packet(0x221, bytes([0, 10])))        # too short
@@ -82,6 +84,25 @@ class GatewayTest(unittest.TestCase):
         self.gateway._error_summary()
         self.gateway._compare_summary()
         self.gateway._compare_summary()
+
+    def test_tunnel_rate_counts_from_the_first_packet(self):
+        self.gateway._on_packet(float_packet(4, 11, 53.2))
+        node = self.gateway.tunnel_nodes[4]
+        node.first_mono -= 100                                        # the tunnel has been running for 100 s
+        node.packets = 5000
+        self.write()
+        self.assertAlmostEqual(self.read("uha_status.json")["Nodes"]["ELECON"]["TunnelAvgPerS"], 50, delta=1)
+
+    def test_summary_reports_an_offset(self):
+        for i in range(30):                                          # VARS2 always 10 % too high: a real error
+            self.gateway._on_packet(old_packet(11, 500 + i))
+            self.gateway._on_packet(float_packet(4, 11, (500 + i) * 1.1 / 10))
+        with self.assertLogs("uhagatepy", level="INFO") as logged:
+            self.gateway._compare_summary()
+        text = " | ".join(r.getMessage() for r in logged.records)
+        self.assertIn("1 OFFSET", text)
+        self.assertIn("BAT_VOLTAGE_V", text)
+        self.assertEqual([r.levelname for r in logged.records][0], "WARNING")
 
     def test_unwritable_folder_is_reported_once(self):
         self.gateway.cfg.out_dir = os.path.join(self.folder.name, "missing")

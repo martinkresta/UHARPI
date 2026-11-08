@@ -81,23 +81,37 @@ def build(g: "Gateway", unix_time: int, mono: float, raw: dict) -> dict:
             "LastSeenUnix": max((x.last_unix for x in seen), default=None),
             "AgeS": None if last is None else _age(mono, last),
             "TunnelPackets": tunnel.packets if tunnel else 0,
-            "TunnelAvgPerS": round(tunnel.packets / uptime, 2) if tunnel and uptime > 0 else 0,
+            # average since the first tunnel packet of this node (not since start: the tunnel may start later)
+            "TunnelAvgPerS": round(tunnel.packets / max(mono - tunnel.first_mono, 1.0), 2) if tunnel else 0,
             "LogMessages": logs.packets if logs else 0,
             "LastLogEvent": logs.last_event if logs else None,
         }
 
-    # ---- old vs VARS2 ----
-    total = sum(s[0] for s in store.compared.values())
-    mismatched = sum(s[1] for s in store.compared.values())
-    worst = sorted(((s[1], var_id) for var_id, s in store.compared.items() if s[1]), reverse=True)[:10]
+    # ---- old vs VARS2, since start. Differences are VARS2 value (converted back) minus old value, old raw units ----
+    per_variable = {}
+    verdicts = {"ok": 0, "close": 0, "noisy": 0, "offset": 0, "few": 0}
+    for var_id, s in sorted(store.compared.items()):
+        verdict = s.verdict()
+        verdicts[verdict] += 1
+        per_variable[g.defs.by_id[var_id].name] = {
+            "Verdict": verdict, "Compared": s.compared, "Mismatched": s.mismatched,
+            "MeanDiff": round(s.mean_diff, 2), "MeanAbsDiff": round(s.mean_abs_diff, 2), "MaxAbsDiff": s.max_abs_diff,
+            "RelativePct": round(100 * s.relative, 2), "MeanGapS": round(s.mean_gap_s, 2),
+            "LastVars2": s.last_v2, "LastOld": s.last_old,
+        }
     comparison = {
-        "VariablesCompared": len(store.compared), "Compared": total, "Mismatched": mismatched,
-        "Worst": {g.defs.by_id[var_id].name: {"Mismatched": n, "Compared": store.compared[var_id][0]}
-                  for n, var_id in worst},
+        "VariablesCompared": len(store.compared),
+        "Compared": sum(s.compared for s in store.compared.values()),
+        "Mismatched": sum(s.mismatched for s in store.compared.values()),
+        "Verdicts": verdicts,
+        "Vars": per_variable,
     }
+    health = store.vars2_health(mono)
+    vars2 = {"Fresh": len(health["fresh"]), "Invalid": health["invalid"], "Stale": health["stale"],
+             "NeverReceived": health["never"]}
 
     return {
         "Version": VERSION, "UnixTime": unix_time, "StartUnix": g.start_unix, "UptimeS": int(uptime),
         "Yaml": {"Version": g.defs.version, "Sha": g.defs.sha, "Variables": len(g.defs.by_id)},
-        "Link": link, "Counters": counters, "Comparison": comparison, "Nodes": nodes, "Vars": variables,
+        "Link": link, "Counters": counters, "Vars2": vars2, "Comparison": comparison, "Nodes": nodes, "Vars": variables,
     }

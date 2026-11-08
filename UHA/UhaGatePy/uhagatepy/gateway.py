@@ -44,6 +44,7 @@ class Counters:
 @dataclass
 class NodeStats:
     packets: int = 0
+    first_mono: float = 0.0
     last_mono: float = 0.0
     last_unix: int = 0
     last_event: str = ""
@@ -77,7 +78,6 @@ class Gateway:
 
         self._logged: Set[str] = set()    # error messages already logged in this summary period
         self._reported: Dict[str, int] = {}
-        self._compare_prev: Dict[int, tuple] = {}
         self._next_error_summary = self.start_mono + cfg.error_summary_s
         self._next_compare_summary = self.start_mono + cfg.compare_summary_s
         self._next_hourly = self.start_mono + 3600
@@ -272,6 +272,8 @@ class Gateway:
     @staticmethod
     def _touch(nodes: Dict[int, NodeStats], node: int, mono: float, unix: int, event: str = "") -> None:
         stats = nodes.setdefault(node, NodeStats())
+        if stats.packets == 0:
+            stats.first_mono = mono
         stats.packets += 1
         stats.last_mono = mono
         stats.last_unix = unix
@@ -393,24 +395,42 @@ class Gateway:
             log.warning("in the last %d s: %s", self.cfg.error_summary_s, ", ".join(found))
 
     def _compare_summary(self) -> None:
-        """Old vs VARS2: the main check of the migration (every format sends the same data)."""
-        compared = mismatched = 0
-        worst = []
-        for var_id, (total, bad) in self.store.compared.items():
-            previous_total, previous_bad = self._compare_prev.get(var_id, (0, 0))
-            compared += total - previous_total
-            mismatched += bad - previous_bad
-            if bad > previous_bad:
-                worst.append((bad - previous_bad, total - previous_total, self.defs.by_id[var_id].name))
-            self._compare_prev[var_id] = (total, bad)
+        """Old vs VARS2: the main check of the migration (every format sends the same data).
+
+        Per variable a verdict from the statistics of the last period (see store.CompareStats):
+        ok / close = fine, noisy = fast signal sampled at different moments, OFFSET = look for a real error.
+        """
+        window = self.store.take_window()
         period = self.cfg.compare_summary_s
-        if compared == 0:
-            log.info("old vs VARS2 (last %d s): nothing to compare, %d variables received in VARS2 format",
-                     period, len(self.store.v2))
-            return
-        worst.sort(reverse=True)
-        text = "old vs VARS2 (last %d s): %d values compared, %d mismatches (%.1f %%)" % (
-            period, compared, mismatched, 100.0 * mismatched / compared)
-        if worst:
-            text += "; worst: " + ", ".join("%s %d/%d" % (name, bad, total) for bad, total, name in worst[:5])
-        (log.warning if mismatched * 20 > compared else log.info)("%s", text)
+        mono = time.monotonic()
+        health = self.store.vars2_health(mono)
+        lines = []
+        if window:
+            groups: Dict[str, list] = {"ok": [], "close": [], "noisy": [], "offset": [], "few": []}
+            for var_id, stats in window.items():
+                groups[stats.verdict()].append((stats.relative, var_id, stats))
+            compared = sum(s.compared for s in window.values())
+            beyond = sum(s.mismatched for s in window.values())
+            text = "old vs VARS2 (last %d s): %d values of %d variables compared, %d beyond +-1 (%.1f %%); "                    "variables: %d ok, %d close, %d noisy, %d OFFSET, %d too few" % (
+                       period, compared, len(window), beyond, 100.0 * beyond / compared,
+                       len(groups["ok"]), len(groups["close"]), len(groups["noisy"]), len(groups["offset"]),
+                       len(groups["few"]))
+            lines.append((log.warning if groups["offset"] else log.info, text))
+            for kind in ("offset", "noisy"):
+                worst = sorted(groups[kind], reverse=True)[:5]
+                if worst:
+                    details = ", ".join("%s %+.1f (%.1f %%)" % (self.defs.by_id[v].name, s.mean_diff, 100 * s.relative)
+                                        for _, v, s in worst)
+                    lines.append((log.warning if kind == "offset" else log.info,
+                                  "  %s (mean difference in old raw units, relative to the value): %s" % (kind, details)))
+        else:
+            lines.append((log.info, "old vs VARS2 (last %d s): nothing to compare, %d variables received in VARS2 format"
+                          % (period, len(self.store.v2))))
+        problems = {key: names for key, names in health.items() if key != "fresh" and names}
+        if problems:
+            text = "VARS2 stream: %d fresh" % len(health["fresh"])
+            for key, names in problems.items():
+                text += "; %s %d (%s%s)" % (key, len(names), ", ".join(names[:6]), ", ..." if len(names) > 6 else "")
+            lines.append((log.warning if health["stale"] else log.info, text))
+        for log_function, text in lines:
+            log_function("%s", text)
