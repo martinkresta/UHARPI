@@ -6,7 +6,7 @@ Implemented, reviewed, tested on the PC, on the Pi with a fake ELECON and in a 3
 Martin approved the plan and the decisions in §6.
 On the Pi: `python3-serial` + `python3-yaml` installed (apt), code in `/home/pi/UhaGatePy`,
 `uhagatepy.service` enabled (production). Results in §7.
-Task: `Claude/uhagatepy-brief.md`. Contract with ELECON: `VARS2_spec.md` §7 (UHA_FW repo).
+Task: `tasks/uhagatepy_python_gateway.md`. Contract with ELECON: `VARS2_spec.md` §7 (UHA_FW repo).
 
 ---
 
