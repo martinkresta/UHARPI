@@ -255,5 +255,19 @@ That one, `POW_WS_HEATING_W`, differs by +12.7 W on ≈ 1050 W (2.1 %, VARS2 is 
 not a scale or unit error, but worth a look in the next summaries. Only `TEMP_KOLARNA_C` is never compared (it has no
 old counterpart in the gateway's old table).
 
+### Frozen-node watch (2026-11-12)
+Incident: ELECON and ELECON_D stopped transmitting on CAN (ELECON_D's VARS2 stopped 10:00:56, TECHM showed
+`EleconComError`); ELECON kept re-sending ELECON_D's last stored values over the serial link marked valid, so the
+gateway published 6.5 h old BMS1 data as fresh ("age 0 s"). Both nodes recovered after an NMT reset (16:38).
+Age of a value cannot show this, a value that never changes can. New module `node_watch.py`: a node is **frozen**
+when none of its variables (old or VARS2, node = YAML producer) changed for `frozen-after-s` (default 120 s). The limit
+grows by itself for legitimately quiet nodes (3 x the longest quiet gap seen, at most 30 min; a frozen gap is not
+learned, so one outage cannot switch the detection off: IOBOARD_D settled at 304 s within 2 minutes).
+Output: journal warning `node X FROZEN: none of its N variables has changed for S s ...` (repeated every 30 min),
+`... data is changing again after S s` when it wakes up; `uha_status.json` `Nodes.<X>.Frozen / QuietS / FrozenLimitS`;
+a "Data" column on `WS/uha-status.html`. Limitation: it only sees nodes whose values stop moving. ELECON's own CAN
+transmit failure is not caught this way (its local measurements keep changing); that showed as TECHM
+`EL_HEATER_STATUS = 8 (EleconComError)`.
+
 ### Still to do
 1. Watch the 10-minute summaries in the journal for `OFFSET` (a warning is logged) for a few days.

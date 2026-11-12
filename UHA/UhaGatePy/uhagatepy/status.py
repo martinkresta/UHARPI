@@ -85,6 +85,10 @@ def build(g: "Gateway", unix_time: int, mono: float, raw: dict) -> dict:
             "TunnelAvgPerS": round(tunnel.packets / max(mono - tunnel.first_mono, 1.0), 2) if tunnel else 0,
             "LogMessages": logs.packets if logs else 0,
             "LastLogEvent": logs.last_event if logs else None,
+            # no variable of the node changed for a while: data is stale even if it keeps arriving
+            "Frozen": g.watch.is_frozen(name, mono),
+            "QuietS": int(g.watch.quiet_s(name, mono)) if name in g.watch.nodes else None,
+            "FrozenLimitS": int(g.watch.threshold_s(name)),
         }
 
     # ---- old vs VARS2, since start. Differences are VARS2 value (converted back) minus old value, old raw units ----

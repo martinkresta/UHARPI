@@ -193,6 +193,10 @@ not stored in this repo). VARS2 ids equal the old `VAR_*` ids.
 - `tools/fake_elecon.py` feeds the gateway through a pseudo-terminal (no production port needed).
 - Test window `sudo /home/pi/UhaGatePy/test_window.sh 10` stops the production gateway for ≤ 15 min and always restores it.
 
+Frozen-node watch (`node_watch.py`): a node none of whose variables changed for `frozen-after-s` (120 s, adaptive per node) is
+reported in the journal (`node X FROZEN`), in `uha_status.json` (`Nodes.<X>.Frozen`) and on `WS/uha-status.html`. Needed because
+ELECON re-sends stale values of a dead node as fresh.
+
 Known label mismatch: the gateway's old table (`UHA.h`) calls id 49 `VAR_MPPT_ENERGY_TODAY_WH`, the firmware
 `VAR_MPPT_TEMP_C` (a temperature). The `uha.json` key keeps the old name for compatibility.
 

@@ -29,6 +29,7 @@ class Config:
     error_summary_s: int = 600                         # period of the error summary
     compare_window_ms: int = 2000                      # old and VARS2 value must be this close to be compared
     compare_summary_s: int = 600                       # period of the old-vs-VARS2 comparison summary
+    frozen_after_s: int = 120                          # node is frozen if no variable of it changed for this long
     verbose: bool = False                              # debug log (every packet, every mismatch)
 
 
@@ -45,6 +46,7 @@ OPTIONS = (
     ("error_summary_s", "error summary period [s]", 1),
     ("compare_window_ms", "max time between old and VARS2 value for a comparison [ms]", 1),
     ("compare_summary_s", "old-vs-VARS2 comparison summary period [s]", 1),
+    ("frozen_after_s", "report a node as frozen when none of its variables changed for this long [s]", 10),
 )
 
 

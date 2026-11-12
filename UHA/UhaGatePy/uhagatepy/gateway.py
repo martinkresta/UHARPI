@@ -15,6 +15,7 @@ from typing import Callable, Dict, Set
 
 from . import VERSION, config, event_log, outputs, rpiserp, rtc, status, tunnel
 from .legacy_table import NUM_OF_VARS
+from .node_watch import NodeWatch
 from .log import log
 from .serial_link import LinkError, SerialLink
 from .store import Store
@@ -57,6 +58,7 @@ class Gateway:
         self.link = SerialLink(cfg.port)
         self.parser = rpiserp.Parser()
         self.store = Store(defs, cfg.compare_window_ms / 1000)
+        self.watch = NodeWatch(cfg.frozen_after_s)       # nodes whose data stopped changing
         self.counters = Counters()
         self.tunnel_nodes: Dict[int, NodeStats] = {}   # node id -> tunnel packets from that producer
         self.log_nodes: Dict[int, NodeStats] = {}      # node id -> log messages from that node
@@ -237,7 +239,9 @@ class Gateway:
             self.counters.out_of_range_vars += 1
             return
         log.debug("old var %d = %d%s", var_id, raw, "" if valid else " (invalid)")
+        previous = self.store.old.get(var_id)
         self.store.set_old(var_id, raw, valid, mono, unix)
+        self._watch_value(var_id, previous is not None and previous.raw != raw, mono)
 
     def _on_tunnel(self, packet: rpiserp.Packet, mono: float, unix: int) -> None:
         self.counters.tunnel_packets += 1
@@ -252,9 +256,22 @@ class Gateway:
         if self.defs.node_names.get(value.producer) != definition.producer:
             self.counters.wrong_producer += 1             # still stored: the value itself is fine
             log.debug("%s came from node %d, YAML says %s", definition.name, value.producer, definition.producer)
+        previous_v2 = self.store.v2.get(value.var_id)
         mismatch = self.store.set_v2(value, mono, unix)
+        self._watch_value(value.var_id, previous_v2 is not None and previous_v2.value != value.value, mono)
         if mismatch is not None:
             log.debug("mismatch %s: VARS2 gives %d, old value is %d", definition.name, mismatch[0], mismatch[1])
+
+    def _watch_value(self, var_id: int, changed: bool, mono: float) -> None:
+        """Tell the frozen-node watch that a value of the variable's producer arrived (and whether it changed)."""
+        definition = self.defs.by_id.get(var_id)
+        if definition is None:
+            return                                         # not in the YAML: producer unknown
+        self.watch.seen(definition.producer, mono)
+        if changed:
+            quiet = self.watch.changed(definition.producer, mono)
+            if quiet:
+                log.info("node %s: data is changing again after %d s", definition.producer, quiet)
 
     def _on_log_message(self, packet: rpiserp.Packet, mono: float, unix: int) -> None:
         self.counters.log_packets += 1
@@ -329,7 +346,21 @@ class Gateway:
                 self.silence_warned = True
                 self.receiving = False
 
+        for node, quiet in self.watch.check(mono):
+            self._report_frozen(node, quiet, mono)
+
         self._periodic_reports(mono)
+
+    def _report_frozen(self, node: str, quiet: float, mono: float) -> None:
+        """Warn that a node's data stopped changing. The values may still look fresh: ELECON repeats its last
+        stored values, so the node can be dead while its data arrives at the usual rate."""
+        node_id = self.defs.nodes.get(node)
+        tunnel = self.tunnel_nodes.get(node_id)
+        count = sum(1 for d in self.defs.by_id.values() if d.producer == node)
+        log.warning("node %s FROZEN: none of its %d variables has changed for %d s (limit %d s); VARS2 packets from it "
+                    "last seen %s - the node may have stopped sending, its values shown are old",
+                    node, count, quiet, self.watch.threshold_s(node),
+                    "never" if tunnel is None else "%d s ago" % (mono - tunnel.last_mono))
 
     def _write_outputs(self, mono: float, now: float) -> None:
         unix = int(now)

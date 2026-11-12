@@ -16,9 +16,13 @@ UHA.start(U => {
   const link = s.Link || {}, c = s.Counters || {}, y = s.Yaml || {}, cmp = s.Comparison || {};
   const up = link.State === 'up';
 
+  const frozenLimit = ((Object.values(s.Nodes || {})[0]) || {}).FrozenLimitS || 120;
   const nodes = Object.entries(s.Nodes || {}).map(([name, v]) =>
-    `<tr class="${v.AgeS === null ? 'bad' : ''}"><td>${name}</td><td class="n">${v.Id}</td>` +
-    `<td class="n">${v.AgeS === null ? 'never seen' : v.AgeS + ' s'}</td><td class="n hide-sm">${n(v.TunnelPackets)}</td>` +
+    `<tr class="${v.AgeS === null || v.Frozen ? 'bad' : ''}"><td>${name}</td><td class="n">${v.Id}</td>` +
+    `<td class="n">${v.AgeS === null ? 'never seen' : v.AgeS + ' s'}</td>` +
+    // Data: do the node's values still change? A frozen node can keep sending the same old values (ELECON repeats them)
+    `<td>${v.QuietS === null || v.QuietS === undefined ? '–' : v.Frozen ? `<span class="tag bad">frozen ${U.fmtDuration(v.QuietS)}</span>` : '<span class="tag ok">changing</span>'}</td>` +
+    `<td class="n hide-sm">${n(v.TunnelPackets)}</td>` +
     `<td class="n hide-sm">${n(v.LogMessages)}</td><td class="hide-sm">${v.LastLogEvent || '–'}</td></tr>`).join('');
 
   const errs = ['UnknownIds', 'Malformed', 'OutOfRangeVarIds', 'WrongProducer', 'ChecksumErrors', 'LengthErrors', 'DiscardedBytes', 'TxErrors', 'WriteErrors', 'EventLogErrors']
@@ -43,8 +47,8 @@ UHA.start(U => {
       U.rowText('Old vs VARS2 compared', n(cmp.Compared) + ' (mismatched ' + n(cmp.Mismatched) + ')')) +
     U.card('Error counters', `<table class="t">${errs}</table>`) +
     `</div><h3 style="margin-top:20px">Nodes</h3>` +
-    `<table class="t"><tr><th>Node</th><th class="n">ID</th><th class="n">Last seen</th><th class="n hide-sm">Tunnel packets</th><th class="n hide-sm">Log msgs</th><th class="hide-sm">Last log event</th></tr>${nodes}</table>` +
-    `<p class="note">Nodes are seen through the VARS2 tunnel and log messages; "never seen" is expected until ELECON sends the tunnel.</p>`;
+    `<table class="t"><tr><th>Node</th><th class="n">ID</th><th class="n">Last seen</th><th>Data</th><th class="n hide-sm">Tunnel packets</th><th class="n hide-sm">Log msgs</th><th class="hide-sm">Last log event</th></tr>${nodes}</table>` +
+    `<p class="note">Last seen = last VARS2 packet or log message of the node. Data = "frozen" when none of its variables changed for ${frozenLimit} s or more: the node has probably stopped sending, even if old values still arrive.</p>`;
 }, { status: true });
 </script>
 </body>
