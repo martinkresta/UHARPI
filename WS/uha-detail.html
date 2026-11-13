@@ -31,14 +31,14 @@ UHA.start(U => {
       const val = v.value === null ? '–' : U.show(name, { force: true, kwh: false });
       return `<tr class="${cls}"><td>${U.label(name)}<span class="raw">${name}</span></td><td class="n">${val}</td>` +
         `<td class="n hide-sm">${v.age_s === null ? '–' : v.age_s.toFixed(1) + ' s'}</td>` +
-        `<td class="hide-sm">${v.producer}</td><td class="hide-sm"><span class="tag ${v.valid ? 'ok' : 'bad'}">${v.valid ? v.source : 'invalid'}</span></td><td class="hide-sm n">${v.id}</td></tr>`;
+        `<td class="hide-sm">${v.producer}</td><td class="hide-sm"><span class="tag ${v.valid ? 'ok' : 'bad'}">${v.valid ? 'fresh' : v.value === null ? 'never' : 'stale'}</span></td><td class="hide-sm n">${v.id}</td></tr>`;
     }).join('');
 
   return `<h1 class="pagetitle">All data</h1><p class="pagesub">Every variable in physical units (${all.length} total)</p>` +
     `<div class="tabs">${tabs}</div>` +
     `<div class="tools"><input type="search" id="q" placeholder="Filter…" value="${filter}">` +
     `<label><input type="checkbox" id="hi" ${hideInvalid ? 'checked' : ''}> hide invalid</label></div>` +
-    `<table class="t"><tr><th>Variable</th><th class="n">Value</th><th class="n hide-sm">Age</th><th class="hide-sm">Producer</th><th class="hide-sm">Source</th><th class="hide-sm n">ID</th></tr>${rows}</table>`;
+    `<table class="t"><tr><th>Variable</th><th class="n">Value</th><th class="n hide-sm">Age</th><th class="hide-sm">Producer</th><th class="hide-sm">State</th><th class="hide-sm n">ID</th></tr>${rows}</table>`;
 }, {
   after() {      // the page is re-rendered every tick: rebind controls and restore focus
     const q = document.getElementById('q'), hi = document.getElementById('hi');

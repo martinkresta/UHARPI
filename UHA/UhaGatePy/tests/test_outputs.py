@@ -64,22 +64,22 @@ class BmsJsonTest(unittest.TestCase):
 
 
 class Uha2JsonTest(unittest.TestCase):
-    def test_sources_and_enum(self):
+    def test_values_and_enum(self):
         defs = mini_defs()
-        store = Store(defs, 2.0)
-        store.set_old(10, 64, True, 1.0, 1)
+        store = Store(defs)
+        store.set_v2(tunnel.decode(float_packet(4, 10, 64.0), defs), 1.0, 1)
         store.set_v2(tunnel.decode(float_packet(4, 11, 53.2), defs), 1.0, 1)
         store.set_v2(tunnel.decode(tunnel_packet(3, 80, (2).to_bytes(4, "little")), defs), 1.0, 1)
         data = json.loads(outputs.build_uha2_json(store, defs, 1.5, 99))
         self.assertEqual(data["YamlVersion"], 7)
         v = data["Vars"]
-        self.assertEqual((v["BAT_SOC"]["source"], v["BAT_SOC"]["value"]), ("old", 64))
-        self.assertEqual((v["BAT_VOLTAGE_V"]["source"], v["BAT_VOLTAGE_V"]["value"], v["BAT_VOLTAGE_V"]["unit"]),
-                         ("vars2", 53.2, "V"))
+        self.assertEqual((v["BAT_SOC"]["value"], v["BAT_SOC"]["valid"]), (64, True))
+        self.assertEqual((v["BAT_VOLTAGE_V"]["value"], v["BAT_VOLTAGE_V"]["unit"]), (53.2, "V"))
+        self.assertNotIn("source", v["BAT_SOC"])
         self.assertEqual(v["BAT_VOLTAGE_V"]["producer"], "ELECON")
         self.assertEqual((v["EL_HEATER_STATUS"]["value"], v["EL_HEATER_STATUS"]["enum_name"]), (2, "NoFreePower"))
-        self.assertEqual((v["SOLAR_POWER_W"]["source"], v["SOLAR_POWER_W"]["value"], v["SOLAR_POWER_W"]["valid"]),
-                         ("none", None, False))
+        self.assertEqual((v["SOLAR_POWER_W"]["value"], v["SOLAR_POWER_W"]["valid"], v["SOLAR_POWER_W"]["age_s"]),
+                         (None, False, None))
         self.assertIn("BMS1_CELL_V_16", v)
 
 

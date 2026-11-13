@@ -3,6 +3,10 @@
 set -euo pipefail
 [ "$(id -u)" = 0 ] || { echo "run with sudo"; exit 2; }
 
+# UhaGate6 reads only the old 0x221 format. Once the nodes send only VARS2 (migration step 6b) it gets no data.
+echo "WARNING: UhaGate6 reads only the old 0x221 format. If the nodes no longer send it (VARS2 only),"
+echo "         the dashboard will show no live data (all values 0 / frozen)."
+
 systemctl disable --now uhagatepy || true
 if ! systemctl enable --now uhagate6; then
     echo "uhagate6 did not start - starting uhagate5"

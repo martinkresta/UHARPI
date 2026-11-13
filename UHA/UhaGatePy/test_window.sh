@@ -113,7 +113,7 @@ import json, sys
 s = json.load(open(sys.argv[1]))
 print("link:", s["Link"])
 print("counters:", s["Counters"])
-print("comparison:", s["Comparison"])
+print("vars2:", {k: (v if isinstance(v, int) else len(v)) for k, v in s["Vars2"].items()}, "never:", s["Vars2"]["NeverReceived"])
 print("nodes:", {n: (v["TunnelPackets"], v["TunnelAvgPerS"], v["LogMessages"]) for n, v in s["Nodes"].items()})
 PY
 echo "== journal (without the one-line RTC messages)"

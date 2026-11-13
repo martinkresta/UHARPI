@@ -8,6 +8,15 @@ On the Pi: `python3-serial` + `python3-yaml` installed (apt), code in `/home/pi/
 `uhagatepy.service` enabled (production). Results in §7.
 Task: `tasks/uhagatepy_python_gateway.md`. Contract with ELECON: `VARS2_spec.md` §7 (UHA_FW repo).
 
+**Version 0.2.0 (2026-11-13, task `tasks/uhagatepy_vars2_only.md`): VARS2 only.** The old-vs-VARS2 comparison has
+done its job, so the old `0x221` path and the comparison are removed. `0x221` packets are only counted
+(`Counters.IgnoredOldPackets`). All values come from the VARS2 tunnel; the YAML is the only variable definition.
+`uha.json` keys whose id is not in the YAML are 0. Sections 1–7 below describe the earlier two-protocol version
+(0.1.x) where they talk about the old path or the comparison; §2 is updated.
+
+> **Rollback warning:** UhaGate6 (`rollback_to_v6.sh`) reads only `0x221`. Once the nodes stop the old format
+> (migration step 6b) it shows no live data.
+
 ---
 
 ## 1. Findings
@@ -65,7 +74,7 @@ Single-threaded `asyncio` loop: `loop.add_reader(serial_fd)` + one 1-second time
 No threads, no extra packages (journald logging by `<level>` prefixes on stdout, as in UhaGate6).
 
 ```
-serial bytes ─► rpiserp.Parser ─► packet id? ─┬─ 0x221  ─► store.old[id]  = raw int16 + valid
+serial bytes ─► rpiserp.Parser ─► packet id? ─┬─ 0x221  ─► ignored (counted)
                                               ├─ 0x180..0x18F ─► tunnel.decode ─► store.v2[id] = value, valid, time, producer
                                               └─ 0x620  ─► event_log (log.txt + journal)
 every second:  outputs.write_all(store)  ─► uha.json  bms.json  uha2.json  uha_status.json   (temp file + os.replace)
@@ -84,18 +93,19 @@ every minute:  rtc.send()                ─► 0x051, identical to UhaGate6
 | `vars_def.py` | loads `uha_vars.yaml`: defaults, producer inheritance, arrays, `timeout auto`; clear error + exit if invalid |
 | `legacy_table.py` | **generated once** from UhaGate6 (`uha_json_body.inc`, `uha_vars.h`): the 256 `uha.json` keys in order with ids. Not invented, not hand-edited |
 | `tunnel.py` | decode of a `0x18n` packet (id u16 LE, value 4 B LE as float32 / int32 / uint32, flags, seq) |
-| `store.py` | old store + VARS2 store, freshness choice, legacy conversion, old-vs-new comparison |
+| `store.py` | VARS2 store, freshness, legacy conversion |
 | `outputs.py` | `uha.json`, `bms.json`, `uha2.json`, `uha_status.json`, atomic writes |
 | `event_log.py` | `log.txt` line (same format as UhaGate6) |
 | `rtc.py` | RTC sync payload (`0x051`) |
 | `status.py` | content of `uha_status.json` |
 | `gateway.py` | the event loop: serial link, packet handling, timers, summaries |
 
-### Value selection (spec §7.5)
+### Values (0.2.0: VARS2 only)
 
-For each variable: use the VARS2 value if it has `VALID` and its age ≤ `timeout_ms`, converted back with
-`round(value * legacy_scale)`; otherwise the last old `0x221` raw value (0 if never received, like UhaGate6).
-Rounding is half away from zero like C `round()` (Python's `round` is banker's rounding); the result is
+`uha.json` / `bms.json`: the last received VARS2 value of any age, converted back with `round(value * legacy_scale)`;
+0 if never received or not in the YAML (like UhaGate6 for missing values). Freshness (`VALID` and age ≤ `timeout_ms`)
+is shown as `valid` in `uha2.json` and in the `Vars2` state lists of `uha_status.json`; a dead producer is caught
+by the frozen-node watch. Rounding is half away from zero like C `round()` (Python's `round` is banker's rounding); the result is
 clamped to the int16 range and a clamp is counted/logged once.
 
 ### `uha.json` / `bms.json` compatibility
@@ -110,27 +120,23 @@ and the Pi spent 7 % of a core on it. View with a browser or `python3 -m json.to
 ### `uha2.json` (new)
 
 Per YAML name: `value` (physical units; enum also `enum_name`; bool `true/false`), `unit`, `valid`, `age_s`,
-`producer` (from the packet id), `source` (`vars2` / `old` / `none`). Variables not in the YAML (ids 49, 142) are
-only in `uha_status.json`.
+`producer` (from the packet id). `valid` = `VALID` flag and age ≤ `timeout_ms`; `value` is `null` if never received.
 
 ### `uha_status.json`
 
-All UhaGate6 fields (link, counters, vars, uptime, RSS) plus: packets per id class (old / tunnel / log),
-tunnel packets per producer node with last-seen and rate, unknown VARS2 ids, wrong-producer count,
-YAML version, and the old-vs-new comparison table.
+All UhaGate6 fields (link, counters, vars, uptime, RSS) plus: packets per id class (tunnel / log / ignored old),
+tunnel packets per producer node with last-seen and rate, frozen state per node, unknown VARS2 ids,
+wrong-producer count, YAML version, and `Vars2` (count of fresh variables, lists of invalid / stale / never received).
 
-### Old vs. new comparison (brief §2.6)
+### VARS2 stream summary
 
-When a value arrives in one format and the other format arrived within `compare-window-ms` (default 2 s),
-compare `round(v2 * legacy_scale)` with the old raw value, tolerance ±1. Counted per variable (compared / mismatched).
-Journal: summary every 10 min (total, mismatch %, 5 worst variables); each mismatch only with `--verbose`.
-Fast-changing powers will show some mismatches because of different sampling times; a systematic one
-(wrong scale, wrong id) shows as ~100 % for that variable.
+Journal every `vars2-summary-s` (10 min): `VARS2 stream: N of 257 fresh; invalid …; stale …; never …`
+(warning if anything is stale). The old-vs-new comparison of 0.1.x is removed.
 
 ### Config (`uhagatepy.conf`, same style as `uhagate6.conf`)
 
 `port` (default the by-id CP2102 path), `out-dir` (`/dev/shm` in production), `log-file`, `json-period-ms`,
-`rtc-period-s`, `reopen-s`, `silence-warn-s`, `error-summary-s`, `compare-window-ms`, `vars-yaml`, `verbose`.
+`rtc-period-s`, `reopen-s`, `silence-warn-s`, `error-summary-s`, `vars2-summary-s`, `frozen-after-s`, `vars-yaml`, `verbose`.
 
 ### Service `uhagatepy.service` (installed, **not enabled**)
 
@@ -146,8 +152,8 @@ Fast-changing powers will show some mismatches because of different sampling tim
 | `deploy.sh` | PC | copy code + `uha_vars.yaml` to `/home/pi/UhaGatePy`, run unit tests there, install the unit (not enabled), nothing started |
 | `test_window.sh [min≤15]` | Pi | as in UHA6 (transient unit, backstop timer, `trap`), but production is **uhagate6**: stops it, runs UhaGatePy, **always restores uhagate6**; saves snapshots, CPU/RSS samples, journal |
 | `switch_to_py.sh` | Pi | `enable --now uhagatepy`, `disable uhagate6`; auto-rollback if it does not start |
-| `rollback_to_v6.sh` | Pi | `disable --now uhagatepy`, `enable --now uhagate6` |
-| `tools/fake_elecon.py` | Pi (Linux) | optional: writes `0x221` + tunnel + `0x620` frames into a pseudo-terminal, so UhaGatePy can be run completely **without touching the production serial port** (output to `/tmp`) |
+| `rollback_to_v6.sh` | Pi | `disable --now uhagatepy`, `enable --now uhagate6` (warns: no live data once the nodes send VARS2 only) |
+| `tools/fake_elecon.py` | Pi (Linux) | optional: writes tunnel (+ `0x221` with `--old`) + `0x620` frames into a pseudo-terminal, so UhaGatePy can be run completely **without touching the production serial port** (output to `/tmp`) |
 
 `compare_json.py` from the brief is `uhatest.py compare` in `UHA/UHA6` (reused, copied).
 

@@ -111,7 +111,7 @@ def build_bms_json(raw: Dict[str, int], unix_time: int) -> str:
 
 
 def build_uha2_json(store: Store, defs: VarsFile, mono: float, unix_time: int) -> str:
-    """Every VARS2 variable by its YAML name: value in physical units and where it came from."""
+    """Every VARS2 variable by its YAML name: value in physical units, valid = fresh."""
     variables = {}
     for var_id in sorted(defs.by_id):
         d = defs.by_id[var_id]
@@ -119,8 +119,7 @@ def build_uha2_json(store: Store, defs: VarsFile, mono: float, unix_time: int) -
         entry = {"id": d.id, "value": reading.value, "unit": d.unit, "valid": reading.valid,
                  "age_s": None if reading.age_s is None else round(reading.age_s, 1),
                  "producer": defs.node_names.get(reading.producer, d.producer) if reading.producer is not None
-                 else d.producer,
-                 "source": reading.source}
+                 else d.producer}
         if d.type == "enum":
             entry["enum_name"] = defs.enums[d.enum].get(reading.value) if reading.value is not None else None
         variables[d.name] = entry

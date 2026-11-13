@@ -27,8 +27,7 @@ class Config:
     reopen_s: int = 5                                  # retry period while the serial port is missing
     silence_warn_s: int = 60                           # warn when the link is open but silent this long
     error_summary_s: int = 600                         # period of the error summary
-    compare_window_ms: int = 2000                      # old and VARS2 value must be this close to be compared
-    compare_summary_s: int = 600                       # period of the old-vs-VARS2 comparison summary
+    vars2_summary_s: int = 600                         # period of the VARS2 stream summary (fresh / stale / never)
     frozen_after_s: int = 120                          # node is frozen if no variable of it changed for this long
     verbose: bool = False                              # debug log (every packet, every mismatch)
 
@@ -44,8 +43,7 @@ OPTIONS = (
     ("reopen_s", "serial reopen retry period [s]", 1),
     ("silence_warn_s", "warn after this many seconds without packets", 1),
     ("error_summary_s", "error summary period [s]", 1),
-    ("compare_window_ms", "max time between old and VARS2 value for a comparison [ms]", 1),
-    ("compare_summary_s", "old-vs-VARS2 comparison summary period [s]", 1),
+    ("vars2_summary_s", "VARS2 stream summary period [s]", 1),
     ("frozen_after_s", "report a node as frozen when none of its variables changed for this long [s]", 10),
 )
 

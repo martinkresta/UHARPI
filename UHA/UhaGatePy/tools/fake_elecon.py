@@ -5,12 +5,10 @@
     python3 -m uhagatepy --port /tmp/fake_elecon --out-dir /tmp/out --log-file /tmp/out/log.txt --vars-yaml uha_vars.yaml
 
 It creates a pseudo-terminal, links it to /tmp/fake_elecon (--link) and then sends, like ELECON does:
-  - every YAML variable in the old format (packet 0x221) at its period,
-  - the same variable in the VARS2 tunnel (packet 0x180 + producer) unless --no-tunnel,
+  - every YAML variable in the VARS2 tunnel (packet 0x180 + producer) at its period,
+  - with --old also in the old format (packet 0x221), which the gateway must ignore,
   - a node log message (0x620) every 20 s,
 and prints the RTC sync packets (0x051) it receives from the gateway.
-
---break NAME makes the tunnel value of that variable 10 % wrong, to check the old-vs-VARS2 comparison.
 The frames are built here with plain struct calls (not with the gateway's tunnel module), so the test
 does not simply repeat the gateway's own mistakes.
 """
@@ -54,9 +52,7 @@ def old_frame(d, value):
     return rpiserp.encode(0x221, struct.pack(">HhH", d.id, raw, 1))
 
 
-def tunnel_frame(defs, d, value, wrong):
-    if wrong:
-        value = value * 1.1 + 5
+def tunnel_frame(defs, d, value):
     if d.type == "float":
         payload = struct.pack("<f", value)
     else:
@@ -70,8 +66,7 @@ def main() -> None:
     parser.add_argument("--yaml", default=os.path.join(APP_DIR, "uha_vars.yaml"))
     parser.add_argument("--link", default="/tmp/fake_elecon", help="symlink to the pseudo-terminal")
     parser.add_argument("--seconds", type=float, default=0, help="stop after this time (0 = run until Ctrl-C)")
-    parser.add_argument("--no-tunnel", action="store_true", help="old format only (ELECON before step 2)")
-    parser.add_argument("--break", dest="broken", default="", help="variable name whose tunnel value is wrong")
+    parser.add_argument("--old", action="store_true", help="also send the old 0x221 format (must be ignored)")
     args = parser.parse_args()
 
     defs = vars_def.load(args.yaml)
@@ -100,11 +95,11 @@ def main() -> None:
                 if when <= now:
                     d = defs.by_id[var_id]
                     values[var_id] = next_value(rng, d, values[var_id], defs.enums)
-                    frames.append(old_frame(d, values[var_id]))
-                    sent["old"] += 1
-                    if not args.no_tunnel:
-                        frames.append(tunnel_frame(defs, d, values[var_id], d.name == args.broken))
-                        sent["tunnel"] += 1
+                    frames.append(tunnel_frame(defs, d, values[var_id]))
+                    sent["tunnel"] += 1
+                    if args.old:
+                        frames.append(old_frame(d, values[var_id]))
+                        sent["old"] += 1
                     due[var_id] = when + d.period_ms / 1000
             if now >= next_log:
                 frames.append(rpiserp.encode(0x620, bytes([4, 2, 1, 2, 3, 4, 5, 6])))

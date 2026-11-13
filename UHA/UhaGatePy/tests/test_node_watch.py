@@ -82,7 +82,7 @@ class GatewayWatchTest(unittest.TestCase):
 
     def test_repeating_the_same_values_is_frozen(self):
         for _ in range(5):                                                # ELECON keeps repeating the stored value
-            self.gateway._on_packet(old_packet(180, 3305))
+            self.gateway._on_packet(float_packet(7, 180, 3.305))
             self.gateway._on_packet(float_packet(7, 181, 3.306))
         now = time.monotonic()
         self.assertEqual(self.gateway.watch.check(now + 10), [])
@@ -92,16 +92,16 @@ class GatewayWatchTest(unittest.TestCase):
         self.assertEqual([n for n, _ in self.gateway.watch.check(now + 200)], ["ELECON_D"])
 
     def test_changing_values_are_not_frozen(self):
-        self.gateway._on_packet(old_packet(180, 3305))
-        self.gateway._on_packet(old_packet(180, 3306))                    # changed
+        self.gateway._on_packet(float_packet(7, 180, 3.305))
+        self.gateway._on_packet(float_packet(7, 180, 3.306))                    # changed
         self.assertEqual(self.gateway.watch.check(time.monotonic() + 100), [])
         self.gateway._on_packet(float_packet(7, 181, 3.306))
         self.gateway._on_packet(float_packet(7, 181, 3.307))              # VARS2 value changed
         self.assertEqual(self.gateway.watch.check(time.monotonic() + 100), [])
 
     def test_status_shows_frozen_and_back_again(self):
-        self.gateway._on_packet(old_packet(180, 3305))
-        self.gateway._on_packet(old_packet(180, 3305))
+        self.gateway._on_packet(float_packet(7, 180, 3.305))
+        self.gateway._on_packet(float_packet(7, 180, 3.305))
         nodes = self.status(time.monotonic() + 500)
         self.assertTrue(nodes["ELECON_D"]["Frozen"])
         self.assertGreaterEqual(nodes["ELECON_D"]["QuietS"], 499)
@@ -110,13 +110,13 @@ class GatewayWatchTest(unittest.TestCase):
         self.assertIsNone(nodes["ELECON"]["QuietS"])
         self.gateway.watch.check(time.monotonic() + 500)                   # now reported
         with self.assertLogs("uhagatepy", level="INFO") as logged:
-            self.gateway._on_packet(old_packet(180, 3400))
+            self.gateway._on_packet(float_packet(7, 180, 3.4))
         self.assertIn("changing again", logged.output[0])
         self.assertFalse(self.status(time.monotonic())["ELECON_D"]["Frozen"])
 
-    def test_variable_outside_the_yaml_is_ignored(self):
-        self.gateway._on_packet(old_packet(49, 31))
-        self.gateway._on_packet(old_packet(49, 32))
+    def test_old_packets_do_not_feed_the_watch(self):
+        self.gateway._on_packet(old_packet(180, 3305))
+        self.gateway._on_packet(old_packet(180, 3306))
         self.assertEqual(self.gateway.watch.nodes, {})
 
 

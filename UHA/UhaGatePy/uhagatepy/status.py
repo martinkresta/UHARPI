@@ -1,7 +1,7 @@
-"""Content of uha_status.json: link state, counters, age of every variable, nodes, old-vs-VARS2 check.
+"""Content of uha_status.json: link state, counters, age of every variable, nodes, VARS2 stream state.
 
-Similar to UhaGate6's status file, but not identical: VarPackets is now OldPackets, a node's LastEvent is
-LastLogEvent, and variables without a name in the old table are not listed. Plus the VARS2 parts.
+Similar to UhaGate6's status file, but not identical: a node's LastEvent is LastLogEvent, variables without a name
+in the old table are not listed, and all values come from VARS2 (old 0x221 packets are only counted as ignored).
 """
 import os
 from typing import TYPE_CHECKING
@@ -46,8 +46,8 @@ def build(g: "Gateway", unix_time: int, mono: float, raw: dict) -> dict:
 
     counters = {
         "RxBytes": parser.rx_bytes, "RxPackets": parser.packets,
-        "OldPackets": c.old_packets, "TunnelPackets": c.tunnel_packets, "LogPackets": c.log_packets,
-        "UnknownIds": c.unknown_packets, "Malformed": c.malformed, "OutOfRangeVarIds": c.out_of_range_vars,
+        "TunnelPackets": c.tunnel_packets, "LogPackets": c.log_packets, "IgnoredOldPackets": c.ignored_old_packets,
+        "UnknownIds": c.unknown_packets,
         "TunnelDropped": dict(c.tunnel_drops), "WrongProducer": c.wrong_producer,
         "ChecksumErrors": parser.checksum_errors, "LengthErrors": parser.length_errors,
         "DiscardedBytes": parser.discarded_bytes, "ClampedToInt16": store.clamped,
@@ -56,17 +56,14 @@ def build(g: "Gateway", unix_time: int, mono: float, raw: dict) -> dict:
         "RssKb": rss_kb(),
     }
 
-    # ---- every old variable (as in UhaGate6) ----
+    # ---- every old variable (as in UhaGate6), value and age from VARS2 ----
     variables = {}
     for name, var_id in NAME_TO_ID.items():
-        old = store.old.get(var_id)
         v2 = store.v2.get(var_id)
-        last = max((x.mono for x in (old, v2) if x is not None), default=None)
-        last_unix = max((x.unix for x in (old, v2) if x is not None), default=None)
         variables[name] = {
             "Id": var_id, "Value": raw[name],
-            "AgeS": None if last is None else _age(mono, last), "LastRxUnix": last_unix,
-            "Count": old.count if old else 0, "Count2": v2.count if v2 else 0,
+            "AgeS": None if v2 is None else _age(mono, v2.mono), "LastRxUnix": None if v2 is None else v2.unix,
+            "Count": v2.count if v2 else 0,
         }
 
     # ---- nodes: the VARS2 tunnel names the producer, log messages carry the node id ----
@@ -91,25 +88,6 @@ def build(g: "Gateway", unix_time: int, mono: float, raw: dict) -> dict:
             "FrozenLimitS": int(g.watch.threshold_s(name)),
         }
 
-    # ---- old vs VARS2, since start. Differences are VARS2 value (converted back) minus old value, old raw units ----
-    per_variable = {}
-    verdicts = {"ok": 0, "close": 0, "noisy": 0, "offset": 0, "few": 0}
-    for var_id, s in sorted(store.compared.items()):
-        verdict = s.verdict()
-        verdicts[verdict] += 1
-        per_variable[g.defs.by_id[var_id].name] = {
-            "Verdict": verdict, "Compared": s.compared, "Mismatched": s.mismatched,
-            "MeanDiff": round(s.mean_diff, 2), "MeanAbsDiff": round(s.mean_abs_diff, 2), "MaxAbsDiff": s.max_abs_diff,
-            "RelativePct": round(100 * s.relative, 2), "MeanGapS": round(s.mean_gap_s, 2),
-            "LastVars2": s.last_v2, "LastOld": s.last_old,
-        }
-    comparison = {
-        "VariablesCompared": len(store.compared),
-        "Compared": sum(s.compared for s in store.compared.values()),
-        "Mismatched": sum(s.mismatched for s in store.compared.values()),
-        "Verdicts": verdicts,
-        "Vars": per_variable,
-    }
     health = store.vars2_health(mono)
     vars2 = {"Fresh": len(health["fresh"]), "Invalid": health["invalid"], "Stale": health["stale"],
              "NeverReceived": health["never"]}
@@ -117,5 +95,5 @@ def build(g: "Gateway", unix_time: int, mono: float, raw: dict) -> dict:
     return {
         "Version": VERSION, "UnixTime": unix_time, "StartUnix": g.start_unix, "UptimeS": int(uptime),
         "Yaml": {"Version": g.defs.version, "Sha": g.defs.sha, "Variables": len(g.defs.by_id)},
-        "Link": link, "Counters": counters, "Vars2": vars2, "Comparison": comparison, "Nodes": nodes, "Vars": variables,
+        "Link": link, "Counters": counters, "Vars2": vars2, "Nodes": nodes, "Vars": variables,
     }

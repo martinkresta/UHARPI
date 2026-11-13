@@ -183,12 +183,13 @@ of a VARS2 CAN frame (var id u16 LE, value 4 B LE float32/int32/uint32 by the YA
 Variables are defined in `UHA_FW/UHA_COMMON/VarDefs/uha_vars.yaml` (copied to the Pi by `deploy.sh`,
 not stored in this repo). VARS2 ids equal the old `VAR_*` ids.
 
-- Per variable the VARS2 value is used while fresh (VALID and age ≤ `timeout_ms`), converted back with
-  `round(value * legacy_scale)`, otherwise the old `0x221` value. `uha.json`/`bms.json` stay identical to UhaGate6
+- **Since 0.2.0 (2026-11-13) VARS2 only**: old `0x221` packets are ignored (counted as `IgnoredOldPackets`), the
+  old-vs-VARS2 comparison is removed. `uha.json`/`bms.json` get the last VARS2 value converted back with
+  `round(value * legacy_scale)`, 0 for ids not in the YAML; same keys/format as UhaGate6
   (golden test `tests/test_golden_uhagate6.py` compiles the real UhaGate6 builders and compares).
-- New outputs: `uha2.json` (YAML names, physical units, source) and extended `uha_status.json`
-  (nodes seen from the tunnel, old-vs-VARS2 comparison). The comparison summary in the journal
-  (every 10 min) is the main check of the migration.
+  UhaGate6 (rollback) reads only `0x221`: no live data once the nodes stop the old format.
+- New outputs: `uha2.json` (YAML names, physical units, valid = fresh) and extended `uha_status.json`
+  (nodes seen from the tunnel, `Vars2` fresh/stale/invalid/never). VARS2 stream summary in the journal every 10 min.
 - Python 3.11 with `python3-serial`, `python3-yaml` (apt). Service `uhagatepy.service` (`Conflicts=` v5/v6).
 - `tools/fake_elecon.py` feeds the gateway through a pseudo-terminal (no production port needed).
 - Test window `sudo /home/pi/UhaGatePy/test_window.sh 10` stops the production gateway for ≤ 15 min and always restores it.

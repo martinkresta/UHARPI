@@ -1,6 +1,6 @@
 """The gateway: one asyncio event loop that
 
-  - reads the serial port when data arrives and sorts the packets (old 0x221, VARS2 tunnel, log),
+  - reads the serial port when data arrives and sorts the packets (VARS2 tunnel, log; old 0x221 packets are only counted),
   - once per second writes the JSON files, sends the RTC sync every minute and checks the link,
   - logs start-up, link changes and periodic summaries (never one line per second).
 
@@ -14,25 +14,22 @@ from dataclasses import dataclass, field
 from typing import Callable, Dict, Set
 
 from . import VERSION, config, event_log, outputs, rpiserp, rtc, status, tunnel
-from .legacy_table import NUM_OF_VARS
 from .node_watch import NodeWatch
 from .log import log
 from .serial_link import LinkError, SerialLink
 from .store import Store
 from .vars_def import VarsFile
 
-PACKET_OLD_VARIABLE = 0x221      # ELECON -> RPi: id(2) value(2) valid(2), all big-endian int16
+PACKET_OLD_VARIABLE = 0x221      # old format, replaced by VARS2: ignored, only counted
 PACKET_LOG = 0x620               # ELECON -> RPi: node log message, 8 bytes
 
 
 @dataclass
 class Counters:
-    old_packets: int = 0
+    ignored_old_packets: int = 0      # old 0x221 packets (until the firmware stops sending them)
     tunnel_packets: int = 0
     log_packets: int = 0
     unknown_packets: int = 0          # packet ids we do not know
-    malformed: int = 0                # known packet id but too short
-    out_of_range_vars: int = 0        # old variable id >= NUM_OF_VARS
     wrong_producer: int = 0           # tunnel packet from a node that is not the variable's producer
     tx_packets: int = 0
     tx_errors: int = 0
@@ -57,7 +54,7 @@ class Gateway:
         self.defs = defs
         self.link = SerialLink(cfg.port)
         self.parser = rpiserp.Parser()
-        self.store = Store(defs, cfg.compare_window_ms / 1000)
+        self.store = Store(defs)
         self.watch = NodeWatch(cfg.frozen_after_s)       # nodes whose data stopped changing
         self.counters = Counters()
         self.tunnel_nodes: Dict[int, NodeStats] = {}   # node id -> tunnel packets from that producer
@@ -81,7 +78,7 @@ class Gateway:
         self._logged: Set[str] = set()    # error messages already logged in this summary period
         self._reported: Dict[str, int] = {}
         self._next_error_summary = self.start_mono + cfg.error_summary_s
-        self._next_compare_summary = self.start_mono + cfg.compare_summary_s
+        self._next_vars2_summary = self.start_mono + cfg.vars2_summary_s
         self._next_hourly = self.start_mono + 3600
         self._loop: asyncio.AbstractEventLoop = None  # type: ignore[assignment]
         self._stop: asyncio.Event = None              # type: ignore[assignment]
@@ -217,7 +214,7 @@ class Gateway:
         self.last_packet_mono = mono
 
         if packet.id == PACKET_OLD_VARIABLE:
-            self._on_old_variable(packet, mono, unix)
+            self.counters.ignored_old_packets += 1
         elif tunnel.is_tunnel(packet.id):
             self._on_tunnel(packet, mono, unix)
         elif packet.id == PACKET_LOG:
@@ -225,23 +222,6 @@ class Gateway:
         else:
             self.counters.unknown_packets += 1
             log.debug("unknown packet id 0x%03X, %d data bytes", packet.id, len(packet.data))
-
-    def _on_old_variable(self, packet: rpiserp.Packet, mono: float, unix: int) -> None:
-        self.counters.old_packets += 1
-        data = packet.data
-        if len(data) < 4:
-            self.counters.malformed += 1
-            return
-        var_id = (data[0] << 8) | data[1]
-        raw = int.from_bytes(data[2:4], "big", signed=True)
-        valid = len(data) < 6 or int.from_bytes(data[4:6], "big") != 0   # UhaGate6 ignored this field
-        if var_id >= NUM_OF_VARS:
-            self.counters.out_of_range_vars += 1
-            return
-        log.debug("old var %d = %d%s", var_id, raw, "" if valid else " (invalid)")
-        previous = self.store.old.get(var_id)
-        self.store.set_old(var_id, raw, valid, mono, unix)
-        self._watch_value(var_id, previous is not None and previous.raw != raw, mono)
 
     def _on_tunnel(self, packet: rpiserp.Packet, mono: float, unix: int) -> None:
         self.counters.tunnel_packets += 1
@@ -256,22 +236,16 @@ class Gateway:
         if self.defs.node_names.get(value.producer) != definition.producer:
             self.counters.wrong_producer += 1             # still stored: the value itself is fine
             log.debug("%s came from node %d, YAML says %s", definition.name, value.producer, definition.producer)
-        previous_v2 = self.store.v2.get(value.var_id)
-        mismatch = self.store.set_v2(value, mono, unix)
-        self._watch_value(value.var_id, previous_v2 is not None and previous_v2.value != value.value, mono)
-        if mismatch is not None:
-            log.debug("mismatch %s: VARS2 gives %d, old value is %d", definition.name, mismatch[0], mismatch[1])
+        changed = self.store.set_v2(value, mono, unix)
+        self._watch_value(definition.producer, changed, mono)
 
-    def _watch_value(self, var_id: int, changed: bool, mono: float) -> None:
-        """Tell the frozen-node watch that a value of the variable's producer arrived (and whether it changed)."""
-        definition = self.defs.by_id.get(var_id)
-        if definition is None:
-            return                                         # not in the YAML: producer unknown
-        self.watch.seen(definition.producer, mono)
+    def _watch_value(self, producer: str, changed: bool, mono: float) -> None:
+        """Tell the frozen-node watch that a value of this producer arrived (and whether it changed)."""
+        self.watch.seen(producer, mono)
         if changed:
-            quiet = self.watch.changed(definition.producer, mono)
+            quiet = self.watch.changed(producer, mono)
             if quiet:
-                log.info("node %s: data is changing again after %d s", definition.producer, quiet)
+                log.info("node %s: data is changing again after %d s", producer, quiet)
 
     def _on_log_message(self, packet: rpiserp.Packet, mono: float, unix: int) -> None:
         self.counters.log_packets += 1
@@ -364,7 +338,7 @@ class Gateway:
 
     def _write_outputs(self, mono: float, now: float) -> None:
         unix = int(now)
-        raw = self.store.snapshot(mono)
+        raw = self.store.snapshot()
         builders = {
             "uha.json": lambda: outputs.build_uha_json(raw, unix),
             "bms.json": lambda: outputs.build_bms_json(raw, unix),
@@ -394,17 +368,16 @@ class Gateway:
             self._next_error_summary = mono + self.cfg.error_summary_s
             self._logged.clear()
             self._error_summary()
-        if mono >= self._next_compare_summary:
-            self._next_compare_summary = mono + self.cfg.compare_summary_s
-            self._compare_summary()
+        if mono >= self._next_vars2_summary:
+            self._next_vars2_summary = mono + self.cfg.vars2_summary_s
+            self._vars2_summary(mono)
         if mono >= self._next_hourly:
             self._next_hourly = mono + 3600
-            old_vars = len(self.store.old)
-            log.info("hourly: link %s, packets %d (old %d, tunnel %d), variables seen: old %d / VARS2 %d, "
+            log.info("hourly: link %s, packets %d (tunnel %d, old ignored %d), VARS2 variables seen %d of %d, "
                      "checksum errors %d, reconnects %d, RTC syncs %d, RSS %d kB",
-                     "up" if self.link.is_open else "down", self.parser.packets, self.counters.old_packets,
-                     self.counters.tunnel_packets, old_vars, len(self.store.v2), self.parser.checksum_errors,
-                     self.reconnects, self.counters.rtc_sent, status.rss_kb())
+                     "up" if self.link.is_open else "down", self.parser.packets, self.counters.tunnel_packets,
+                     self.counters.ignored_old_packets, len(self.store.v2), len(self.defs.by_id),
+                     self.parser.checksum_errors, self.reconnects, self.counters.rtc_sent, status.rss_kb())
 
     def _error_summary(self) -> None:
         c = self.counters
@@ -412,8 +385,6 @@ class Gateway:
             "checksum errors": self._delta("checksum", self.parser.checksum_errors),
             "length errors": self._delta("length", self.parser.length_errors),
             "unknown packet ids": self._delta("unknown", c.unknown_packets),
-            "short packets": self._delta("malformed", c.malformed),
-            "old ids out of range": self._delta("range", c.out_of_range_vars),
             "tunnel packets dropped": self._delta("drops", sum(c.tunnel_drops.values())),
             "tunnel packets from the wrong node": self._delta("producer", c.wrong_producer),
             "values clamped to int16": self._delta("clamped", self.store.clamped),
@@ -425,43 +396,13 @@ class Gateway:
         if found:
             log.warning("in the last %d s: %s", self.cfg.error_summary_s, ", ".join(found))
 
-    def _compare_summary(self) -> None:
-        """Old vs VARS2: the main check of the migration (every format sends the same data).
-
-        Per variable a verdict from the statistics of the last period (see store.CompareStats):
-        ok / close = fine, noisy = fast signal sampled at different moments, OFFSET = look for a real error.
-        """
-        window = self.store.take_window()
-        period = self.cfg.compare_summary_s
-        mono = time.monotonic()
+    def _vars2_summary(self, mono: float) -> None:
+        """State of the VARS2 stream: how many variables are fresh, which are invalid, stale or never received."""
         health = self.store.vars2_health(mono)
-        lines = []
-        if window:
-            groups: Dict[str, list] = {"ok": [], "close": [], "noisy": [], "offset": [], "few": []}
-            for var_id, stats in window.items():
-                groups[stats.verdict()].append((stats.relative, var_id, stats))
-            compared = sum(s.compared for s in window.values())
-            beyond = sum(s.mismatched for s in window.values())
-            text = "old vs VARS2 (last %d s): %d values of %d variables compared, %d beyond +-1 (%.1f %%); "                    "variables: %d ok, %d close, %d noisy, %d OFFSET, %d too few" % (
-                       period, compared, len(window), beyond, 100.0 * beyond / compared,
-                       len(groups["ok"]), len(groups["close"]), len(groups["noisy"]), len(groups["offset"]),
-                       len(groups["few"]))
-            lines.append((log.warning if groups["offset"] else log.info, text))
-            for kind in ("offset", "noisy"):
-                worst = sorted(groups[kind], reverse=True)[:5]
-                if worst:
-                    details = ", ".join("%s %+.1f (%.1f %%)" % (self.defs.by_id[v].name, s.mean_diff, 100 * s.relative)
-                                        for _, v, s in worst)
-                    lines.append((log.warning if kind == "offset" else log.info,
-                                  "  %s (mean difference in old raw units, relative to the value): %s" % (kind, details)))
-        else:
-            lines.append((log.info, "old vs VARS2 (last %d s): nothing to compare, %d variables received in VARS2 format"
-                          % (period, len(self.store.v2))))
-        problems = {key: names for key, names in health.items() if key != "fresh" and names}
-        if problems:
-            text = "VARS2 stream: %d fresh" % len(health["fresh"])
-            for key, names in problems.items():
+        text = "VARS2 stream: %d of %d fresh" % (len(health["fresh"]), len(self.defs.by_id))
+        for key in ("invalid", "stale", "never"):
+            names = health[key]
+            if names:
                 text += "; %s %d (%s%s)" % (key, len(names), ", ".join(names[:6]), ", ..." if len(names) > 6 else "")
-            lines.append((log.warning if health["stale"] else log.info, text))
-        for log_function, text in lines:
-            log_function("%s", text)
+        log_function = log.warning if health["stale"] else log.info
+        log_function("%s", text)
