@@ -90,7 +90,7 @@ every minute:  rtc.send()                ─► 0x051, identical to UhaGate6
 | `log.py` | logging with journald level prefixes, no per-second output |
 | `rpiserp.py` | frame parser (split frames, checksum, length) + encoder, counters |
 | `serial_link.py` | open/read/write with pyserial, reconnect every 5 s, link state |
-| `vars_def.py` | loads `uha_vars.yaml`: defaults, producer inheritance, arrays, `timeout auto`; clear error + exit if invalid |
+| `vars_def.py` | loads `uha_vars.yaml` (flat `vars:` groups and, since 2026-11-14, `subgroups:`): defaults, producer inheritance (subgroup, else group), arrays, `timeout auto`; `struct`/`validity`/`field` ignored; clear error + exit if invalid |
 | `legacy_table.py` | **generated once** from UhaGate6 (`uha_json_body.inc`, `uha_vars.h`): the 256 `uha.json` keys in order with ids. Not invented, not hand-edited |
 | `tunnel.py` | decode of a `0x18n` packet (id u16 LE, value 4 B LE as float32 / int32 / uint32, flags, seq) |
 | `store.py` | VARS2 store, freshness, legacy conversion |

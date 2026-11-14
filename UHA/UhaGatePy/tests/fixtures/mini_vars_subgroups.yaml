@@ -1,0 +1,35 @@
+# Same variables as mini_vars.yaml, in the new layout (groups with subgroups, producer on the group or the
+# subgroup, extra keys struct / validity / field that the gateway ignores).
+version: 7
+nodes: {IOBOARD_D: 1, TECHM: 3, ELECON: 4, ELECON_D: 7, RPI: 15}
+defaults: {type: float, timeout_ms: auto, on_can: true}
+enums:
+  ElHeaterState: {0: Heating, 1: TempReached, 2: NoFreePower}
+groups:
+  Energy:                       # container: producer inherited by the subgroups without their own
+    producer: ELECON
+    subgroups:
+      Solar:
+        vars:
+          - {id: 8,  name: SOLAR_POWER_W,         field: Power_W,       legacy: VAR_SOLAR_POWER_W,          unit: "W",  period_ms: 3000, on_can: false}
+          - {id: 9,  name: SOLAR_ENERGY_TODAY_WH, field: EnergyToday_Wh, legacy: VAR_SOLAR_ENERGY_TODAY_10WH, unit: "Wh", period_ms: 3000, legacy_scale: 0.1}
+      Battery:
+        validity: group
+        vars:
+          - {id: 10, name: BAT_SOC,       field: Soc_pct,   legacy: VAR_BAT_SOC,         unit: "%", period_ms: 1000}
+          - {id: 11, name: BAT_VOLTAGE_V, field: Voltage_V, legacy: VAR_BAT_VOLTAGE_V10, unit: "V", period_ms: 1000, legacy_scale: 10}
+  Heater:                       # container without producer: each subgroup has its own
+    subgroups:
+      Status:
+        producer: TECHM
+        vars:
+          - {id: 80,  name: EL_HEATER_STATUS, field: Status, legacy: VAR_EL_HEATER_STATUS, type: enum, enum: ElHeaterState, period_ms: 3000}
+      Balance:
+        producer: ELECON_D
+        vars:
+          - {id: 306, name: STRG1_BALANCED_TODAY, field: BalancedToday, legacy: VAR_STRG1_BALANCED_TODAY, type: bool, period_ms: 3000}
+  Bms1:                         # plain group with vars, as before
+    producer: ELECON_D
+    struct: Pack
+    vars:
+      - {id: 180, name: BMS1_CELL_V, field: CellV, count: 16, legacy: "VAR_BMS1_CELL{1..16}_MV", unit: "V", legacy_scale: 1000, period_ms: 5000}

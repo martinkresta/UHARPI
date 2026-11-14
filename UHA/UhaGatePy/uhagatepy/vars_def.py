@@ -1,8 +1,12 @@
 """Loads the variable definitions from uha_vars.yaml (single source of truth, lives in UHA_FW).
 
 Only what the gateway needs is read: ids, names, types, scales, timeouts and producers.
-Rules (see VARS2_spec.md section 3):
-  - a variable inherits `producer` from its group and the other missing keys from `defaults:`
+Rules (see VARS2_spec.md section 3 and the header of uha_vars.yaml):
+  - a group has either `vars:` (list of variables) or `subgroups:` (name -> {producer?, vars}), one level only.
+    Both layouts are read: the old flat one (only `vars:`) and the new one with subgroups.
+  - a variable inherits `producer` from its subgroup, else from its group (old files: also on the variable)
+    and the other missing keys from `defaults:`
+  - keys the gateway does not need (`struct`, `validity`, `field`, `receivers`, ...) are ignored
   - `timeout_ms: auto` means 3 x period_ms
   - `count: n` makes an array: ids id .. id+n-1, names NAME_1 .. NAME_n and the legacy
     name 'VAR_BMS1_CELL{1..16}_MV' becomes VAR_BMS1_CELL1_MV .. VAR_BMS1_CELL16_MV
@@ -11,7 +15,7 @@ A broken file raises VarsDefError with the reason - the gateway then refuses to 
 import hashlib
 import re
 from dataclasses import dataclass, field
-from typing import Dict, List
+from typing import Dict, Iterator, List, Optional, Tuple
 
 import yaml
 
@@ -72,6 +76,20 @@ def load(path: str) -> VarsFile:
         raise VarsDefError(f"{path}: malformed definition ({type(e).__name__}: {e})")
 
 
+def _var_lists(groups: dict) -> Iterator[Tuple[str, Optional[str], list]]:
+    """(group path, producer, variable list) of every group and subgroup, in file order."""
+    for group_name, group in groups.items():
+        if "vars" in group:
+            yield group_name, group.get("producer"), group["vars"]
+        elif "subgroups" in group:
+            for sub_name, sub in group["subgroups"].items():
+                if "vars" not in sub:
+                    _fail(f"subgroup {group_name}.{sub_name} has no 'vars'")
+                yield f"{group_name}.{sub_name}", sub.get("producer", group.get("producer")), sub["vars"]
+        else:
+            _fail(f"group {group_name} has neither 'vars' nor 'subgroups'")
+
+
 def _build(data: dict, sha: str) -> VarsFile:
     nodes = {str(name): int(number) for name, number in data["nodes"].items()}
     enums = {name: {int(k): str(v) for k, v in entries.items()} for name, entries in (data.get("enums") or {}).items()}
@@ -80,13 +98,13 @@ def _build(data: dict, sha: str) -> VarsFile:
     names = set()
     warnings: List[str] = []
 
-    for group_name, group in data["groups"].items():
-        for entry in group["vars"]:
+    for group_path, group_producer, entries in _var_lists(data["groups"]):
+        for entry in entries:
             item = dict(defaults)
             item.update(entry)
-            producer = entry.get("producer", group.get("producer"))
+            producer = entry.get("producer", group_producer)
             if producer not in nodes:
-                _fail(f"variable {entry.get('name')}: producer '{producer}' is not in nodes")
+                _fail(f"variable {entry.get('name')} ({group_path}): producer '{producer}' is not in nodes")
             vtype = item.get("type", "float")
             if vtype not in TYPES:
                 _fail(f"variable {entry['name']}: unknown type '{vtype}'")
