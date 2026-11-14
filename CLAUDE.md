@@ -198,6 +198,11 @@ Frozen-node watch (`node_watch.py`): a node none of whose variables changed for 
 reported in the journal (`node X FROZEN`), in `uha_status.json` (`Nodes.<X>.Frozen`) and on `WS/uha-status.html`. Needed because
 ELECON re-sends stale values of a dead node as fresh.
 
+**0.3.0 (branch `feature/vars2-logging`, prepared 2026-11-14, not yet in production): VARS2 log into SQLite**
+(`db_log.py`, writer thread) at `/var/lib/uhalog/uha_log.db` for the variables with `log_s` / `agg` in the YAML;
+config `log-db`, `log-raw-days`, `log-max-mb`, `log-min-free-mb`. Grafana 13 (LAN only, `http://192.168.1.10/grafana/`)
+reads it; config and dashboards in `UHA/Grafana/` (`make_dashboards.py`, `deploy_grafana.sh`, README).
+
 Known label mismatch: the gateway's old table (`UHA.h`) calls id 49 `VAR_MPPT_ENERGY_TODAY_WH`, the firmware
 `VAR_MPPT_TEMP_C` (a temperature). The `uha.json` key keeps the old name for compatibility.
 

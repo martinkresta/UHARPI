@@ -1,0 +1,15 @@
+# Grafana datasource: the UhaGatePy SQLite log (read only). Installed to /etc/grafana/provisioning/datasources/
+# by deploy_grafana.sh, which replaces @LOG_DB@ with the database path (default /var/lib/uhalog/uha_log.db).
+apiVersion: 1
+
+datasources:
+  - name: UHA log
+    uid: uhalog
+    type: frser-sqlite-datasource
+    access: proxy
+    isDefault: true
+    editable: false
+    jsonData:
+      path: "@LOG_DB@"
+      # read only; the plugin adds _pragma=query_only(1) by itself
+      pathOptions: "mode=ro"

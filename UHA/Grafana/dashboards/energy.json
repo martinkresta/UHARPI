@@ -1,0 +1,454 @@
+{
+  "uid": "uha-energy",
+  "title": "UHA Energy",
+  "tags": [
+    "uha"
+  ],
+  "timezone": "Europe/Prague",
+  "editable": true,
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "1m",
+  "graphTooltip": 1,
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "1m",
+      "5m",
+      "15m",
+      "1h"
+    ]
+  },
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Power",
+      "description": "BAT_POWER_W (+ charging), SOLAR_POWER_W, LOAD_W - mean per bucket",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "watt",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null
+          },
+          "displayName": "${__field.labels.name}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BAT_POWER_W', 'SOLAR_POWER_W', 'LOAD_W') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BAT_POWER_W', 'SOLAR_POWER_W', 'LOAD_W') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BAT_POWER_W', 'SOLAR_POWER_W', 'LOAD_W') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BAT_POWER_W', 'SOLAR_POWER_W', 'LOAD_W') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 1
+    },
+    {
+      "type": "timeseries",
+      "title": "State of charge",
+      "description": "",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 9,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null
+          },
+          "displayName": "${__field.labels.name}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BAT_SOC', 'BMS1_SOC', 'BMS2_SOC', 'BMS3_SOC') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BAT_SOC', 'BMS1_SOC', 'BMS2_SOC', 'BMS3_SOC') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BAT_SOC', 'BMS1_SOC', 'BMS2_SOC', 'BMS3_SOC') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BAT_SOC', 'BMS1_SOC', 'BMS2_SOC', 'BMS3_SOC') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 2
+    },
+    {
+      "type": "timeseries",
+      "title": "Storages power",
+      "description": "1 = house (ELECON), 2 = workshop (ELECON_D)",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 9,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "watt",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null
+          },
+          "displayName": "${__field.labels.name}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('STRG1_POWER_W', 'STRG2_POWER_W', 'LPV1_POWER_W', 'LPV2_POWER_W', 'LLOAD1_POWER_W', 'LLOAD2_POWER_W') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('STRG1_POWER_W', 'STRG2_POWER_W', 'LPV1_POWER_W', 'LPV2_POWER_W', 'LLOAD1_POWER_W', 'LLOAD2_POWER_W') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('STRG1_POWER_W', 'STRG2_POWER_W', 'LPV1_POWER_W', 'LPV2_POWER_W', 'LLOAD1_POWER_W', 'LLOAD2_POWER_W') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('STRG1_POWER_W', 'STRG2_POWER_W', 'LPV1_POWER_W', 'LPV2_POWER_W', 'LLOAD1_POWER_W', 'LLOAD2_POWER_W') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 3
+    },
+    {
+      "type": "timeseries",
+      "title": "Energy per hour",
+      "description": "From agg_15min (the current 15 min are not in yet)",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 17,
+        "w": 24,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "kwatth",
+          "custom": {
+            "drawStyle": "bars",
+            "lineWidth": 1,
+            "fillOpacity": 80,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null,
+            "barAlignment": 1
+          },
+          "displayName": "${__field.labels.name}",
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- kWh per local hour: SUM of the 15 min increments of the counters\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT * FROM (\n  SELECT x.ts - x.ts % 3600 AS time, 'Consumption (LLOAD1+2)' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f - q.f % 3600 + 3600 AND x.ts < q.t\n  WHERE v.name IN ('LLOAD1_CONS_WH', 'LLOAD2_CONS_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT x.ts - x.ts % 3600 AS time, 'PV production (LPV1+2)' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f - q.f % 3600 + 3600 AND x.ts < q.t\n  WHERE v.name IN ('LPV1_PROD_WH', 'LPV2_PROD_WH')\n  GROUP BY 1\n) ORDER BY 1",
+          "queryText": "-- kWh per local hour: SUM of the 15 min increments of the counters\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT * FROM (\n  SELECT x.ts - x.ts % 3600 AS time, 'Consumption (LLOAD1+2)' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f - q.f % 3600 + 3600 AND x.ts < q.t\n  WHERE v.name IN ('LLOAD1_CONS_WH', 'LLOAD2_CONS_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT x.ts - x.ts % 3600 AS time, 'PV production (LPV1+2)' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f - q.f % 3600 + 3600 AND x.ts < q.t\n  WHERE v.name IN ('LPV1_PROD_WH', 'LPV2_PROD_WH')\n  GROUP BY 1\n) ORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 4
+    },
+    {
+      "type": "timeseries",
+      "title": "Energy per day (last 30 days)",
+      "description": "",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 25,
+        "w": 12,
+        "h": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "kwatth",
+          "custom": {
+            "drawStyle": "bars",
+            "lineWidth": 1,
+            "fillOpacity": 80,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null,
+            "barAlignment": 1
+          },
+          "displayName": "${__field.labels.name}",
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- kWh per local day: SUM of the 15 min increments of the counters\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT * FROM (\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'Consumption (LLOAD1+2)' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('LLOAD1_CONS_WH', 'LLOAD2_CONS_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'PV production (LPV1+2)' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('LPV1_PROD_WH', 'LPV2_PROD_WH')\n  GROUP BY 1\n) ORDER BY 1",
+          "queryText": "-- kWh per local day: SUM of the 15 min increments of the counters\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT * FROM (\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'Consumption (LLOAD1+2)' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('LLOAD1_CONS_WH', 'LLOAD2_CONS_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'PV production (LPV1+2)' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('LPV1_PROD_WH', 'LPV2_PROD_WH')\n  GROUP BY 1\n) ORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "timeFrom": "30d",
+      "id": 5
+    },
+    {
+      "type": "timeseries",
+      "title": "Meters per day (last 30 days)",
+      "description": "",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 25,
+        "w": 12,
+        "h": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "kwatth",
+          "custom": {
+            "drawStyle": "bars",
+            "lineWidth": 1,
+            "fillOpacity": 80,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null,
+            "barAlignment": 1,
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            }
+          },
+          "displayName": "${__field.labels.name}",
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- kWh per local day: SUM of the 15 min increments of the counters\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT * FROM (\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'AC300' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_AC300_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'AC3KW' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_AC3KW_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'AC5KW' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_AC5KW_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'FRIDGE' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_FRIDGE_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'KITCHEN' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_KITCHEN_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'WASCHMACHINE' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_WASCHMACHINE_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'OTHER' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_OTHER_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'TECHM' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_TECHM_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'AXPERT' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_AXPERT_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'EVSE' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_EVSE_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'WS_HEATING' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_WS_HEATING_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'EL_HEATER' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('EL_HEATER_CONS_WH')\n  GROUP BY 1\n) ORDER BY 1",
+          "queryText": "-- kWh per local day: SUM of the 15 min increments of the counters\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT * FROM (\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'AC300' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_AC300_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'AC3KW' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_AC3KW_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'AC5KW' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_AC5KW_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'FRIDGE' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_FRIDGE_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'KITCHEN' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_KITCHEN_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'WASCHMACHINE' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_WASCHMACHINE_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'OTHER' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_OTHER_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'TECHM' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_TECHM_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'AXPERT' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_AXPERT_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'EVSE' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_EVSE_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'WS_HEATING' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_WS_HEATING_WH')\n  GROUP BY 1\n  UNION ALL\n  SELECT CAST(strftime('%s', date(x.ts, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS time, 'EL_HEATER' AS name, SUM(x.value) / 1000.0 AS value\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('EL_HEATER_CONS_WH')\n  GROUP BY 1\n) ORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "timeFrom": "30d",
+      "id": 6
+    },
+    {
+      "type": "timeseries",
+      "title": "Meters power",
+      "description": "",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 34,
+        "w": 24,
+        "h": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "watt",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null
+          },
+          "displayName": "${__field.labels.name}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('POW_AC300_W', 'POW_AC3KW_W', 'POW_AC5KW_W', 'POW_FRIDGE_W', 'POW_KITCHEN_W', 'POW_WASCHMACHINE_W', 'POW_OTHER_W', 'POW_TECHM_W', 'POW_AXPERT_W', 'POW_EVSE_W', 'POW_WS_HEATING_W') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('POW_AC300_W', 'POW_AC3KW_W', 'POW_AC5KW_W', 'POW_FRIDGE_W', 'POW_KITCHEN_W', 'POW_WASCHMACHINE_W', 'POW_OTHER_W', 'POW_TECHM_W', 'POW_AXPERT_W', 'POW_EVSE_W', 'POW_WS_HEATING_W') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('POW_AC300_W', 'POW_AC3KW_W', 'POW_AC5KW_W', 'POW_FRIDGE_W', 'POW_KITCHEN_W', 'POW_WASCHMACHINE_W', 'POW_OTHER_W', 'POW_TECHM_W', 'POW_AXPERT_W', 'POW_EVSE_W', 'POW_WS_HEATING_W') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('POW_AC300_W', 'POW_AC3KW_W', 'POW_AC5KW_W', 'POW_FRIDGE_W', 'POW_KITCHEN_W', 'POW_WASCHMACHINE_W', 'POW_OTHER_W', 'POW_TECHM_W', 'POW_AXPERT_W', 'POW_EVSE_W', 'POW_WS_HEATING_W') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 7
+    }
+  ],
+  "templating": {
+    "list": []
+  },
+  "annotations": {
+    "list": []
+  },
+  "links": [
+    {
+      "title": "UHA dashboards",
+      "type": "dashboards",
+      "tags": [
+        "uha"
+      ],
+      "asDropdown": false
+    }
+  ]
+}

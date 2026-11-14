@@ -1,4 +1,5 @@
 """Loading uha_vars.yaml: the old flat layout and the new layout with subgroups give the same variables."""
+import dataclasses
 import os
 import subprocess
 import tempfile
@@ -80,6 +81,8 @@ class RealYamlTest(unittest.TestCase):
             self.skipTest("UHA_FW git history not available (normal on the Pi)")
         old_defs, new_defs = load_text(old), vars_def.load(REAL_YAML)
         self.assertEqual(len(new_defs.by_id), 258)
+        # since 0.3.0 the file also has log_s / agg (DB logging); everything else must be unchanged
+        new_defs.by_id = {i: dataclasses.replace(d, log_s=0, agg="avg") for i, d in new_defs.by_id.items()}
         self.assertEqual(without_sha(new_defs), without_sha(old_defs))
 
 

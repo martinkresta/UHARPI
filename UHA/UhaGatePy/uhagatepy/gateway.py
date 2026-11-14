@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from typing import Callable, Dict, Set
 
 from . import VERSION, config, event_log, outputs, rpiserp, rtc, status, tunnel
+from .db_log import DbLog
 from .node_watch import NodeWatch
 from .log import log
 from .serial_link import LinkError, SerialLink
@@ -56,6 +57,7 @@ class Gateway:
         self.parser = rpiserp.Parser()
         self.store = Store(defs)
         self.watch = NodeWatch(cfg.frozen_after_s)       # nodes whose data stopped changing
+        self.db = DbLog(cfg, defs)                       # VARS2 log into SQLite (own writer thread)
         self.counters = Counters()
         self.tunnel_nodes: Dict[int, NodeStats] = {}   # node id -> tunnel packets from that producer
         self.log_nodes: Dict[int, NodeStats] = {}      # node id -> log messages from that node
@@ -101,13 +103,22 @@ class Gateway:
         if not os.access(self.cfg.out_dir, os.W_OK):
             log.error("output folder %s is not writable", self.cfg.out_dir)
 
+        self._start_db_log()
         self._open_link()
         ticker = asyncio.create_task(self._tick_loop())
         await self._stop.wait()
         ticker.cancel()
         self._close_link()
+        self.db.stop()
         log.info("UhaGatePy stopped")
         return 0
+
+    def _start_db_log(self) -> None:
+        try:
+            self.db.start()
+        except Exception:                                  # logging is optional, the gateway runs without it
+            log.exception("DB log: cannot start, running without it")
+            self.db.enabled = False
 
     def _on_stop_signal(self, sig: int) -> None:
         log.info("stopping on signal %s", signal.Signals(sig).name)
@@ -237,6 +248,7 @@ class Gateway:
             self.counters.wrong_producer += 1             # still stored: the value itself is fine
             log.debug("%s came from node %d, YAML says %s", definition.name, value.producer, definition.producer)
         changed = self.store.set_v2(value, mono, unix)
+        self.db.on_value(value.var_id, value.value, value.valid, unix)     # catches its own errors
         self._watch_value(definition.producer, changed, mono)
 
     def _watch_value(self, producer: str, changed: bool, mono: float) -> None:
@@ -306,6 +318,7 @@ class Gateway:
             self._open_link()
 
         self._write_outputs(mono, now)
+        self.db.tick(now)                                  # catches its own errors
 
         slot = int(now) // self.cfg.rtc_period_s          # changes every minute with the default 60 s
         if slot != self._last_rtc_slot:

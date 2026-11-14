@@ -95,5 +95,6 @@ def build(g: "Gateway", unix_time: int, mono: float, raw: dict) -> dict:
     return {
         "Version": VERSION, "UnixTime": unix_time, "StartUnix": g.start_unix, "UptimeS": int(uptime),
         "Yaml": {"Version": g.defs.version, "Sha": g.defs.sha, "Variables": len(g.defs.by_id)},
-        "Link": link, "Counters": counters, "Vars2": vars2, "Nodes": nodes, "Vars": variables,
+        "Link": link, "Counters": counters, "Vars2": vars2, "DbLog": g.db.status(), "Nodes": nodes,
+        "Vars": variables,
     }

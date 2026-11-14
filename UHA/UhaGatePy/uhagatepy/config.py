@@ -29,6 +29,10 @@ class Config:
     error_summary_s: int = 600                         # period of the error summary
     vars2_summary_s: int = 600                         # period of the VARS2 stream summary (fresh / stale / never)
     frozen_after_s: int = 120                          # node is frozen if no variable of it changed for this long
+    log_db: str = ""                                   # SQLite database for the VARS2 log, "" = no logging
+    log_raw_days: int = 30                             # keep the `raw` table this many days (agg_15min forever)
+    log_max_mb: int = 2048                             # stop writing when the database (+ WAL) is bigger
+    log_min_free_mb: int = 1024                        # stop writing when the disk has less free space
     verbose: bool = False                              # debug log (every packet, every mismatch)
 
 
@@ -44,6 +48,10 @@ OPTIONS = (
     ("silence_warn_s", "warn after this many seconds without packets", 1),
     ("error_summary_s", "error summary period [s]", 1),
     ("vars2_summary_s", "VARS2 stream summary period [s]", 1),
+    ("log_db", "SQLite database for the VARS2 log (empty = no logging)", None),
+    ("log_raw_days", "days to keep the raw log table", 1),
+    ("log_max_mb", "maximum database size [MB]", 1),
+    ("log_min_free_mb", "minimum free disk space for logging [MB]", 0),
     ("frozen_after_s", "report a node as frozen when none of its variables changed for this long [s]", 10),
 )
 

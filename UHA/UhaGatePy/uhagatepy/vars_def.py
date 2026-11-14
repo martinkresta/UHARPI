@@ -6,6 +6,8 @@ Rules (see VARS2_spec.md section 3 and the header of uha_vars.yaml):
     Both layouts are read: the old flat one (only `vars:`) and the new one with subgroups.
   - a variable inherits `producer` from its subgroup, else from its group (old files: also on the variable)
     and the other missing keys from `defaults:`
+  - `log_s` (10 | 60) and `agg` (avg | delta) select the variables stored in the database (db_log.py);
+    missing log_s = not logged
   - keys the gateway does not need (`struct`, `validity`, `field`, `receivers`, ...) are ignored
   - `timeout_ms: auto` means 3 x period_ms
   - `count: n` makes an array: ids id .. id+n-1, names NAME_1 .. NAME_n and the legacy
@@ -44,6 +46,8 @@ class VarDef:
     period_ms: int
     timeout_ms: int
     on_can: bool         # False: only forwarded over the serial link
+    log_s: int = 0       # database log period in s (10 or 60), 0 = not logged
+    agg: str = "avg"     # avg: mean over log_s | delta: counter, the increment is stored
 
 
 @dataclass
@@ -115,6 +119,12 @@ def _build(data: dict, sha: str) -> VarsFile:
                 _fail(f"variable {entry['name']}: legacy_scale must be a positive number")
             period = int(item["period_ms"])
             timeout = 3 * period if item.get("timeout_ms", "auto") == "auto" else int(item["timeout_ms"])
+            log_s = int(item.get("log_s") or 0)
+            if log_s not in (0, 10, 60):
+                _fail(f"variable {entry['name']}: log_s must be 10 or 60")
+            agg = str(item.get("agg", "avg"))
+            if agg not in ("avg", "delta"):
+                _fail(f"variable {entry['name']}: agg must be avg or delta")
             count = int(item.get("count") or 1)
             is_array = "count" in entry
 
@@ -139,7 +149,8 @@ def _build(data: dict, sha: str) -> VarsFile:
                 by_id[var_id] = VarDef(
                     id=var_id, name=name, legacy=legacy, type=vtype, enum=item.get("enum") or "",
                     unit=str(item.get("unit", "")), legacy_scale=float(scale), producer=producer,
-                    period_ms=period, timeout_ms=timeout, on_can=bool(item.get("on_can", True)))
+                    period_ms=period, timeout_ms=timeout, on_can=bool(item.get("on_can", True)),
+                    log_s=log_s, agg=agg)
 
     return VarsFile(version=int(data.get("version", 0)), sha=sha, nodes=nodes,
                     node_names={number: name for name, number in nodes.items()}, enums=enums, by_id=by_id,

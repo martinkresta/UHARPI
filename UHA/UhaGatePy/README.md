@@ -14,6 +14,10 @@ done its job, so the old `0x221` path and the comparison are removed. `0x221` pa
 `uha.json` keys whose id is not in the YAML are 0. Sections 1–7 below describe the earlier two-protocol version
 (0.1.x) where they talk about the old path or the comparison; §2 is updated.
 
+**Version 0.3.0 (2026-11-14, task `tasks/vars2_db_logging_grafana.md`): VARS2 log into SQLite** for Grafana
+(`db_log.py`, section "VARS2 DB log" below; Grafana files in `UHA/Grafana/`). Prepared and tested on the Pi with the
+fake ELECON; **not yet in production** (waiting for Martin's go).
+
 > **Rollback warning:** UhaGate6 (`rollback_to_v6.sh`) reads only `0x221`. Once the nodes stop the old format
 > (migration step 6b) it shows no live data.
 
@@ -99,6 +103,7 @@ every minute:  rtc.send()                ─► 0x051, identical to UhaGate6
 | `rtc.py` | RTC sync payload (`0x051`) |
 | `status.py` | content of `uha_status.json` |
 | `gateway.py` | the event loop: serial link, packet handling, timers, summaries |
+| `db_log.py` | (0.3.0) VARS2 log into SQLite: collects intervals in the loop, one writer thread does all disk work |
 
 ### Values (0.2.0: VARS2 only)
 
@@ -136,7 +141,8 @@ Journal every `vars2-summary-s` (10 min): `VARS2 stream: N of 257 fresh; invalid
 ### Config (`uhagatepy.conf`, same style as `uhagate6.conf`)
 
 `port` (default the by-id CP2102 path), `out-dir` (`/dev/shm` in production), `log-file`, `json-period-ms`,
-`rtc-period-s`, `reopen-s`, `silence-warn-s`, `error-summary-s`, `vars2-summary-s`, `frozen-after-s`, `vars-yaml`, `verbose`.
+`rtc-period-s`, `reopen-s`, `silence-warn-s`, `error-summary-s`, `vars2-summary-s`, `frozen-after-s`, `vars-yaml`, `verbose`;
+0.3.0: `log-db`, `log-raw-days`, `log-max-mb`, `log-min-free-mb` (see "VARS2 DB log").
 
 ### Service `uhagatepy.service` (installed, **not enabled**)
 
@@ -274,6 +280,47 @@ Output: journal warning `node X FROZEN: none of its N variables has changed for 
 a "Data" column on `WS/uha-status.html`. Limitation: it only sees nodes whose values stop moving. ELECON's own CAN
 transmit failure is not caught this way (its local measurements keep changing); that showed as TECHM
 `EL_HEATER_STATUS = 8 (EleconComError)`.
+
+### VARS2 DB log (0.3.0, 2026-11-14)
+**What is logged:** every variable with `log_s` in `uha_vars.yaml` (176 values: 85 every 10 s, 91 every 60 s, 21 of
+them counters with `agg: delta`). `avg`: mean of the valid values in `[ts, ts+log_s)`, `NULL` if there was none
+(invalid flag or nothing received). `delta` (energy / water counters): increment against the previous 60 s value,
+a drop below half = reset (midnight, node restart) -> the increment is the new value; may be slightly negative
+(kept, the sum stays right); a `NULL` interval keeps `prev`, the next valid value carries the whole increment; the very
+first value is only the baseline. So consumption over any time = `SUM(value)`.
+
+**Schema** (`/var/lib/uhalog/uha_log.db`, WAL, `auto_vacuum=INCREMENTAL`; times UTC unix seconds, `ts` = interval start):
+`vars(id, name, unit, log_s, agg)` all YAML variables, refreshed at every start (`log_s` NULL = not logged);
+`raw(var_id, ts, value)` kept `log-raw-days`; `agg_15min(var_id, ts, value)` AVG / SUM of raw per 15 min, kept
+forever (filled when a window is complete, missing windows after a restart too);
+`counter_state(var_id, ts, value)` last counter values, so a restart continues the deltas.
+Not under `/home`: Grafana's unit has `ProtectHome=true`. Folder `root:grafana 2770`, files 0660 (Grafana writes `-shm`).
+
+**How it runs:** `Gateway._on_tunnel` -> `DbLog.on_value` (cheap, in the loop) collects the intervals; every 60 s a
+batch goes through a queue to the writer thread (one transaction). The writer opens the DB (retries every 60 s;
+the gateway runs without logging meanwhile), waits for `timedatectl NTPSynchronized=yes`, computes agg_15min,
+deletes old raw rows once a day (5 min after the start, then every 24 h; per variable via the primary key, then
+`incremental_vacuum` + WAL truncate) and checks before each batch DB + WAL size (`log-max-mb`) and free disk
+(`log-min-free-mb`): over the limit -> the batch is skipped, warning once an hour, resumes by itself. Every exception
+in the logger is caught and logged (the same error at most every 10 min); it cannot stop the gateway.
+
+**Config:** `log-db` (empty = off), `log-raw-days = 30` (60 on an SSD), `log-max-mb = 2048`, `log-min-free-mb = 1024`.
+
+**How to check:** journal `DB log: ...` lines: start (`opened ...`, `clock is NTP synchronized`, `collecting`), every
+10 min `DB log: last 600 s: N rows (M NULL) in K batches, A agg rows, slowest write T ms; skipped, dropped, errors;
+DB x MB (WAL y MB), free z MB`, the daily `clean-up`, and after midnight one self-check line per counter
+`counter X reset a -> b; deltas since the last reset/start sum to S, counter went c -> a = E (difference D)` (D must be ~0).
+`uha_status.json` -> `DbLog` (state, rows, sizes, last write). SQL: `sudo sqlite3 /var/lib/uhalog/uha_log.db
+"select count(*) from raw; select count(*) from agg_15min;"`.
+
+**Tests (2026-11-14):** PC simulation with synthetic time (2 h, invalid gaps, a counter reset, a restart in between):
+rows as expected (only the unfinished last interval at a stop is lost), invalid interval -> NULL, the delta after the
+gap carries the whole increment, reset delta = new value, self-check difference 0, counters continue after the
+restart, the open 15 min window of the first run is filled after the restart, agg SUM = raw SUM. 24.5 B per raw
+row (estimate 25 B -> ~22 MB/day). On the Pi with `tools/fake_elecon.py` (separate out-dir and DB, production not
+touched): 6010 rows per 10 min (85 x 60 + 91 x 10 = 6010), slowest write 150-330 ms, CPU 8.2 % / RSS 27 MB
+(production 0.2.1: 8.1 % / 25 MB), long read transactions (like Grafana) next to it do not stop the writes.
+Existing unit tests (72) pass, golden test against UhaGate6 included.
 
 ### Still to do
 1. Watch the 10-minute summaries in the journal for `OFFSET` (a warning is logged) for a few days.

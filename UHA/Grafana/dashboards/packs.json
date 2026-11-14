@@ -1,0 +1,390 @@
+{
+  "uid": "uha-packs",
+  "title": "UHA Packs",
+  "tags": [
+    "uha"
+  ],
+  "timezone": "Europe/Prague",
+  "editable": true,
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "1m",
+  "graphTooltip": 1,
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "1m",
+      "5m",
+      "15m",
+      "1h"
+    ]
+  },
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "BMS1 Workshop 251 Ah - cells",
+      "description": "",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "volt",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null
+          },
+          "displayName": "${__field.labels.name}",
+          "decimals": 3
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS1_CELL_V_1', 'BMS1_CELL_V_2', 'BMS1_CELL_V_3', 'BMS1_CELL_V_4', 'BMS1_CELL_V_5', 'BMS1_CELL_V_6', 'BMS1_CELL_V_7', 'BMS1_CELL_V_8', 'BMS1_CELL_V_9', 'BMS1_CELL_V_10', 'BMS1_CELL_V_11', 'BMS1_CELL_V_12', 'BMS1_CELL_V_13', 'BMS1_CELL_V_14', 'BMS1_CELL_V_15', 'BMS1_CELL_V_16') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS1_CELL_V_1', 'BMS1_CELL_V_2', 'BMS1_CELL_V_3', 'BMS1_CELL_V_4', 'BMS1_CELL_V_5', 'BMS1_CELL_V_6', 'BMS1_CELL_V_7', 'BMS1_CELL_V_8', 'BMS1_CELL_V_9', 'BMS1_CELL_V_10', 'BMS1_CELL_V_11', 'BMS1_CELL_V_12', 'BMS1_CELL_V_13', 'BMS1_CELL_V_14', 'BMS1_CELL_V_15', 'BMS1_CELL_V_16') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS1_CELL_V_1', 'BMS1_CELL_V_2', 'BMS1_CELL_V_3', 'BMS1_CELL_V_4', 'BMS1_CELL_V_5', 'BMS1_CELL_V_6', 'BMS1_CELL_V_7', 'BMS1_CELL_V_8', 'BMS1_CELL_V_9', 'BMS1_CELL_V_10', 'BMS1_CELL_V_11', 'BMS1_CELL_V_12', 'BMS1_CELL_V_13', 'BMS1_CELL_V_14', 'BMS1_CELL_V_15', 'BMS1_CELL_V_16') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS1_CELL_V_1', 'BMS1_CELL_V_2', 'BMS1_CELL_V_3', 'BMS1_CELL_V_4', 'BMS1_CELL_V_5', 'BMS1_CELL_V_6', 'BMS1_CELL_V_7', 'BMS1_CELL_V_8', 'BMS1_CELL_V_9', 'BMS1_CELL_V_10', 'BMS1_CELL_V_11', 'BMS1_CELL_V_12', 'BMS1_CELL_V_13', 'BMS1_CELL_V_14', 'BMS1_CELL_V_15', 'BMS1_CELL_V_16') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 1
+    },
+    {
+      "type": "timeseries",
+      "title": "BMS2 House 220 Ah - cells",
+      "description": "",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 24,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "volt",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null
+          },
+          "displayName": "${__field.labels.name}",
+          "decimals": 3
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS2_CELL_V_1', 'BMS2_CELL_V_2', 'BMS2_CELL_V_3', 'BMS2_CELL_V_4', 'BMS2_CELL_V_5', 'BMS2_CELL_V_6', 'BMS2_CELL_V_7', 'BMS2_CELL_V_8', 'BMS2_CELL_V_9', 'BMS2_CELL_V_10', 'BMS2_CELL_V_11', 'BMS2_CELL_V_12', 'BMS2_CELL_V_13', 'BMS2_CELL_V_14', 'BMS2_CELL_V_15', 'BMS2_CELL_V_16') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS2_CELL_V_1', 'BMS2_CELL_V_2', 'BMS2_CELL_V_3', 'BMS2_CELL_V_4', 'BMS2_CELL_V_5', 'BMS2_CELL_V_6', 'BMS2_CELL_V_7', 'BMS2_CELL_V_8', 'BMS2_CELL_V_9', 'BMS2_CELL_V_10', 'BMS2_CELL_V_11', 'BMS2_CELL_V_12', 'BMS2_CELL_V_13', 'BMS2_CELL_V_14', 'BMS2_CELL_V_15', 'BMS2_CELL_V_16') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS2_CELL_V_1', 'BMS2_CELL_V_2', 'BMS2_CELL_V_3', 'BMS2_CELL_V_4', 'BMS2_CELL_V_5', 'BMS2_CELL_V_6', 'BMS2_CELL_V_7', 'BMS2_CELL_V_8', 'BMS2_CELL_V_9', 'BMS2_CELL_V_10', 'BMS2_CELL_V_11', 'BMS2_CELL_V_12', 'BMS2_CELL_V_13', 'BMS2_CELL_V_14', 'BMS2_CELL_V_15', 'BMS2_CELL_V_16') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS2_CELL_V_1', 'BMS2_CELL_V_2', 'BMS2_CELL_V_3', 'BMS2_CELL_V_4', 'BMS2_CELL_V_5', 'BMS2_CELL_V_6', 'BMS2_CELL_V_7', 'BMS2_CELL_V_8', 'BMS2_CELL_V_9', 'BMS2_CELL_V_10', 'BMS2_CELL_V_11', 'BMS2_CELL_V_12', 'BMS2_CELL_V_13', 'BMS2_CELL_V_14', 'BMS2_CELL_V_15', 'BMS2_CELL_V_16') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 2
+    },
+    {
+      "type": "timeseries",
+      "title": "BMS3 House 80 Ah - cells",
+      "description": "",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 24,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "volt",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null
+          },
+          "displayName": "${__field.labels.name}",
+          "decimals": 3
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS3_CELL_V_1', 'BMS3_CELL_V_2', 'BMS3_CELL_V_3', 'BMS3_CELL_V_4', 'BMS3_CELL_V_5', 'BMS3_CELL_V_6', 'BMS3_CELL_V_7', 'BMS3_CELL_V_8', 'BMS3_CELL_V_9', 'BMS3_CELL_V_10', 'BMS3_CELL_V_11', 'BMS3_CELL_V_12', 'BMS3_CELL_V_13', 'BMS3_CELL_V_14', 'BMS3_CELL_V_15', 'BMS3_CELL_V_16') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS3_CELL_V_1', 'BMS3_CELL_V_2', 'BMS3_CELL_V_3', 'BMS3_CELL_V_4', 'BMS3_CELL_V_5', 'BMS3_CELL_V_6', 'BMS3_CELL_V_7', 'BMS3_CELL_V_8', 'BMS3_CELL_V_9', 'BMS3_CELL_V_10', 'BMS3_CELL_V_11', 'BMS3_CELL_V_12', 'BMS3_CELL_V_13', 'BMS3_CELL_V_14', 'BMS3_CELL_V_15', 'BMS3_CELL_V_16') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS3_CELL_V_1', 'BMS3_CELL_V_2', 'BMS3_CELL_V_3', 'BMS3_CELL_V_4', 'BMS3_CELL_V_5', 'BMS3_CELL_V_6', 'BMS3_CELL_V_7', 'BMS3_CELL_V_8', 'BMS3_CELL_V_9', 'BMS3_CELL_V_10', 'BMS3_CELL_V_11', 'BMS3_CELL_V_12', 'BMS3_CELL_V_13', 'BMS3_CELL_V_14', 'BMS3_CELL_V_15', 'BMS3_CELL_V_16') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS3_CELL_V_1', 'BMS3_CELL_V_2', 'BMS3_CELL_V_3', 'BMS3_CELL_V_4', 'BMS3_CELL_V_5', 'BMS3_CELL_V_6', 'BMS3_CELL_V_7', 'BMS3_CELL_V_8', 'BMS3_CELL_V_9', 'BMS3_CELL_V_10', 'BMS3_CELL_V_11', 'BMS3_CELL_V_12', 'BMS3_CELL_V_13', 'BMS3_CELL_V_14', 'BMS3_CELL_V_15', 'BMS3_CELL_V_16') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 3
+    },
+    {
+      "type": "timeseries",
+      "title": "Pack voltage",
+      "description": "",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 8,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "volt",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null
+          },
+          "displayName": "${__field.labels.name}",
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS1_VOLTAGE_V', 'BMS2_VOLTAGE_V', 'BMS3_VOLTAGE_V', 'BAT_VOLTAGE_V') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS1_VOLTAGE_V', 'BMS2_VOLTAGE_V', 'BMS3_VOLTAGE_V', 'BAT_VOLTAGE_V') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS1_VOLTAGE_V', 'BMS2_VOLTAGE_V', 'BMS3_VOLTAGE_V', 'BAT_VOLTAGE_V') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS1_VOLTAGE_V', 'BMS2_VOLTAGE_V', 'BMS3_VOLTAGE_V', 'BAT_VOLTAGE_V') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 4
+    },
+    {
+      "type": "timeseries",
+      "title": "Pack current",
+      "description": "",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 24,
+        "w": 8,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "amp",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null
+          },
+          "displayName": "${__field.labels.name}",
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS1_CURRENT_A', 'BMS2_CURRENT_A', 'BMS3_CURRENT_A', 'BAT_CURRENT_A') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS1_CURRENT_A', 'BMS2_CURRENT_A', 'BMS3_CURRENT_A', 'BAT_CURRENT_A') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS1_CURRENT_A', 'BMS2_CURRENT_A', 'BMS3_CURRENT_A', 'BAT_CURRENT_A') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS1_CURRENT_A', 'BMS2_CURRENT_A', 'BMS3_CURRENT_A', 'BAT_CURRENT_A') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 5
+    },
+    {
+      "type": "timeseries",
+      "title": "Pack SOC",
+      "description": "",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 24,
+        "w": 8,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null
+          },
+          "displayName": "${__field.labels.name}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS1_SOC', 'BMS2_SOC', 'BMS3_SOC', 'BAT_SOC') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS1_SOC', 'BMS2_SOC', 'BMS3_SOC', 'BAT_SOC') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS1_SOC', 'BMS2_SOC', 'BMS3_SOC', 'BAT_SOC') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BMS1_SOC', 'BMS2_SOC', 'BMS3_SOC', 'BAT_SOC') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 6
+    }
+  ],
+  "templating": {
+    "list": []
+  },
+  "annotations": {
+    "list": []
+  },
+  "links": [
+    {
+      "title": "UHA dashboards",
+      "type": "dashboards",
+      "tags": [
+        "uha"
+      ],
+      "asDropdown": false
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+# Grafana dashboard provider: the JSON files in /var/lib/grafana/dashboards/uha (copied from UHA/Grafana/dashboards
+# by deploy_grafana.sh). Changes made in the Grafana UI cannot be saved over them - edit make_dashboards.py instead.
+apiVersion: 1
+
+providers:
+  - name: UHA
+    folder: UHA
+    type: file
+    disableDeletion: true
+    allowUiUpdates: false
+    updateIntervalSeconds: 60
+    options:
+      path: /var/lib/grafana/dashboards/uha

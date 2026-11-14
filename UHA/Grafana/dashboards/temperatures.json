@@ -1,0 +1,499 @@
+{
+  "uid": "uha-temperatures",
+  "title": "UHA Temperatures",
+  "tags": [
+    "uha"
+  ],
+  "timezone": "Europe/Prague",
+  "editable": true,
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "1m",
+  "graphTooltip": 1,
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "1m",
+      "5m",
+      "15m",
+      "1h"
+    ]
+  },
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "House",
+      "description": "",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null
+          },
+          "displayName": "${__field.labels.name}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_OFFICE_C', 'TEMP_KIDROOM_C', 'TEMP_DOWNSTAIRS_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_OFFICE_C', 'TEMP_KIDROOM_C', 'TEMP_DOWNSTAIRS_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_OFFICE_C', 'TEMP_KIDROOM_C', 'TEMP_DOWNSTAIRS_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_OFFICE_C', 'TEMP_KIDROOM_C', 'TEMP_DOWNSTAIRS_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 1
+    },
+    {
+      "type": "timeseries",
+      "title": "Outside",
+      "description": "",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null
+          },
+          "displayName": "${__field.labels.name}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_OUTSIDE_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_OUTSIDE_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_OUTSIDE_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_OUTSIDE_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 2
+    },
+    {
+      "type": "timeseries",
+      "title": "Tank",
+      "description": "TANK_1..6 = tank layers",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null
+          },
+          "displayName": "${__field.labels.name}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TANK_1_C', 'TEMP_TANK_2_C', 'TEMP_TANK_3_C', 'TEMP_TANK_4_C', 'TEMP_TANK_5_C', 'TEMP_TANK_6_C', 'TEMP_TANK_IN_H_C', 'TEMP_TANK_OUT_H_C', 'TEMP_TANK_IN_C_C', 'TEMP_TANK_OUT_C_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TANK_1_C', 'TEMP_TANK_2_C', 'TEMP_TANK_3_C', 'TEMP_TANK_4_C', 'TEMP_TANK_5_C', 'TEMP_TANK_6_C', 'TEMP_TANK_IN_H_C', 'TEMP_TANK_OUT_H_C', 'TEMP_TANK_IN_C_C', 'TEMP_TANK_OUT_C_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TANK_1_C', 'TEMP_TANK_2_C', 'TEMP_TANK_3_C', 'TEMP_TANK_4_C', 'TEMP_TANK_5_C', 'TEMP_TANK_6_C', 'TEMP_TANK_IN_H_C', 'TEMP_TANK_OUT_H_C', 'TEMP_TANK_IN_C_C', 'TEMP_TANK_OUT_C_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TANK_1_C', 'TEMP_TANK_2_C', 'TEMP_TANK_3_C', 'TEMP_TANK_4_C', 'TEMP_TANK_5_C', 'TEMP_TANK_6_C', 'TEMP_TANK_IN_H_C', 'TEMP_TANK_OUT_H_C', 'TEMP_TANK_IN_C_C', 'TEMP_TANK_OUT_C_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 3
+    },
+    {
+      "type": "timeseries",
+      "title": "Boiler and heating circuits",
+      "description": "",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null
+          },
+          "displayName": "${__field.labels.name}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_BOILER_C', 'TEMP_BOILER_IN_C', 'TEMP_BOILER_OUT_C', 'TEMP_BOILER_EXHAUST_C', 'TEMP_RAD_H_C', 'TEMP_RAD_C_C', 'TEMP_WALL_IN_C', 'TEMP_WALL_OUT_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_BOILER_C', 'TEMP_BOILER_IN_C', 'TEMP_BOILER_OUT_C', 'TEMP_BOILER_EXHAUST_C', 'TEMP_RAD_H_C', 'TEMP_RAD_C_C', 'TEMP_WALL_IN_C', 'TEMP_WALL_OUT_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_BOILER_C', 'TEMP_BOILER_IN_C', 'TEMP_BOILER_OUT_C', 'TEMP_BOILER_EXHAUST_C', 'TEMP_RAD_H_C', 'TEMP_RAD_C_C', 'TEMP_WALL_IN_C', 'TEMP_WALL_OUT_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_BOILER_C', 'TEMP_BOILER_IN_C', 'TEMP_BOILER_OUT_C', 'TEMP_BOILER_EXHAUST_C', 'TEMP_RAD_H_C', 'TEMP_RAD_C_C', 'TEMP_WALL_IN_C', 'TEMP_WALL_OUT_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 4
+    },
+    {
+      "type": "timeseries",
+      "title": "Workshop",
+      "description": "",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 17,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null
+          },
+          "displayName": "${__field.labels.name}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_DILNA_C', 'TEMP_AKUPACK1_C', 'TEMP_KOLARNA_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_DILNA_C', 'TEMP_AKUPACK1_C', 'TEMP_KOLARNA_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_DILNA_C', 'TEMP_AKUPACK1_C', 'TEMP_KOLARNA_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_DILNA_C', 'TEMP_AKUPACK1_C', 'TEMP_KOLARNA_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 5
+    },
+    {
+      "type": "timeseries",
+      "title": "Recuperation",
+      "description": "FC fresh cold, FH fresh hot, WH waste hot, WC waste cold",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 17,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null
+          },
+          "displayName": "${__field.labels.name}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_RECU_FC_C', 'TEMP_RECU_FH_C', 'TEMP_RECU_WH_C', 'TEMP_RECU_WC_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_RECU_FC_C', 'TEMP_RECU_FH_C', 'TEMP_RECU_WH_C', 'TEMP_RECU_WC_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_RECU_FC_C', 'TEMP_RECU_FH_C', 'TEMP_RECU_WH_C', 'TEMP_RECU_WC_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_RECU_FC_C', 'TEMP_RECU_FH_C', 'TEMP_RECU_WH_C', 'TEMP_RECU_WC_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 6
+    },
+    {
+      "type": "timeseries",
+      "title": "Boards and converters",
+      "description": "",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 25,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null
+          },
+          "displayName": "${__field.labels.name}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TECHM_BOARD_C', 'TEMP_IOBOARD_D_C', 'TEMP_IOBOARD_U_C', 'TEMP_ELECON_BOARD_C', 'TEMP_BOARD_ELECON_D_C', 'AXPERT_TEMP_C', 'MPPT_TEMP_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TECHM_BOARD_C', 'TEMP_IOBOARD_D_C', 'TEMP_IOBOARD_U_C', 'TEMP_ELECON_BOARD_C', 'TEMP_BOARD_ELECON_D_C', 'AXPERT_TEMP_C', 'MPPT_TEMP_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TECHM_BOARD_C', 'TEMP_IOBOARD_D_C', 'TEMP_IOBOARD_U_C', 'TEMP_ELECON_BOARD_C', 'TEMP_BOARD_ELECON_D_C', 'AXPERT_TEMP_C', 'MPPT_TEMP_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TECHM_BOARD_C', 'TEMP_IOBOARD_D_C', 'TEMP_IOBOARD_U_C', 'TEMP_ELECON_BOARD_C', 'TEMP_BOARD_ELECON_D_C', 'AXPERT_TEMP_C', 'MPPT_TEMP_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 7
+    },
+    {
+      "type": "timeseries",
+      "title": "Wind (mean)",
+      "description": "",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 25,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "velocityms",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null
+          },
+          "displayName": "${__field.labels.name}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('METEO_WIND_AVG') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('METEO_WIND_AVG') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('METEO_WIND_AVG') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('METEO_WIND_AVG') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 8
+    }
+  ],
+  "templating": {
+    "list": []
+  },
+  "annotations": {
+    "list": []
+  },
+  "links": [
+    {
+      "title": "UHA dashboards",
+      "type": "dashboards",
+      "tags": [
+        "uha"
+      ],
+      "asDropdown": false
+    }
+  ]
+}
