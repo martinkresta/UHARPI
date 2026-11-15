@@ -11,7 +11,7 @@ First login `admin` / `admin`, Grafana then asks for a new password (Martin sets
 | Path | What | Installed to |
 |------|------|--------------|
 | `make_dashboards.py` | generates `dashboards/*.json`: panel lists + the SQL (read its header for the query rules) | — |
-| `dashboards/energy.json` `packs.json` `temperatures.json` | the three dashboards (generated, commit them too) | `/var/lib/grafana/dashboards/uha/` |
+| `dashboards/energy.json` `packs.json` `temperatures.json` `states.json` | the dashboards (generated, commit them too) | `/var/lib/grafana/dashboards/uha/` |
 | `provisioning/datasources/uhalog.yaml` | datasource "UHA log" (uid `uhalog`), the SQLite file, read only | `/etc/grafana/provisioning/datasources/` |
 | `provisioning/dashboards/uha.yaml` | dashboard provider, folder "UHA" | `/etc/grafana/provisioning/dashboards/` |
 | `systemd/grafana-uha.conf` | Grafana settings as `GF_*` variables (the packaged `grafana.ini` is untouched) | `/etc/systemd/system/grafana-server.service.d/uha.conf` |
@@ -45,6 +45,13 @@ Folder **UHA**, linked to each other (tag `uha`). Time zone Europe/Prague.
    meter power.
 2. **UHA Packs** — 16 cell voltages per pack (one panel each), pack voltage / current / SOC.
 3. **UHA Temperatures** — house, outside, tank, boiler + heating circuits, workshop, recuperation, boards, wind.
+4. **UHA States** (0.4.0, table `events`) — state timelines: lights per node (PWM %, 0 = off), one timeline per
+   enum (sunscreens: `BlindCmd`), a table "Lights on now" and bars "Light on-time per day" (hours per local day,
+   last 30 days: intervals with value > 0 between consecutive rows of one light, the last one until now, clipped to
+   the day). Generated from `uha_vars.yaml` (env `UHA_VARS_YAML`, default the UHA_FW checkout): every `agg: event`
+   variable with unit `%` is a light, every `enum` one goes to its enum's timeline, value mappings from the YAML
+   `enums` — new nodes' states (step 2b) appear after `python make_dashboards.py`. Invalid is shown as "invalid"
+   (the query writes it as -1).
 
 Which table a panel reads: raw up to 2 days, agg_15min beyond, one value per day beyond 60 days (CET day for
 averages, exact local day for the energy bars). Speed on the Pi 3 with a full-size database (3 days raw + 1 year

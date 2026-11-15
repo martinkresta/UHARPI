@@ -18,11 +18,21 @@ Measured on the Pi 3 with a full-size database, one panel of 16 cells: 1 day ~1.
 Energy bars (counters, agg: delta) always read agg_15min: SUM per local hour / exact local day. The last, unfinished 15 min
 are therefore missing from the bars (up to ~16 min behind).
 Local time: SQLite 'localtime' = time zone of the Pi (Europe/Prague), also for summer time.
+
+States dashboard (UhaGatePy 0.4.0): events(var_id, ts, value), one row per change of an `agg: event` variable
+(invalid = NULL), kept forever. The panels are generated from uha_vars.yaml (env UHA_VARS_YAML, default the
+UHA_FW checkout): lights = event variables with unit %, one timeline per node; enum states = one timeline per
+enum with the value mappings taken from the YAML enums.
 """
 import json
 import os
+import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(HERE, "..", "UhaGatePy"))
+from uhagatepy import vars_def  # noqa: E402  (the gateway's YAML reader)
+
+YAML = os.environ.get("UHA_VARS_YAML", "C:/Martin/GIT/UHA_FW/UHA_COMMON/VarDefs/uha_vars.yaml")
 DS = {"type": "frser-sqlite-datasource", "uid": "uhalog"}
 RAW_MAX_S = 2 * 86400        # up to this range read raw (more rows would be slow on the Pi 3)
 DAILY_MIN_S = 60 * 86400     # above this range one value per local day
@@ -177,8 +187,144 @@ temperatures = dashboard("uha-temperatures", "UHA Temperatures", [
     panel("Wind (mean)", avg_sql(["METEO_WIND_AVG"]), "velocityms", 12, 25, 12, 8),
 ])
 
+# ---- States (events table) -----------------------------------------------------------------------------------
+
+def events_sql(names, prefix=""):
+    """State changes in the range + the state at the range start (last row before it), one series per variable.
+    Invalid (NULL) becomes -1 so that the timeline shows 'invalid' instead of continuing the previous state
+    (the panel connects the nulls that come from merging the series)."""
+    n = names_sql(names)
+    label = f"substr(v.name, {len(prefix) + 1})" if prefix else "v.name"
+    return f"""-- events: changes in the range + the state at its start
+{RANGE_CTE}
+SELECT time, name, value FROM (
+  SELECT x.ts AS time, {label} AS name, COALESCE(x.value, -1) AS value
+  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t
+  WHERE v.name IN ({n})
+  UNION ALL
+  SELECT q.f, {label}, COALESCE(x.value, -1)
+  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id
+       AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id AND e.ts < q.f)
+  WHERE v.name IN ({n})
+) ORDER BY time"""
+
+
+def on_time_sql(names, prefix=""):
+    """Hours per local day with value > 0: intervals between consecutive rows of one variable (the last one runs
+    until now), clipped to the local days of the range."""
+    n = names_sql(names)
+    label = f"substr(v.name, {len(prefix) + 1})" if prefix else "v.name"
+    next_day = "CAST(strftime('%s', date({t}, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER)"
+    return f"""-- hours on per local day, from events
+{RANGE_CTE},
+days(d0, d1) AS (
+  SELECT s, {next_day.format(t="s")} FROM (SELECT {LOCAL_DAY.format(t="q.f")} AS s FROM q)
+  UNION ALL
+  SELECT d1, {next_day.format(t="d1")} FROM days, q WHERE d1 < q.t
+),
+ev AS (
+  SELECT {label} AS name, x.ts, x.value, LEAD(x.ts) OVER (PARTITION BY x.var_id ORDER BY x.ts) AS te
+  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts < q.t
+       AND x.ts >= COALESCE((SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id
+                              AND e.ts <= (SELECT MIN(d0) FROM days)), 0)
+  WHERE v.name IN ({n})
+),
+iv AS (
+  SELECT name, ts, COALESCE(te, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER))) AS te FROM ev, q WHERE value > 0
+)
+SELECT d.d0 AS time, iv.name, SUM(MIN(iv.te, d.d1) - MAX(iv.ts, d.d0)) / 3600.0 AS value
+FROM days d JOIN iv ON iv.ts < d.d1 AND iv.te > d.d0
+GROUP BY 1, 2
+ORDER BY 1"""
+
+
+def lights_now_sql(names, prefix=""):
+    n = names_sql(names)
+    label = f"substr(v.name, {len(prefix) + 1})" if prefix else "v.name"
+    return f"""-- lights with value > 0 in their newest event row
+SELECT {label} AS light, x.value AS pct, x.ts * 1000 AS since
+FROM vars v CROSS JOIN events x ON x.var_id = v.id
+     AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id)
+WHERE v.name IN ({n}) AND x.value > 0
+ORDER BY 1"""
+
+
+ENUM_COLORS = ["#8e8e8e", "green", "blue", "orange", "purple", "red", "yellow", "dark-green", "dark-blue"]
+INVALID_MAP = {"-1": {"text": "invalid", "color": "#3a3a3a", "index": 99}}
+
+
+def timeline(title, sql, mappings, x, y, w=24, h=8, unit="none", thresholds=None, desc=""):
+    steps = thresholds or [{"color": "#8e8e8e", "value": None}]
+    return {
+        "type": "state-timeline", "title": title, "description": desc, "datasource": DS,
+        "gridPos": {"x": x, "y": y, "w": w, "h": h},
+        "fieldConfig": {"defaults": {
+            "unit": unit, "displayName": "${__field.labels.name}", "mappings": mappings,
+            "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": steps},
+            "custom": {"fillOpacity": 80, "lineWidth": 0, "spanNulls": True}}, "overrides": []},
+        "options": {"mergeValues": True, "showValue": "auto", "alignValue": "left", "rowHeight": 0.85,
+                    "legend": {"showLegend": False, "displayMode": "list", "placement": "bottom"},
+                    "tooltip": {"mode": "single", "sort": "none"}},
+        "targets": [{"refId": "A", "datasource": DS, "queryType": "time series", "rawQueryText": sql,
+                     "queryText": sql, "timeColumns": ["time"]}],
+    }
+
+
+def table(title, sql, x, y, w=8, h=8, desc=""):
+    return {
+        "type": "table", "title": title, "description": desc, "datasource": DS,
+        "gridPos": {"x": x, "y": y, "w": w, "h": h},
+        "fieldConfig": {"defaults": {}, "overrides": [
+            {"matcher": {"id": "byName", "options": "pct"}, "properties": [{"id": "unit", "value": "percent"}]},
+            {"matcher": {"id": "byName", "options": "since"},
+             "properties": [{"id": "unit", "value": "dateTimeAsLocal"}]}]},
+        "options": {"showHeader": True},
+        "targets": [{"refId": "A", "datasource": DS, "queryType": "table", "rawQueryText": sql,
+                     "queryText": sql, "timeColumns": ["since"]}],
+    }
+
+
+def states_dashboard(defs):
+    events = sorted((d for d in defs.by_id.values() if d.agg == "event"), key=lambda d: d.id)
+    lights, enums = {}, {}
+    for d in events:
+        if d.unit == "%":
+            lights.setdefault(d.producer, []).append(d.name)
+        elif d.type == "enum":
+            enums.setdefault(d.enum, []).append(d.name)
+    light_map = [{"type": "value", "options": dict({"0": {"text": "off", "color": "#555555", "index": 0}},
+                                                   **INVALID_MAP)}]
+    light_steps = [{"color": "#555555", "value": None}, {"color": "#e0b400", "value": 1}]
+    panels, y = [], 0
+    all_lights = [name for names in lights.values() for name in names]
+    for node, names in lights.items():
+        h = 2 + len(names)
+        panels.append(timeline(f"Lights {node}", events_sql(names, "ST_LIGHT_"), light_map, 0, y, h=h,
+                               unit="percent", thresholds=light_steps, desc="PWM duty really set, 0 = off"))
+        y += h
+    for enum, names in enums.items():
+        items = defs.enums[enum]
+        options = {str(k): {"text": v, "color": ENUM_COLORS[i % len(ENUM_COLORS)], "index": i}
+                   for i, (k, v) in enumerate(sorted(items.items()))}
+        options.update(INVALID_MAP)
+        h = 2 + 2 * len(names)
+        panels.append(timeline(f"{enum} states", events_sql(names, "ST_"), [{"type": "value", "options": options}],
+                               0, y, h=h, desc=f"enum {enum} from uha_vars.yaml"))
+        y += h
+    if all_lights:
+        panels.append(table("Lights on now", lights_now_sql(all_lights, "ST_LIGHT_"), 0, y, 8, 9,
+                            desc="Newest event row with value > 0"))
+        on_time = panel("Light on-time per day (hours)", on_time_sql(all_lights, "ST_LIGHT_"), "h", 8, y, 16, 9,
+                        bars=True, stack=True, decimals=1, time_from="30d",
+                        desc="Intervals with value > 0 between consecutive event rows, per local day")
+        panels.append(on_time)
+    return dashboard("uha-states", "UHA States", panels)
+
+
+states = states_dashboard(vars_def.load(YAML))
+
 if __name__ == "__main__":
-    for name, board in (("energy", energy), ("packs", packs), ("temperatures", temperatures)):
+    for name, board in (("energy", energy), ("packs", packs), ("temperatures", temperatures), ("states", states)):
         path = os.path.join(HERE, "dashboards", name + ".json")
         with open(path, "w", encoding="utf-8", newline="\n") as f:
             json.dump(board, f, indent=2)

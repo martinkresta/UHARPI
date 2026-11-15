@@ -322,5 +322,21 @@ touched): 6010 rows per 10 min (85 x 60 + 91 x 10 = 6010), slowest write 150-330
 (production 0.2.1: 8.1 % / 25 MB), long read transactions (like Grafana) next to it do not stop the writes.
 Existing unit tests (72) pass, golden test against UhaGate6 included.
 
+### States as events (0.4.0, 2026-11-15)
+Task: `UHA_FW/UHA_COMMON/tasks/vars2_states_on_change.md`. Discrete states (lights, sunscreens; later relays,
+modes, setpoints) are normal VARS2 variables in the YAML group `States` with `send: on_change` (the firmware sends
+them on change + every 20 s as refresh) and `agg: event`. Pilot: IOBOARD_U ids 400–413.
+
+- `vars_def.py`: `legacy` is optional (no `legacy` -> only in `uha2.json`, not in `uha.json`), `agg: event`
+  (must not have `log_s`), `send` is read (inherited group -> subgroup -> variable) but not used.
+- `db_log.py`: table `events(var_id, ts, value)` (WITHOUT ROWID, kept forever). A row when the value or valid differs
+  from the last stored row of that variable (invalid -> `NULL`); refresh frames with the same value are dropped. After
+  a gateway start the first value of each event variable is stored. `ts` = receive time (UTC s); two changes in one
+  second: the last one is kept (`INSERT OR REPLACE`). Same writer thread, batches, NTP wait and size guard as `raw`.
+  `vars.agg` = `event` for them.
+- Journal: the 10-minute summary has `N events (M in the table)`; `uha_status.json` -> `DbLog.EventRows`.
+- Check: `sudo sqlite3 /var/lib/uhalog/uha_log.db "select v.name, e.ts, e.value from events e join vars v on
+  v.id = e.var_id order by e.ts desc limit 20;"`. Grafana: dashboard **UHA States** (`UHA/Grafana/README.md`).
+
 ### Still to do
 1. Watch the 10-minute summaries in the journal for `OFFSET` (a warning is logged) for a few days.
