@@ -208,6 +208,12 @@ Known label mismatch: the gateway's old table (`UHA.h`) calls id 49 `VAR_MPPT_EN
 
 ---
 
+## Known Issues
+
+Open problems of the whole UHA system (also gateway / dashboard ones) are kept in the UHA_FW repo: `UHA_FW/UHA_COMMON/KnownIssues/` (index `README.md`).
+
+---
+
 ## Web Dashboard (WS/)
 
 Static files served by nginx from `/home/pi/Web/`. `uha.json` is written to the same folder by the C++ app, so no path issues.
