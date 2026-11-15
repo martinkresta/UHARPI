@@ -6,6 +6,9 @@ Which variables: those with `log_s` (10 or 60) in uha_vars.yaml. `agg` says how 
          consumption is SUM(value). A drop below half of the previous value is a reset (midnight, node restart):
          the increment is then the new value itself. The increment may be slightly negative (LEMON counters can
          drop a little) - it is kept, the sum stays right.
+  event  states (lights, relays, modes; YAML group States, no log_s): one row in `events` per change of the value
+         or of valid (invalid -> NULL). Refresh frames with the same value are dropped. After a gateway start the
+         first value of each event variable is stored, so the state is known again.
 
 Two halves:
   DbLog    runs in the asyncio loop of the gateway. Gets every tunnel value (on_value) and the 1 s tick, collects
@@ -22,6 +25,8 @@ Tables (time = UTC unix seconds, ts = start of the interval, a multiple of its l
   raw            var_id, ts, value - one row per variable and log_s interval, kept log-raw-days
   agg_15min      var_id, ts, value - AVG (avg) or SUM (delta) of raw over 15 min, kept forever
   counter_state  var_id, ts, value - last counter value of each delta variable, so a restart continues the deltas
+  events         var_id, ts, value - one row per change of an event variable (ts = receive time; two changes in
+                 one second: the last one is kept), kept forever
 """
 import os
 import queue
@@ -50,6 +55,7 @@ CREATE TABLE IF NOT EXISTS vars (id INTEGER PRIMARY KEY, name TEXT, unit TEXT, l
 CREATE TABLE IF NOT EXISTS raw (var_id INTEGER, ts INTEGER, value REAL, PRIMARY KEY (var_id, ts)) WITHOUT ROWID;
 CREATE TABLE IF NOT EXISTS agg_15min (var_id INTEGER, ts INTEGER, value REAL, PRIMARY KEY (var_id, ts)) WITHOUT ROWID;
 CREATE TABLE IF NOT EXISTS counter_state (var_id INTEGER PRIMARY KEY, ts INTEGER, value REAL);
+CREATE TABLE IF NOT EXISTS events (var_id INTEGER, ts INTEGER, value REAL, PRIMARY KEY (var_id, ts)) WITHOUT ROWID;
 """
 
 # AVG or SUM of the raw rows per variable and 15 min window. "vars CROSS JOIN raw" makes SQLite loop over the
@@ -83,6 +89,7 @@ class Batch:
     rows: List[Tuple[int, int, Optional[float]]]          # (var_id, ts, value) for the raw table
     counters: List[Tuple[int, int, float]]                # (var_id, ts, value) for counter_state
     closed_until: int                                     # all 60 s intervals before this time are in `rows`
+    events: List[Tuple[int, int, Optional[float]]] = field(default_factory=list)   # (var_id, ts, value) for events
 
 
 @dataclass
@@ -95,6 +102,7 @@ class Stats:
     skipped_batches: int = 0    # not written: size limit or no free disk space
     dropped_batches: int = 0    # queue full (writer too slow or stuck)
     write_errors: int = 0
+    event_rows: int = 0         # rows written into events
     max_write_ms: float = 0.0
     reported: Dict[str, int] = field(default_factory=dict)
 
@@ -107,6 +115,7 @@ class DbLog:
         self.enabled = bool(cfg.log_db)
         self.logged = sorted((d for d in defs.by_id.values() if d.log_s), key=lambda d: d.id)
         self.by_id = {d.id: d for d in self.logged}
+        self.events = {d.id: d for d in defs.by_id.values() if d.agg == "event"}   # one row per change
         self.periods: Dict[int, list] = {}                # log_s -> its variables
         for d in self.logged:
             self.periods.setdefault(d.log_s, []).append(d)
@@ -119,6 +128,8 @@ class DbLog:
         self._prev: Dict[int, Tuple[int, float]] = {}     # delta: var_id -> (ts, previous counter value)
         self._check: Dict[int, List[float]] = {}          # delta self-check: var_id -> [start value, sum of deltas]
         self._rows: List[Tuple[int, int, Optional[float]]] = []
+        self._ev_last: Dict[int, Optional[float]] = {}    # event: var_id -> value last stored (None = invalid)
+        self._ev_rows: List[Tuple[int, int, Optional[float]]] = []
         self._queue: "queue.Queue[Optional[Batch]]" = queue.Queue(maxsize=QUEUE_BATCHES)
         self._writer = _Writer(self, defs) if self.enabled else None
 
@@ -133,6 +144,7 @@ class DbLog:
         log.info("DB log: %s, %d variables (%d every 10 s, %d every 60 s, %d of them counters), raw kept %d days, "
                  "limits %d MB / free %d MB", self.cfg.log_db, len(self.logged), n10, len(self.logged) - n10, n_delta,
                  self.cfg.log_raw_days, self.cfg.log_max_mb, self.cfg.log_min_free_mb)
+        log.info("DB log: %d event variables (one row per change, table events)", len(self.events))
         if not self.logged:
             log.warning("DB log: no variable has log_s in the YAML - nothing to log")
         self._writer.start()
@@ -140,6 +152,9 @@ class DbLog:
     def on_value(self, var_id: int, value: float, valid: bool, unix: int) -> None:
         """A VARS2 value arrived (from Gateway._on_tunnel)."""
         if not self.ready:
+            return
+        if var_id in self.events:
+            self._on_event(var_id, value, valid, unix)
             return
         definition = self.by_id.get(var_id)
         if definition is None:
@@ -160,6 +175,17 @@ class DbLog:
         except Exception:
             _log_error("on_value", "error while collecting a value", exc=True)
 
+    def _on_event(self, var_id: int, value: float, valid: bool, unix: int) -> None:
+        """Event variable: a row only when value or valid differ from what was stored last (first value: always)."""
+        try:
+            new = _round7(float(value)) if valid else None
+            if var_id in self._ev_last and self._ev_last[var_id] == new:
+                return                          # refresh frame, same state
+            self._ev_last[var_id] = new
+            self._ev_rows.append((var_id, int(unix), new))
+        except Exception:
+            _log_error("on_event", "error while collecting an event", exc=True)
+
     def tick(self, now: float) -> None:
         """Every second (from Gateway._on_tick): close finished intervals."""
         if not self.enabled:
@@ -178,7 +204,7 @@ class DbLog:
         if not self.enabled or not self._writer.is_alive():
             return
         try:
-            if self.ready and self._rows:
+            if self.ready and (self._rows or self._ev_rows):
                 self._send(closed_until=0)
             self._queue.put(None, timeout=2)
         except Exception:
@@ -195,7 +221,7 @@ class DbLog:
             "Enabled": self.enabled, "Writing": self.ready and not (w and w.space_blocked),
             "State": w.state if w else "off",
             "Rows": s.rows, "NullRows": s.null_rows, "Batches": s.batches, "AggRows": s.agg_rows,
-            "SkippedBatches": s.skipped_batches, "DroppedBatches": s.dropped_batches, "WriteErrors": s.write_errors,
+            "EventRows": s.event_rows, "SkippedBatches": s.skipped_batches, "DroppedBatches": s.dropped_batches, "WriteErrors": s.write_errors,
             "DbMb": round(w.db_bytes / 1e6, 1) if w else None, "FreeMb": int(w.free_bytes / 1e6) if w else None,
             "LastWriteUnix": w.last_write_unix if w else None,
         }
@@ -267,14 +293,15 @@ class DbLog:
 
     def _send(self, closed_until: int) -> None:
         counters = [(var_id, ts, value) for var_id, (ts, value) in self._prev.items()]
-        batch = Batch(self._rows, counters, closed_until)
+        batch = Batch(self._rows, counters, closed_until, self._ev_rows)
         self._rows = []
+        self._ev_rows = []
         try:
             self._queue.put_nowait(batch)
         except queue.Full:
             self.stats.dropped_batches += 1
-            _log_error("queue", "writer is behind, %d rows dropped (queue of %d batches full)",
-                       len(batch.rows), QUEUE_BATCHES)
+            _log_error("queue", "writer is behind, %d rows + %d events dropped (queue of %d batches full)",
+                       len(batch.rows), len(batch.events), QUEUE_BATCHES)
 
 
 class _Writer(threading.Thread):
@@ -382,7 +409,8 @@ class _Writer(threading.Thread):
             con.execute("BEGIN")
             con.execute("DELETE FROM vars")
             con.executemany("INSERT INTO vars (id, name, unit, log_s, agg) VALUES (?, ?, ?, ?, ?)",
-                            [(d.id, d.name, d.unit, d.log_s or None, d.agg if d.log_s else None)
+                            [(d.id, d.name, d.unit, d.log_s or None,
+                              d.agg if d.log_s or d.agg == "event" else None)
                              for d in sorted(self.defs.by_id.values(), key=lambda d: d.id)])
             con.execute("COMMIT")
             self._agg_next = self._last_agg_end(con)
@@ -478,6 +506,8 @@ class _Writer(threading.Thread):
             con.executemany("INSERT OR REPLACE INTO raw (var_id, ts, value) VALUES (?, ?, ?)", batch.rows)
             con.executemany("INSERT OR REPLACE INTO counter_state (var_id, ts, value) VALUES (?, ?, ?)",
                             batch.counters)
+            # same second twice: the later row replaces the earlier one (the last change is kept)
+            con.executemany("INSERT OR REPLACE INTO events (var_id, ts, value) VALUES (?, ?, ?)", batch.events)
             agg_rows = self._aggregate(batch.closed_until) if batch.closed_until else 0
             con.execute("COMMIT")
         except sqlite3.Error as e:
@@ -492,6 +522,7 @@ class _Writer(threading.Thread):
         s = self.stats
         s.rows += len(batch.rows)
         s.null_rows += sum(1 for row in batch.rows if row[2] is None)
+        s.event_rows += len(batch.events)
         s.batches += 1
         s.agg_rows += agg_rows
         s.max_write_ms = max(s.max_write_ms, ms)
@@ -543,7 +574,8 @@ class _Writer(threading.Thread):
         s = self.stats
         r = s.reported
         delta = {}
-        for key in ("rows", "null_rows", "batches", "agg_rows", "skipped_batches", "dropped_batches", "write_errors"):
+        for key in ("rows", "null_rows", "batches", "agg_rows", "skipped_batches", "dropped_batches", "write_errors",
+                    "event_rows"):
             value = getattr(s, key)
             delta[key] = value - r.get(key, 0)
             r[key] = value
@@ -553,12 +585,18 @@ class _Writer(threading.Thread):
             wal = os.path.getsize(self.path + "-wal")
         except OSError:
             pass
+        events_total = -1
+        try:
+            events_total = self.con.execute("SELECT count(*) FROM events").fetchone()[0]
+        except sqlite3.Error:
+            pass
         problems = delta["skipped_batches"] or delta["dropped_batches"] or delta["write_errors"]
         (log.warning if problems else log.info)(
-            "DB log: last %d s: %d rows (%d NULL) in %d batches, %d agg rows, slowest write %d ms; skipped %d, "
-            "dropped %d, errors %d; DB %.1f MB (WAL %.1f MB), free %d MB", SUMMARY_S, delta["rows"],
-            delta["null_rows"], delta["batches"], delta["agg_rows"], s.max_write_ms, delta["skipped_batches"],
-            delta["dropped_batches"], delta["write_errors"], self.db_bytes / 1e6, wal / 1e6, self.free_bytes / 1e6)
+            "DB log: last %d s: %d rows (%d NULL) in %d batches, %d agg rows, %d events (%d in the table), "
+            "slowest write %d ms; skipped %d, dropped %d, errors %d; DB %.1f MB (WAL %.1f MB), free %d MB",
+            SUMMARY_S, delta["rows"], delta["null_rows"], delta["batches"], delta["agg_rows"], delta["event_rows"],
+            events_total, s.max_write_ms, delta["skipped_batches"], delta["dropped_batches"], delta["write_errors"],
+            self.db_bytes / 1e6, wal / 1e6, self.free_bytes / 1e6)
         s.max_write_ms = 0.0
 
 

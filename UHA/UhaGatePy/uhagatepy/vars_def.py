@@ -7,7 +7,9 @@ Rules (see VARS2_spec.md section 3 and the header of uha_vars.yaml):
   - a variable inherits `producer` from its subgroup, else from its group (old files: also on the variable)
     and the other missing keys from `defaults:`
   - `log_s` (10 | 60) and `agg` (avg | delta) select the variables stored in the database (db_log.py);
-    missing log_s = not logged
+    missing log_s = not logged. `agg: event` (no log_s): one row per change into the events table (States)
+  - `legacy` is optional: a variable without it (all States) is only in uha2.json, not in uha.json
+  - `send` (periodic | on_change, inherited from the group / subgroup) is read but not used by the gateway
   - keys the gateway does not need (`struct`, `validity`, `field`, `receivers`, ...) are ignored
   - `timeout_ms: auto` means 3 x period_ms
   - `count: n` makes an array: ids id .. id+n-1, names NAME_1 .. NAME_n and the legacy
@@ -47,7 +49,8 @@ class VarDef:
     timeout_ms: int
     on_can: bool         # False: only forwarded over the serial link
     log_s: int = 0       # database log period in s (10 or 60), 0 = not logged
-    agg: str = "avg"     # avg: mean over log_s | delta: counter, the increment is stored
+    agg: str = "avg"     # avg: mean over log_s | delta: counter, the increment is stored | event: row per change
+    send: str = "periodic"   # periodic | on_change (firmware TX mode; not used by the gateway)
 
 
 @dataclass
@@ -80,16 +83,18 @@ def load(path: str) -> VarsFile:
         raise VarsDefError(f"{path}: malformed definition ({type(e).__name__}: {e})")
 
 
-def _var_lists(groups: dict) -> Iterator[Tuple[str, Optional[str], list]]:
-    """(group path, producer, variable list) of every group and subgroup, in file order."""
+def _var_lists(groups: dict, default_send: str) -> Iterator[Tuple[str, Optional[str], str, list]]:
+    """(group path, producer, send, variable list) of every group and subgroup, in file order."""
     for group_name, group in groups.items():
+        group_send = group.get("send", default_send)
         if "vars" in group:
-            yield group_name, group.get("producer"), group["vars"]
+            yield group_name, group.get("producer"), group_send, group["vars"]
         elif "subgroups" in group:
             for sub_name, sub in group["subgroups"].items():
                 if "vars" not in sub:
                     _fail(f"subgroup {group_name}.{sub_name} has no 'vars'")
-                yield f"{group_name}.{sub_name}", sub.get("producer", group.get("producer")), sub["vars"]
+                yield (f"{group_name}.{sub_name}", sub.get("producer", group.get("producer")),
+                       sub.get("send", group_send), sub["vars"])
         else:
             _fail(f"group {group_name} has neither 'vars' nor 'subgroups'")
 
@@ -102,7 +107,8 @@ def _build(data: dict, sha: str) -> VarsFile:
     names = set()
     warnings: List[str] = []
 
-    for group_path, group_producer, entries in _var_lists(data["groups"]):
+    for group_path, group_producer, group_send, entries in _var_lists(data["groups"],
+                                                                      defaults.get("send", "periodic")):
         for entry in entries:
             item = dict(defaults)
             item.update(entry)
@@ -123,24 +129,29 @@ def _build(data: dict, sha: str) -> VarsFile:
             if log_s not in (0, 10, 60):
                 _fail(f"variable {entry['name']}: log_s must be 10 or 60")
             agg = str(item.get("agg", "avg"))
-            if agg not in ("avg", "delta"):
-                _fail(f"variable {entry['name']}: agg must be avg or delta")
+            if agg not in ("avg", "delta", "event"):
+                _fail(f"variable {entry['name']}: agg must be avg, delta or event")
+            if agg == "event" and log_s:
+                _fail(f"variable {entry['name']}: agg event must not have log_s")
+            send = str(entry.get("send", group_send))       # read for completeness, the gateway ignores it
+            if send not in ("periodic", "on_change"):
+                _fail(f"variable {entry['name']}: send must be periodic or on_change")
             count = int(item.get("count") or 1)
             is_array = "count" in entry
 
             for index in range(count):
                 name = f"{entry['name']}_{index + 1}" if is_array else entry["name"]
-                legacy = _expand_legacy(item["legacy"], index)
+                legacy = _expand_legacy(item["legacy"], index) if item.get("legacy") else ""
                 var_id = int(entry["id"]) + index
                 if var_id in by_id:
                     _fail(f"duplicate id {var_id} ({name})")
                 if name in names:
                     _fail(f"duplicate name {name}")
-                known_id = NAME_TO_ID.get(legacy)
+                known_id = NAME_TO_ID.get(legacy) if legacy else None
                 if known_id is not None and known_id != var_id:
                     _fail(f"{name}: id {var_id} does not match the old variable {legacy} "
                           f"(id {known_id}) - VARS2 and old ids must be equal")
-                if known_id is None:
+                if legacy and known_id is None:
                     # The id is what counts. Only the label differs, e.g. the gateway's old table calls
                     # id 49 VAR_MPPT_ENERGY_TODAY_WH but the firmware VAR_MPPT_TEMP_C.
                     warnings.append(f"{name} (id {var_id}): old name {legacy} is not in the gateway's table"
@@ -150,7 +161,7 @@ def _build(data: dict, sha: str) -> VarsFile:
                     id=var_id, name=name, legacy=legacy, type=vtype, enum=item.get("enum") or "",
                     unit=str(item.get("unit", "")), legacy_scale=float(scale), producer=producer,
                     period_ms=period, timeout_ms=timeout, on_can=bool(item.get("on_can", True)),
-                    log_s=log_s, agg=agg)
+                    log_s=log_s, agg=agg, send=send)
 
     return VarsFile(version=int(data.get("version", 0)), sha=sha, nodes=nodes,
                     node_names={number: name for name, number in nodes.items()}, enums=enums, by_id=by_id,
