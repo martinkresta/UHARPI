@@ -70,6 +70,7 @@
   U.ageClass = function (n) {
     const v = vars[n];
     if (!v || v.value === null || v.valid === false) return 'bad';
+    if (v.on_change) return '';   // states (send: on_change) come only on change + every 20 s; valid covers the timeout
     return v.age_s !== null && v.age_s > STALE_AGE_S ? 'old' : '';
   };
 

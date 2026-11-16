@@ -338,5 +338,9 @@ them on change + every 20 s as refresh) and `agg: event`. Pilot: IOBOARD_U ids 4
 - Check: `sudo sqlite3 /var/lib/uhalog/uha_log.db "select v.name, e.ts, e.value from events e join vars v on
   v.id = e.var_id order by e.ts desc limit 20;"`. Grafana: dashboard **UHA States** (`UHA/Grafana/README.md`).
 
+**0.4.1 (2026-11-16):** `uha2.json` entries of `send: on_change` variables have `"on_change": true`. They are only
+refreshed every 20 s, so `WS/js/uha-common.js` (`ageClass()`) no longer greys them out after 10 s; `valid` (timeout
+60 s) still shows a missing node. Step 2c adds TECHM states (ids 440–464) and makes `EL_HEATER_STATUS` on_change.
+
 ### Still to do
 1. Watch the 10-minute summaries in the journal for `OFFSET` (a warning is logged) for a few days.
