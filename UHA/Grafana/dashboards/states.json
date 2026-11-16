@@ -174,8 +174,16 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#8e8e8e",
+                "color": "#3a3a3a",
                 "value": null
+              },
+              {
+                "color": "#555555",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
               }
             ]
           },
@@ -380,8 +388,24 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#8e8e8e",
+                "color": "#3a3a3a",
                 "value": null
+              },
+              {
+                "color": "#8e8e8e",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              },
+              {
+                "color": "blue",
+                "value": 2
+              },
+              {
+                "color": "orange",
+                "value": 3
               }
             ]
           },
@@ -485,8 +509,16 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#8e8e8e",
+                "color": "#3a3a3a",
                 "value": null
+              },
+              {
+                "color": "#555555",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
               }
             ]
           },
@@ -627,8 +659,56 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#8e8e8e",
+                "color": "#3a3a3a",
                 "value": null
+              },
+              {
+                "color": "#8e8e8e",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              },
+              {
+                "color": "blue",
+                "value": 2
+              },
+              {
+                "color": "orange",
+                "value": 3
+              },
+              {
+                "color": "purple",
+                "value": 4
+              },
+              {
+                "color": "red",
+                "value": 5
+              },
+              {
+                "color": "yellow",
+                "value": 6
+              },
+              {
+                "color": "dark-green",
+                "value": 7
+              },
+              {
+                "color": "dark-blue",
+                "value": 8
+              },
+              {
+                "color": "#8e8e8e",
+                "value": 9
+              },
+              {
+                "color": "green",
+                "value": 10
+              },
+              {
+                "color": "blue",
+                "value": 11
               }
             ]
           },
@@ -744,8 +824,36 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#8e8e8e",
+                "color": "#3a3a3a",
                 "value": null
+              },
+              {
+                "color": "#8e8e8e",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              },
+              {
+                "color": "blue",
+                "value": 2
+              },
+              {
+                "color": "orange",
+                "value": 3
+              },
+              {
+                "color": "purple",
+                "value": 4
+              },
+              {
+                "color": "red",
+                "value": 5
+              },
+              {
+                "color": "yellow",
+                "value": 6
               }
             ]
           },
@@ -1331,8 +1439,28 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#8e8e8e",
+                "color": "#3a3a3a",
                 "value": null
+              },
+              {
+                "color": "#8e8e8e",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              },
+              {
+                "color": "blue",
+                "value": 2
+              },
+              {
+                "color": "orange",
+                "value": 3
+              },
+              {
+                "color": "purple",
+                "value": 4
               }
             ]
           },
@@ -1451,8 +1579,28 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#8e8e8e",
+                "color": "#3a3a3a",
                 "value": null
+              },
+              {
+                "color": "#8e8e8e",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              },
+              {
+                "color": "blue",
+                "value": 2
+              },
+              {
+                "color": "orange",
+                "value": 3
+              },
+              {
+                "color": "purple",
+                "value": 4
               }
             ]
           },
@@ -1568,8 +1716,36 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#8e8e8e",
+                "color": "#3a3a3a",
                 "value": null
+              },
+              {
+                "color": "#8e8e8e",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              },
+              {
+                "color": "blue",
+                "value": 2
+              },
+              {
+                "color": "orange",
+                "value": 3
+              },
+              {
+                "color": "purple",
+                "value": 4
+              },
+              {
+                "color": "red",
+                "value": 5
+              },
+              {
+                "color": "yellow",
+                "value": 6
               }
             ]
           },
@@ -1764,8 +1940,16 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#8e8e8e",
+                "color": "#3a3a3a",
                 "value": null
+              },
+              {
+                "color": "#555555",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
               }
             ]
           },
@@ -1871,8 +2055,28 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#8e8e8e",
+                "color": "#3a3a3a",
                 "value": null
+              },
+              {
+                "color": "#8e8e8e",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              },
+              {
+                "color": "blue",
+                "value": 2
+              },
+              {
+                "color": "orange",
+                "value": 3
+              },
+              {
+                "color": "purple",
+                "value": 4
               }
             ]
           },

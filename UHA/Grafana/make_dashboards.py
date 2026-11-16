@@ -371,6 +371,8 @@ def states_dashboard(defs):
         if n["bools"]:
             h = 2 + len(n["bools"])
             panels.append(timeline(f"Relays {node}", events_sql(n["bools"], "ST_"), bool_map, 0, y, h=h,
+                                   thresholds=[{"color": "#3a3a3a", "value": None}, {"color": "#555555", "value": 0},
+                                               {"color": "green", "value": 1}],
                                    desc="On / off outputs as really set"))
             y += h
         for enum, names in n["enums"].items():
@@ -378,9 +380,14 @@ def states_dashboard(defs):
             options = {str(k): {"text": v, "color": ENUM_COLORS[i % len(ENUM_COLORS)], "index": i}
                        for i, (k, v) in enumerate(sorted(items.items()))}
             options.update(INVALID_MAP)
+            # Grafana colours the timeline from the thresholds (the mapping colours are not used here),
+            # so every enum value gets its own threshold step with the same colour; -1 (invalid) stays dark
+            steps = [{"color": INVALID_MAP["-1"]["color"], "value": None}] + \
+                    [{"color": ENUM_COLORS[i % len(ENUM_COLORS)], "value": k}
+                     for i, (k, v) in enumerate(sorted(items.items()))]
             h = 2 + 2 * len(names)
             panels.append(timeline(f"{enum} {node}", events_sql(names, "ST_"), [{"type": "value", "options": options}],
-                                   0, y, h=h, desc=f"enum {enum} from uha_vars.yaml"))
+                                   0, y, h=h, thresholds=steps, desc=f"enum {enum} from uha_vars.yaml"))
             y += h
         units = {}
         for d in n["nums"]:
