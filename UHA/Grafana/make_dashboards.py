@@ -206,22 +206,30 @@ def two_queries(p, sql_b):
 
 
 def events_sql(names, prefix=""):
-    """State changes in the range + the state at the range start (last row before it), one series per variable.
+    """State changes in the range + the state at the range start (last row before it) + the same state again at the
+    range end / now, so that the timeline draws the current state up to the right edge. One series per variable.
     Invalid (NULL) becomes -1 so that the timeline shows 'invalid' instead of continuing the previous state
-    (the panel connects the nulls that come from merging the series)."""
+    (the panel connects the nulls that come from merging the series). A silent node gets an invalid row from the
+    gateway after timeout_ms, so its last state is not drawn on."""
     n = names_sql(names)
     label = strip_sql(prefix)
-    return f"""-- events: changes in the range + the state at its start
-{RANGE_CTE}
+    return f"""-- events: changes in the range + the state at its start + the state at its end (or now)
+{RANGE_CTE},
+e AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)
 SELECT time, name, value FROM (
   SELECT x.ts AS time, {label} AS name, COALESCE(x.value, -1) AS value
-  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t
+  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t
   WHERE v.name IN ({n})
   UNION ALL
-  SELECT q.f, {label}, COALESCE(x.value, -1)
-  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id
-       AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id AND e.ts < q.f)
+  SELECT e.f, {label}, COALESCE(x.value, -1)
+  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id
+       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)
   WHERE v.name IN ({n})
+  UNION ALL
+  SELECT e.te, {label}, COALESCE(x.value, -1)
+  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id
+       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)
+  WHERE v.name IN ({n}) AND x.ts < e.te     -- no extra point if the last change is exactly at the end
 ) ORDER BY time"""
 
 

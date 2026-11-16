@@ -130,6 +130,7 @@ class DbLog:
         self._rows: List[Tuple[int, int, Optional[float]]] = []
         self._ev_last: Dict[int, Optional[float]] = {}    # event: var_id -> value last stored (None = invalid)
         self._ev_rows: List[Tuple[int, int, Optional[float]]] = []
+        self._ev_seen: Dict[int, int] = {}                # event: var_id -> unix time of the last frame
         self._queue: "queue.Queue[Optional[Batch]]" = queue.Queue(maxsize=QUEUE_BATCHES)
         self._writer = _Writer(self, defs) if self.enabled else None
 
@@ -178,6 +179,7 @@ class DbLog:
     def _on_event(self, var_id: int, value: float, valid: bool, unix: int) -> None:
         """Event variable: a row only when value or valid differ from what was stored last (first value: always)."""
         try:
+            self._ev_seen[var_id] = int(unix)    # for the silence check in _expire_events()
             new = _round7(float(value)) if valid else None
             if var_id in self._ev_last and self._ev_last[var_id] == new:
                 return                          # refresh frame, same state
@@ -185,6 +187,14 @@ class DbLog:
             self._ev_rows.append((var_id, int(unix), new))
         except Exception:
             _log_error("on_event", "error while collecting an event", exc=True)
+
+    def _expire_events(self, unix: int) -> None:
+        """An event variable that got no frame for longer than its timeout_ms (node silent, being flashed) gets one
+        invalid row, so a chart does not draw its last state on as if it were still true."""
+        for var_id, seen in self._ev_seen.items():
+            if self._ev_last.get(var_id) is not None and unix - seen > self.events[var_id].timeout_ms / 1000:
+                self._ev_last[var_id] = None
+                self._ev_rows.append((var_id, unix, None))
 
     def tick(self, now: float) -> None:
         """Every second (from Gateway._on_tick): close finished intervals."""
@@ -196,6 +206,7 @@ class DbLog:
                     self._begin(self._writer.init_counters)
                 return
             self._advance(int(now))
+            self._expire_events(int(now))
         except Exception:
             _log_error("tick", "error in the periodic task", exc=True)
 

@@ -342,5 +342,10 @@ them on change + every 20 s as refresh) and `agg: event`. Pilot: IOBOARD_U ids 4
 refreshed every 20 s, so `WS/js/uha-common.js` (`ageClass()`) no longer greys them out after 10 s; `valid` (timeout
 60 s) still shows a missing node. Step 2c adds TECHM states (ids 440–464) and makes `EL_HEATER_STATUS` on_change.
 
+**0.4.2 (2026-11-16):** an event variable that gets no frame for longer than its `timeout_ms` (60 s for states: the
+node is silent or being flashed) gets one invalid row (`NULL`) in `events`, so Grafana does not draw its last state on
+as if it were still true. The Grafana state timelines add the last state again at the range end / now, so the current
+state is drawn up to the right edge.
+
 ### Still to do
 1. Watch the 10-minute summaries in the journal for `OFFSET` (a warning is logged) for a few days.
