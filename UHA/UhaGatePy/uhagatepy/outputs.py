@@ -122,5 +122,7 @@ def build_uha2_json(store: Store, defs: VarsFile, mono: float, unix_time: int) -
                  else d.producer}
         if d.type == "enum":
             entry["enum_name"] = defs.enums[d.enum].get(reading.value) if reading.value is not None else None
+        if d.send == "on_change":
+            entry["on_change"] = True   # sent on change + 20 s refresh: a large age_s is normal, `valid` tells
         variables[d.name] = entry
     return to_json_compact({"UnixTime": unix_time, "YamlVersion": defs.version, "Vars": variables})

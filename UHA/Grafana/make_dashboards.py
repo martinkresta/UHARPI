@@ -189,12 +189,28 @@ temperatures = dashboard("uha-temperatures", "UHA Temperatures", [
 
 # ---- States (events table) -----------------------------------------------------------------------------------
 
+def strip_sql(prefix):
+    """SQL label: v.name without the prefix, only where the name really starts with it (EL_HEATER_STATUS stays)."""
+    if not prefix:
+        return "v.name"
+    n = len(prefix)
+    return f"CASE WHEN substr(v.name, 1, {n}) = '{prefix}' THEN substr(v.name, {n + 1}) ELSE v.name END"
+
+
+def two_queries(p, sql_b):
+    """Add a second query (refId B) to a panel, e.g. actual temperatures from raw next to setpoints from events."""
+    t = dict(p["targets"][0])
+    t.update({"refId": "B", "rawQueryText": sql_b, "queryText": sql_b})
+    p["targets"].append(t)
+    return p
+
+
 def events_sql(names, prefix=""):
     """State changes in the range + the state at the range start (last row before it), one series per variable.
     Invalid (NULL) becomes -1 so that the timeline shows 'invalid' instead of continuing the previous state
     (the panel connects the nulls that come from merging the series)."""
     n = names_sql(names)
-    label = f"substr(v.name, {len(prefix) + 1})" if prefix else "v.name"
+    label = strip_sql(prefix)
     return f"""-- events: changes in the range + the state at its start
 {RANGE_CTE}
 SELECT time, name, value FROM (
@@ -213,7 +229,7 @@ def on_time_sql(names, prefix=""):
     """Hours per local day with value > 0: intervals between consecutive rows of one variable (the last one runs
     until now), clipped to the local days of the range."""
     n = names_sql(names)
-    label = f"substr(v.name, {len(prefix) + 1})" if prefix else "v.name"
+    label = strip_sql(prefix)
     next_day = "CAST(strftime('%s', date({t}, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER)"
     return f"""-- hours on per local day, from events
 {RANGE_CTE},
@@ -240,7 +256,7 @@ ORDER BY 1"""
 
 def lights_now_sql(names, prefix=""):
     n = names_sql(names)
-    label = f"substr(v.name, {len(prefix) + 1})" if prefix else "v.name"
+    label = strip_sql(prefix)
     return f"""-- lights with value > 0 in their newest event row
 SELECT {label} AS light, x.value AS pct, x.ts * 1000 AS since
 FROM vars v CROSS JOIN events x ON x.var_id = v.id
@@ -297,6 +313,29 @@ def step_panel(title, sql, unit, x, y, w=24, h=7, desc=""):
     return p
 
 
+# TECHM: setpoints next to the actual values (own panels, not in the generic setpoint panel)
+TECHM_OWN_PANELS = {"ST_UP_REQ_C", "ST_DOWN_REQ_C", "ST_EXHAUST_SET_C"}
+
+
+def techm_panels(panels, y):
+    rooms = two_queries(step_panel("Room request in effect vs room temperature",
+                                   events_sql(["ST_UP_REQ_C", "ST_DOWN_REQ_C"], "ST_"), "celsius", 0, y, 12, 8,
+                                   desc="UP = upstairs (kidroom, radiators), DOWN = downstairs (walls)"),
+                        avg_sql(["TEMP_KIDROOM_C", "TEMP_DOWNSTAIRS_C"]))
+    exhaust = two_queries(step_panel("Exhaust setpoint vs exhaust", events_sql(["ST_EXHAUST_SET_C"], "ST_"),
+                                     "celsius", 12, y, 12, 8, desc="BOILER_AIR control setpoint (es_AirControl)"),
+                          avg_sql(["TEMP_BOILER_EXHAUST_C"]))
+    y += 8
+    valves = panel("Valves (commanded %)", avg_sql(["TECHM_VALVE_WALL_PCT", "TECHM_VALVE_RAD_PCT",
+                                                    "TECHM_AIR_VALVE_SIGNAL_PCT"]), "percent", 0, y, 12, 8,
+                   desc="Mixing valves wall / radiators as commanded; air valve = servo signal (20..100 % = 2..10 V)")
+    water = panel("Water required vs actual", avg_sql(["TECHM_REQ_WATER_RAD_C", "TEMP_RAD_H_C",
+                                                       "TECHM_REQ_WATER_WALL_C", "TEMP_WALL_IN_C"]),
+                  "celsius", 12, y, 12, 8, desc="TEMPCON required water temperatures and the circuit inlets")
+    panels += [rooms, exhaust, valves, water]
+    return y + 8
+
+
 def states_dashboard(defs):
     """One row per producing node: lights (unit %), on/off states (bool), one timeline per enum, numeric states."""
     events = sorted((d for d in defs.by_id.values() if d.agg == "event"), key=lambda d: d.id)
@@ -332,6 +371,8 @@ def states_dashboard(defs):
         if n["bools"]:
             h = 2 + len(n["bools"])
             panels.append(timeline(f"Relays {node}", events_sql(n["bools"], "ST_"), bool_map, 0, y, h=h,
+                                   thresholds=[{"color": "#3a3a3a", "value": None}, {"color": "#555555", "value": 0},
+                                               {"color": "green", "value": 1}],
                                    desc="On / off outputs as really set"))
             y += h
         for enum, names in n["enums"].items():
@@ -339,18 +380,27 @@ def states_dashboard(defs):
             options = {str(k): {"text": v, "color": ENUM_COLORS[i % len(ENUM_COLORS)], "index": i}
                        for i, (k, v) in enumerate(sorted(items.items()))}
             options.update(INVALID_MAP)
+            # Grafana colours the timeline from the thresholds (the mapping colours are not used here),
+            # so every enum value gets its own threshold step with the same colour; -1 (invalid) stays dark
+            steps = [{"color": INVALID_MAP["-1"]["color"], "value": None}] + \
+                    [{"color": ENUM_COLORS[i % len(ENUM_COLORS)], "value": k}
+                     for i, (k, v) in enumerate(sorted(items.items()))]
             h = 2 + 2 * len(names)
             panels.append(timeline(f"{enum} {node}", events_sql(names, "ST_"), [{"type": "value", "options": options}],
-                                   0, y, h=h, desc=f"enum {enum} from uha_vars.yaml"))
+                                   0, y, h=h, thresholds=steps, desc=f"enum {enum} from uha_vars.yaml"))
             y += h
         units = {}
         for d in n["nums"]:
-            units.setdefault(d.unit, []).append(d.name)
+            if d.name not in TECHM_OWN_PANELS:
+                units.setdefault(d.unit, []).append(d.name)
         for unit, names in units.items():
             grafana_unit = {"°C": "celsius"}.get(unit, "none")
-            panels.append(step_panel(f"Setpoints {node}", events_sql(names, "ST_"), grafana_unit, 0, y,
-                                     desc="Numeric states (setpoints), one point per change"))
+            title = "Setpoints" if unit == "°C" else "Values"
+            panels.append(step_panel(f"{title} {node}", events_sql(names, "ST_"), grafana_unit, 0, y,
+                                     desc="Numeric states, one point per change"))
             y += 7
+        if node == "TECHM":
+            y = techm_panels(panels, y)
     if all_lights:
         panels.append(table("Lights on now", lights_now_sql(all_lights, "ST_LIGHT_"), 0, y, 8, 9,
                             desc="Newest event row with value > 0"))

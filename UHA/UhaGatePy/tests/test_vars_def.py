@@ -80,12 +80,17 @@ class RealYamlTest(unittest.TestCase):
         except (OSError, subprocess.CalledProcessError):
             self.skipTest("UHA_FW git history not available (normal on the Pi)")
         old_defs, new_defs = load_text(old), vars_def.load(REAL_YAML)
-        # since 0.4.0 the file also has the States group (agg event, enum BlindCmd): not in the old file
-        new_defs.by_id = {i: d for i, d in new_defs.by_id.items() if d.agg != "event"}
-        new_defs.enums = {k: v for k, v in new_defs.enums.items() if k in old_defs.enums}   # States enums are new
+        # since 0.4.0 the file also has the States group (ids >= 400, new enums): not in the old file
+        new_defs.by_id = {i: d for i, d in new_defs.by_id.items() if i in old_defs.by_id}
+        new_defs.enums = {k: v for k, v in new_defs.enums.items() if k in old_defs.enums}
         self.assertEqual(len(new_defs.by_id), 258)
+        # step 2c: EL_HEATER_STATUS (id 80) became send: on_change with a 20 s refresh - intended
+        old80 = old_defs.by_id[80]
+        new_defs.by_id[80] = dataclasses.replace(new_defs.by_id[80], period_ms=old80.period_ms,
+                                                 timeout_ms=old80.timeout_ms)
         # since 0.3.0 the file also has log_s / agg (DB logging); everything else must be unchanged
-        new_defs.by_id = {i: dataclasses.replace(d, log_s=0, agg="avg") for i, d in new_defs.by_id.items()}
+        new_defs.by_id = {i: dataclasses.replace(d, log_s=0, agg="avg", send="periodic")
+                          for i, d in new_defs.by_id.items()}
         self.assertEqual(without_sha(new_defs), without_sha(old_defs))
 
 
