@@ -24,16 +24,225 @@
   },
   "panels": [
     {
+      "type": "row",
+      "title": "IOBOARD_D",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 1
+      },
+      "panels": [],
+      "id": 1
+    },
+    {
       "type": "state-timeline",
-      "title": "Lights IOBOARD_U",
-      "description": "PWM duty really set, 0 = off",
+      "title": "Lights IOBOARD_D",
+      "description": "Output really set: PWM %, relay lights 0 / 100",
       "datasource": {
         "type": "frser-sqlite-datasource",
         "uid": "uhalog"
       },
       "gridPos": {
         "x": 0,
-        "y": 0,
+        "y": 1,
+        "w": 24,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "displayName": "${__field.labels.name}",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "off",
+                  "color": "#555555",
+                  "index": 0
+                },
+                "-1": {
+                  "text": "invalid",
+                  "color": "#3a3a3a",
+                  "index": 99
+                }
+              }
+            }
+          ],
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#555555",
+                "value": null
+              },
+              {
+                "color": "#e0b400",
+                "value": 1
+              }
+            ]
+          },
+          "custom": {
+            "fillOpacity": 80,
+            "lineWidth": 0,
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "mergeValues": true,
+        "showValue": "auto",
+        "alignValue": "left",
+        "rowHeight": 0.85,
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- events: changes in the range + the state at its start\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, substr(v.name, 10) AS name, COALESCE(x.value, -1) AS value\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER')\n  UNION ALL\n  SELECT q.f, substr(v.name, 10), COALESCE(x.value, -1)\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id AND e.ts < q.f)\n  WHERE v.name IN ('ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER')\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, substr(v.name, 10) AS name, COALESCE(x.value, -1) AS value\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER')\n  UNION ALL\n  SELECT q.f, substr(v.name, 10), COALESCE(x.value, -1)\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id AND e.ts < q.f)\n  WHERE v.name IN ('ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER')\n) ORDER BY time",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 2
+    },
+    {
+      "type": "state-timeline",
+      "title": "Relays IOBOARD_D",
+      "description": "On / off outputs as really set",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 24,
+        "h": 3
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "displayName": "${__field.labels.name}",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "off",
+                  "color": "#555555",
+                  "index": 0
+                },
+                "1": {
+                  "text": "on",
+                  "color": "green",
+                  "index": 1
+                },
+                "-1": {
+                  "text": "invalid",
+                  "color": "#3a3a3a",
+                  "index": 99
+                }
+              }
+            }
+          ],
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#8e8e8e",
+                "value": null
+              }
+            ]
+          },
+          "custom": {
+            "fillOpacity": 80,
+            "lineWidth": 0,
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "mergeValues": true,
+        "showValue": "auto",
+        "alignValue": "left",
+        "rowHeight": 0.85,
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- events: changes in the range + the state at its start\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, substr(v.name, 4) AS name, COALESCE(x.value, -1) AS value\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('ST_SEWAGE_PUMP')\n  UNION ALL\n  SELECT q.f, substr(v.name, 4), COALESCE(x.value, -1)\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id AND e.ts < q.f)\n  WHERE v.name IN ('ST_SEWAGE_PUMP')\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, substr(v.name, 4) AS name, COALESCE(x.value, -1) AS value\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('ST_SEWAGE_PUMP')\n  UNION ALL\n  SELECT q.f, substr(v.name, 4), COALESCE(x.value, -1)\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id AND e.ts < q.f)\n  WHERE v.name IN ('ST_SEWAGE_PUMP')\n) ORDER BY time",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 3
+    },
+    {
+      "type": "row",
+      "title": "IOBOARD_U",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 24,
+        "h": 1
+      },
+      "panels": [],
+      "id": 4
+    },
+    {
+      "type": "state-timeline",
+      "title": "Lights IOBOARD_U",
+      "description": "Output really set: PWM %, relay lights 0 / 100",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 9,
         "w": 24,
         "h": 14
       },
@@ -112,11 +321,11 @@
           ]
         }
       ],
-      "id": 1
+      "id": 5
     },
     {
       "type": "state-timeline",
-      "title": "BlindCmd states",
+      "title": "BlindCmd IOBOARD_U",
       "description": "enum BlindCmd from uha_vars.yaml",
       "datasource": {
         "type": "frser-sqlite-datasource",
@@ -124,7 +333,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 14,
+        "y": 23,
         "w": 24,
         "h": 6
       },
@@ -214,7 +423,817 @@
           ]
         }
       ],
-      "id": 2
+      "id": 6
+    },
+    {
+      "type": "row",
+      "title": "ELECON",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 29,
+        "w": 24,
+        "h": 1
+      },
+      "panels": [],
+      "id": 7
+    },
+    {
+      "type": "state-timeline",
+      "title": "Lights ELECON",
+      "description": "Output really set: PWM %, relay lights 0 / 100",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 30,
+        "w": 24,
+        "h": 3
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "displayName": "${__field.labels.name}",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "off",
+                  "color": "#555555",
+                  "index": 0
+                },
+                "-1": {
+                  "text": "invalid",
+                  "color": "#3a3a3a",
+                  "index": 99
+                }
+              }
+            }
+          ],
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#555555",
+                "value": null
+              },
+              {
+                "color": "#e0b400",
+                "value": 1
+              }
+            ]
+          },
+          "custom": {
+            "fillOpacity": 80,
+            "lineWidth": 0,
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "mergeValues": true,
+        "showValue": "auto",
+        "alignValue": "left",
+        "rowHeight": 0.85,
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- events: changes in the range + the state at its start\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, substr(v.name, 10) AS name, COALESCE(x.value, -1) AS value\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('ST_LIGHT_EXTERIOR_HOUSE')\n  UNION ALL\n  SELECT q.f, substr(v.name, 10), COALESCE(x.value, -1)\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id AND e.ts < q.f)\n  WHERE v.name IN ('ST_LIGHT_EXTERIOR_HOUSE')\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, substr(v.name, 10) AS name, COALESCE(x.value, -1) AS value\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('ST_LIGHT_EXTERIOR_HOUSE')\n  UNION ALL\n  SELECT q.f, substr(v.name, 10), COALESCE(x.value, -1)\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id AND e.ts < q.f)\n  WHERE v.name IN ('ST_LIGHT_EXTERIOR_HOUSE')\n) ORDER BY time",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 8
+    },
+    {
+      "type": "state-timeline",
+      "title": "InverterState ELECON",
+      "description": "enum InverterState from uha_vars.yaml",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 33,
+        "w": 24,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "displayName": "${__field.labels.name}",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Off",
+                  "color": "#8e8e8e",
+                  "index": 0
+                },
+                "1": {
+                  "text": "On",
+                  "color": "green",
+                  "index": 1
+                },
+                "2": {
+                  "text": "OnKeepSetting",
+                  "color": "blue",
+                  "index": 2
+                },
+                "3": {
+                  "text": "KeepOn",
+                  "color": "orange",
+                  "index": 3
+                },
+                "4": {
+                  "text": "AutoOff",
+                  "color": "purple",
+                  "index": 4
+                },
+                "-1": {
+                  "text": "invalid",
+                  "color": "#3a3a3a",
+                  "index": 99
+                }
+              }
+            }
+          ],
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#8e8e8e",
+                "value": null
+              }
+            ]
+          },
+          "custom": {
+            "fillOpacity": 80,
+            "lineWidth": 0,
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "mergeValues": true,
+        "showValue": "auto",
+        "alignValue": "left",
+        "rowHeight": 0.85,
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- events: changes in the range + the state at its start\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, substr(v.name, 4) AS name, COALESCE(x.value, -1) AS value\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('ST_AC_300W', 'ST_AC_3KW', 'ST_AC_5KW')\n  UNION ALL\n  SELECT q.f, substr(v.name, 4), COALESCE(x.value, -1)\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id AND e.ts < q.f)\n  WHERE v.name IN ('ST_AC_300W', 'ST_AC_3KW', 'ST_AC_5KW')\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, substr(v.name, 4) AS name, COALESCE(x.value, -1) AS value\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('ST_AC_300W', 'ST_AC_3KW', 'ST_AC_5KW')\n  UNION ALL\n  SELECT q.f, substr(v.name, 4), COALESCE(x.value, -1)\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id AND e.ts < q.f)\n  WHERE v.name IN ('ST_AC_300W', 'ST_AC_3KW', 'ST_AC_5KW')\n) ORDER BY time",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 9
+    },
+    {
+      "type": "row",
+      "title": "RECU",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 41,
+        "w": 24,
+        "h": 1
+      },
+      "panels": [],
+      "id": 10
+    },
+    {
+      "type": "state-timeline",
+      "title": "RecuRemoteMode RECU",
+      "description": "enum RecuRemoteMode from uha_vars.yaml",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 42,
+        "w": 24,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "displayName": "${__field.labels.name}",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Auto",
+                  "color": "#8e8e8e",
+                  "index": 0
+                },
+                "1": {
+                  "text": "SlightOverpressure",
+                  "color": "green",
+                  "index": 1
+                },
+                "2": {
+                  "text": "MaxOverpressure",
+                  "color": "blue",
+                  "index": 2
+                },
+                "3": {
+                  "text": "SlightUnderpressure",
+                  "color": "orange",
+                  "index": 3
+                },
+                "4": {
+                  "text": "MaxUnderpressure",
+                  "color": "purple",
+                  "index": 4
+                },
+                "-1": {
+                  "text": "invalid",
+                  "color": "#3a3a3a",
+                  "index": 99
+                }
+              }
+            }
+          ],
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#8e8e8e",
+                "value": null
+              }
+            ]
+          },
+          "custom": {
+            "fillOpacity": 80,
+            "lineWidth": 0,
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "mergeValues": true,
+        "showValue": "auto",
+        "alignValue": "left",
+        "rowHeight": 0.85,
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- events: changes in the range + the state at its start\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, substr(v.name, 4) AS name, COALESCE(x.value, -1) AS value\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('ST_RECU_REMOTE_MODE')\n  UNION ALL\n  SELECT q.f, substr(v.name, 4), COALESCE(x.value, -1)\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id AND e.ts < q.f)\n  WHERE v.name IN ('ST_RECU_REMOTE_MODE')\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, substr(v.name, 4) AS name, COALESCE(x.value, -1) AS value\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('ST_RECU_REMOTE_MODE')\n  UNION ALL\n  SELECT q.f, substr(v.name, 4), COALESCE(x.value, -1)\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id AND e.ts < q.f)\n  WHERE v.name IN ('ST_RECU_REMOTE_MODE')\n) ORDER BY time",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 11
+    },
+    {
+      "type": "state-timeline",
+      "title": "RecuLimit RECU",
+      "description": "enum RecuLimit from uha_vars.yaml",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 46,
+        "w": 24,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "displayName": "${__field.labels.name}",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "None",
+                  "color": "#8e8e8e",
+                  "index": 0
+                },
+                "1": {
+                  "text": "Eco",
+                  "color": "green",
+                  "index": 1
+                },
+                "2": {
+                  "text": "AntiDry",
+                  "color": "blue",
+                  "index": 2
+                },
+                "3": {
+                  "text": "AntifreezeReduced",
+                  "color": "orange",
+                  "index": 3
+                },
+                "4": {
+                  "text": "AntifreezeStop",
+                  "color": "purple",
+                  "index": 4
+                },
+                "5": {
+                  "text": "BatteryOff",
+                  "color": "red",
+                  "index": 5
+                },
+                "6": {
+                  "text": "InvalidInputs",
+                  "color": "yellow",
+                  "index": 6
+                },
+                "-1": {
+                  "text": "invalid",
+                  "color": "#3a3a3a",
+                  "index": 99
+                }
+              }
+            }
+          ],
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#8e8e8e",
+                "value": null
+              }
+            ]
+          },
+          "custom": {
+            "fillOpacity": 80,
+            "lineWidth": 0,
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "mergeValues": true,
+        "showValue": "auto",
+        "alignValue": "left",
+        "rowHeight": 0.85,
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- events: changes in the range + the state at its start\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, substr(v.name, 4) AS name, COALESCE(x.value, -1) AS value\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('ST_RECU_LIMIT')\n  UNION ALL\n  SELECT q.f, substr(v.name, 4), COALESCE(x.value, -1)\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id AND e.ts < q.f)\n  WHERE v.name IN ('ST_RECU_LIMIT')\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, substr(v.name, 4) AS name, COALESCE(x.value, -1) AS value\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('ST_RECU_LIMIT')\n  UNION ALL\n  SELECT q.f, substr(v.name, 4), COALESCE(x.value, -1)\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id AND e.ts < q.f)\n  WHERE v.name IN ('ST_RECU_LIMIT')\n) ORDER BY time",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 12
+    },
+    {
+      "type": "row",
+      "title": "ELECON_D",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 50,
+        "w": 24,
+        "h": 1
+      },
+      "panels": [],
+      "id": 13
+    },
+    {
+      "type": "state-timeline",
+      "title": "Lights ELECON_D",
+      "description": "Output really set: PWM %, relay lights 0 / 100",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 51,
+        "w": 24,
+        "h": 5
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "displayName": "${__field.labels.name}",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "off",
+                  "color": "#555555",
+                  "index": 0
+                },
+                "-1": {
+                  "text": "invalid",
+                  "color": "#3a3a3a",
+                  "index": 99
+                }
+              }
+            }
+          ],
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#555555",
+                "value": null
+              },
+              {
+                "color": "#e0b400",
+                "value": 1
+              }
+            ]
+          },
+          "custom": {
+            "fillOpacity": 80,
+            "lineWidth": 0,
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "mergeValues": true,
+        "showValue": "auto",
+        "alignValue": "left",
+        "rowHeight": 0.85,
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- events: changes in the range + the state at its start\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, substr(v.name, 10) AS name, COALESCE(x.value, -1) AS value\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP')\n  UNION ALL\n  SELECT q.f, substr(v.name, 10), COALESCE(x.value, -1)\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id AND e.ts < q.f)\n  WHERE v.name IN ('ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP')\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, substr(v.name, 10) AS name, COALESCE(x.value, -1) AS value\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP')\n  UNION ALL\n  SELECT q.f, substr(v.name, 10), COALESCE(x.value, -1)\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id AND e.ts < q.f)\n  WHERE v.name IN ('ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP')\n) ORDER BY time",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 14
+    },
+    {
+      "type": "state-timeline",
+      "title": "Relays ELECON_D",
+      "description": "On / off outputs as really set",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 56,
+        "w": 24,
+        "h": 5
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "displayName": "${__field.labels.name}",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "off",
+                  "color": "#555555",
+                  "index": 0
+                },
+                "1": {
+                  "text": "on",
+                  "color": "green",
+                  "index": 1
+                },
+                "-1": {
+                  "text": "invalid",
+                  "color": "#3a3a3a",
+                  "index": 99
+                }
+              }
+            }
+          ],
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#8e8e8e",
+                "value": null
+              }
+            ]
+          },
+          "custom": {
+            "fillOpacity": 80,
+            "lineWidth": 0,
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "mergeValues": true,
+        "showValue": "auto",
+        "alignValue": "left",
+        "rowHeight": 0.85,
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- events: changes in the range + the state at its start\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, substr(v.name, 4) AS name, COALESCE(x.value, -1) AS value\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('ST_AKUPACK_HEATER', 'ST_EVSE_RELAY', 'ST_WS_HEATING_RELAY')\n  UNION ALL\n  SELECT q.f, substr(v.name, 4), COALESCE(x.value, -1)\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id AND e.ts < q.f)\n  WHERE v.name IN ('ST_AKUPACK_HEATER', 'ST_EVSE_RELAY', 'ST_WS_HEATING_RELAY')\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, substr(v.name, 4) AS name, COALESCE(x.value, -1) AS value\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('ST_AKUPACK_HEATER', 'ST_EVSE_RELAY', 'ST_WS_HEATING_RELAY')\n  UNION ALL\n  SELECT q.f, substr(v.name, 4), COALESCE(x.value, -1)\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id AND e.ts < q.f)\n  WHERE v.name IN ('ST_AKUPACK_HEATER', 'ST_EVSE_RELAY', 'ST_WS_HEATING_RELAY')\n) ORDER BY time",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 15
+    },
+    {
+      "type": "state-timeline",
+      "title": "InverterState ELECON_D",
+      "description": "enum InverterState from uha_vars.yaml",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 61,
+        "w": 24,
+        "h": 6
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "displayName": "${__field.labels.name}",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Off",
+                  "color": "#8e8e8e",
+                  "index": 0
+                },
+                "1": {
+                  "text": "On",
+                  "color": "green",
+                  "index": 1
+                },
+                "2": {
+                  "text": "OnKeepSetting",
+                  "color": "blue",
+                  "index": 2
+                },
+                "3": {
+                  "text": "KeepOn",
+                  "color": "orange",
+                  "index": 3
+                },
+                "4": {
+                  "text": "AutoOff",
+                  "color": "purple",
+                  "index": 4
+                },
+                "-1": {
+                  "text": "invalid",
+                  "color": "#3a3a3a",
+                  "index": 99
+                }
+              }
+            }
+          ],
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#8e8e8e",
+                "value": null
+              }
+            ]
+          },
+          "custom": {
+            "fillOpacity": 80,
+            "lineWidth": 0,
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "mergeValues": true,
+        "showValue": "auto",
+        "alignValue": "left",
+        "rowHeight": 0.85,
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- events: changes in the range + the state at its start\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, substr(v.name, 4) AS name, COALESCE(x.value, -1) AS value\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('ST_AC_AXPERT', 'ST_AC_VICTRON')\n  UNION ALL\n  SELECT q.f, substr(v.name, 4), COALESCE(x.value, -1)\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id AND e.ts < q.f)\n  WHERE v.name IN ('ST_AC_AXPERT', 'ST_AC_VICTRON')\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, substr(v.name, 4) AS name, COALESCE(x.value, -1) AS value\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('ST_AC_AXPERT', 'ST_AC_VICTRON')\n  UNION ALL\n  SELECT q.f, substr(v.name, 4), COALESCE(x.value, -1)\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id AND e.ts < q.f)\n  WHERE v.name IN ('ST_AC_AXPERT', 'ST_AC_VICTRON')\n) ORDER BY time",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 16
+    },
+    {
+      "type": "timeseries",
+      "title": "Setpoints ELECON_D",
+      "description": "Numeric states (setpoints), one point per change",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 67,
+        "w": 24,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "always",
+            "spanNulls": true,
+            "axisSoftMin": null,
+            "lineInterpolation": "stepAfter",
+            "pointSize": 4
+          },
+          "displayName": "${__field.labels.name}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- events: changes in the range + the state at its start\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, substr(v.name, 4) AS name, COALESCE(x.value, -1) AS value\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('ST_AKUPACK_SET_DAY_C', 'ST_AKUPACK_SET_NIGHT_C')\n  UNION ALL\n  SELECT q.f, substr(v.name, 4), COALESCE(x.value, -1)\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id AND e.ts < q.f)\n  WHERE v.name IN ('ST_AKUPACK_SET_DAY_C', 'ST_AKUPACK_SET_NIGHT_C')\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, substr(v.name, 4) AS name, COALESCE(x.value, -1) AS value\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('ST_AKUPACK_SET_DAY_C', 'ST_AKUPACK_SET_NIGHT_C')\n  UNION ALL\n  SELECT q.f, substr(v.name, 4), COALESCE(x.value, -1)\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id AND e.ts < q.f)\n  WHERE v.name IN ('ST_AKUPACK_SET_DAY_C', 'ST_AKUPACK_SET_NIGHT_C')\n) ORDER BY time",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 17
     },
     {
       "type": "table",
@@ -226,7 +1245,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 20,
+        "y": 74,
         "w": 8,
         "h": 9
       },
@@ -270,14 +1289,14 @@
             "uid": "uhalog"
           },
           "queryType": "table",
-          "rawQueryText": "-- lights with value > 0 in their newest event row\nSELECT substr(v.name, 10) AS light, x.value AS pct, x.ts * 1000 AS since\nFROM vars v CROSS JOIN events x ON x.var_id = v.id\n     AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id)\nWHERE v.name IN ('ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN') AND x.value > 0\nORDER BY 1",
-          "queryText": "-- lights with value > 0 in their newest event row\nSELECT substr(v.name, 10) AS light, x.value AS pct, x.ts * 1000 AS since\nFROM vars v CROSS JOIN events x ON x.var_id = v.id\n     AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id)\nWHERE v.name IN ('ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN') AND x.value > 0\nORDER BY 1",
+          "rawQueryText": "-- lights with value > 0 in their newest event row\nSELECT substr(v.name, 10) AS light, x.value AS pct, x.ts * 1000 AS since\nFROM vars v CROSS JOIN events x ON x.var_id = v.id\n     AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id)\nWHERE v.name IN ('ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER', 'ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN', 'ST_LIGHT_EXTERIOR_HOUSE', 'ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP') AND x.value > 0\nORDER BY 1",
+          "queryText": "-- lights with value > 0 in their newest event row\nSELECT substr(v.name, 10) AS light, x.value AS pct, x.ts * 1000 AS since\nFROM vars v CROSS JOIN events x ON x.var_id = v.id\n     AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id)\nWHERE v.name IN ('ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER', 'ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN', 'ST_LIGHT_EXTERIOR_HOUSE', 'ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP') AND x.value > 0\nORDER BY 1",
           "timeColumns": [
             "since"
           ]
         }
       ],
-      "id": 3
+      "id": 18
     },
     {
       "type": "timeseries",
@@ -289,7 +1308,7 @@
       },
       "gridPos": {
         "x": 8,
-        "y": 20,
+        "y": 74,
         "w": 16,
         "h": 9
       },
@@ -333,15 +1352,15 @@
             "uid": "uhalog"
           },
           "queryType": "time series",
-          "rawQueryText": "-- hours on per local day, from events\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ndays(d0, d1) AS (\n  SELECT s, CAST(strftime('%s', date(s, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) FROM (SELECT CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS s FROM q)\n  UNION ALL\n  SELECT d1, CAST(strftime('%s', date(d1, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) FROM days, q WHERE d1 < q.t\n),\nev AS (\n  SELECT substr(v.name, 10) AS name, x.ts, x.value, LEAD(x.ts) OVER (PARTITION BY x.var_id ORDER BY x.ts) AS te\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts < q.t\n       AND x.ts >= COALESCE((SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id\n                              AND e.ts <= (SELECT MIN(d0) FROM days)), 0)\n  WHERE v.name IN ('ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN')\n),\niv AS (\n  SELECT name, ts, COALESCE(te, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER))) AS te FROM ev, q WHERE value > 0\n)\nSELECT d.d0 AS time, iv.name, SUM(MIN(iv.te, d.d1) - MAX(iv.ts, d.d0)) / 3600.0 AS value\nFROM days d JOIN iv ON iv.ts < d.d1 AND iv.te > d.d0\nGROUP BY 1, 2\nORDER BY 1",
-          "queryText": "-- hours on per local day, from events\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ndays(d0, d1) AS (\n  SELECT s, CAST(strftime('%s', date(s, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) FROM (SELECT CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS s FROM q)\n  UNION ALL\n  SELECT d1, CAST(strftime('%s', date(d1, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) FROM days, q WHERE d1 < q.t\n),\nev AS (\n  SELECT substr(v.name, 10) AS name, x.ts, x.value, LEAD(x.ts) OVER (PARTITION BY x.var_id ORDER BY x.ts) AS te\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts < q.t\n       AND x.ts >= COALESCE((SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id\n                              AND e.ts <= (SELECT MIN(d0) FROM days)), 0)\n  WHERE v.name IN ('ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN')\n),\niv AS (\n  SELECT name, ts, COALESCE(te, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER))) AS te FROM ev, q WHERE value > 0\n)\nSELECT d.d0 AS time, iv.name, SUM(MIN(iv.te, d.d1) - MAX(iv.ts, d.d0)) / 3600.0 AS value\nFROM days d JOIN iv ON iv.ts < d.d1 AND iv.te > d.d0\nGROUP BY 1, 2\nORDER BY 1",
+          "rawQueryText": "-- hours on per local day, from events\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ndays(d0, d1) AS (\n  SELECT s, CAST(strftime('%s', date(s, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) FROM (SELECT CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS s FROM q)\n  UNION ALL\n  SELECT d1, CAST(strftime('%s', date(d1, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) FROM days, q WHERE d1 < q.t\n),\nev AS (\n  SELECT substr(v.name, 10) AS name, x.ts, x.value, LEAD(x.ts) OVER (PARTITION BY x.var_id ORDER BY x.ts) AS te\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts < q.t\n       AND x.ts >= COALESCE((SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id\n                              AND e.ts <= (SELECT MIN(d0) FROM days)), 0)\n  WHERE v.name IN ('ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER', 'ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN', 'ST_LIGHT_EXTERIOR_HOUSE', 'ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP')\n),\niv AS (\n  SELECT name, ts, COALESCE(te, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER))) AS te FROM ev, q WHERE value > 0\n)\nSELECT d.d0 AS time, iv.name, SUM(MIN(iv.te, d.d1) - MAX(iv.ts, d.d0)) / 3600.0 AS value\nFROM days d JOIN iv ON iv.ts < d.d1 AND iv.te > d.d0\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- hours on per local day, from events\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ndays(d0, d1) AS (\n  SELECT s, CAST(strftime('%s', date(s, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) FROM (SELECT CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS s FROM q)\n  UNION ALL\n  SELECT d1, CAST(strftime('%s', date(d1, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) FROM days, q WHERE d1 < q.t\n),\nev AS (\n  SELECT substr(v.name, 10) AS name, x.ts, x.value, LEAD(x.ts) OVER (PARTITION BY x.var_id ORDER BY x.ts) AS te\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts < q.t\n       AND x.ts >= COALESCE((SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id\n                              AND e.ts <= (SELECT MIN(d0) FROM days)), 0)\n  WHERE v.name IN ('ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER', 'ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN', 'ST_LIGHT_EXTERIOR_HOUSE', 'ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP')\n),\niv AS (\n  SELECT name, ts, COALESCE(te, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER))) AS te FROM ev, q WHERE value > 0\n)\nSELECT d.d0 AS time, iv.name, SUM(MIN(iv.te, d.d1) - MAX(iv.ts, d.d0)) / 3600.0 AS value\nFROM days d JOIN iv ON iv.ts < d.d1 AND iv.te > d.d0\nGROUP BY 1, 2\nORDER BY 1",
           "timeColumns": [
             "time"
           ]
         }
       ],
       "timeFrom": "30d",
-      "id": 4
+      "id": 19
     }
   ],
   "templating": {

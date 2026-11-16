@@ -82,7 +82,7 @@ class RealYamlTest(unittest.TestCase):
         old_defs, new_defs = load_text(old), vars_def.load(REAL_YAML)
         # since 0.4.0 the file also has the States group (agg event, enum BlindCmd): not in the old file
         new_defs.by_id = {i: d for i, d in new_defs.by_id.items() if d.agg != "event"}
-        new_defs.enums.pop("BlindCmd", None)
+        new_defs.enums = {k: v for k, v in new_defs.enums.items() if k in old_defs.enums}   # States enums are new
         self.assertEqual(len(new_defs.by_id), 258)
         # since 0.3.0 the file also has log_s / agg (DB logging); everything else must be unchanged
         new_defs.by_id = {i: dataclasses.replace(d, log_s=0, agg="avg") for i, d in new_defs.by_id.items()}

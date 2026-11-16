@@ -284,33 +284,73 @@ def table(title, sql, x, y, w=8, h=8, desc=""):
     }
 
 
+def row(title, y):
+    return {"type": "row", "title": title, "collapsed": False, "gridPos": {"x": 0, "y": y, "w": 24, "h": 1},
+            "panels": []}
+
+
+def step_panel(title, sql, unit, x, y, w=24, h=7, desc=""):
+    """Setpoints and other numeric states: a line that holds its value until the next event."""
+    p = panel(title, sql, unit, x, y, w, h, desc=desc)
+    p["fieldConfig"]["defaults"]["custom"].update({"lineInterpolation": "stepAfter", "spanNulls": True,
+                                                   "showPoints": "always", "pointSize": 4})
+    return p
+
+
 def states_dashboard(defs):
+    """One row per producing node: lights (unit %), on/off states (bool), one timeline per enum, numeric states."""
     events = sorted((d for d in defs.by_id.values() if d.agg == "event"), key=lambda d: d.id)
-    lights, enums = {}, {}
+    nodes = {}                                  # producer -> {"lights": [], "bools": [], "enums": {enum: []}, "nums": []}
     for d in events:
+        n = nodes.setdefault(d.producer, {"lights": [], "bools": [], "enums": {}, "nums": []})
         if d.unit == "%":
-            lights.setdefault(d.producer, []).append(d.name)
+            n["lights"].append(d.name)
+        elif d.type == "bool":
+            n["bools"].append(d.name)
         elif d.type == "enum":
-            enums.setdefault(d.enum, []).append(d.name)
+            n["enums"].setdefault(d.enum, []).append(d.name)
+        else:
+            n["nums"].append(d)
     light_map = [{"type": "value", "options": dict({"0": {"text": "off", "color": "#555555", "index": 0}},
                                                    **INVALID_MAP)}]
     light_steps = [{"color": "#555555", "value": None}, {"color": "#e0b400", "value": 1}]
+    bool_map = [{"type": "value", "options": dict({"0": {"text": "off", "color": "#555555", "index": 0},
+                                                   "1": {"text": "on", "color": "green", "index": 1}}, **INVALID_MAP)}]
     panels, y = [], 0
-    all_lights = [name for names in lights.values() for name in names]
-    for node, names in lights.items():
-        h = 2 + len(names)
-        panels.append(timeline(f"Lights {node}", events_sql(names, "ST_LIGHT_"), light_map, 0, y, h=h,
-                               unit="percent", thresholds=light_steps, desc="PWM duty really set, 0 = off"))
-        y += h
-    for enum, names in enums.items():
-        items = defs.enums[enum]
-        options = {str(k): {"text": v, "color": ENUM_COLORS[i % len(ENUM_COLORS)], "index": i}
-                   for i, (k, v) in enumerate(sorted(items.items()))}
-        options.update(INVALID_MAP)
-        h = 2 + 2 * len(names)
-        panels.append(timeline(f"{enum} states", events_sql(names, "ST_"), [{"type": "value", "options": options}],
-                               0, y, h=h, desc=f"enum {enum} from uha_vars.yaml"))
-        y += h
+    all_lights = []
+    for node in sorted(nodes, key=lambda name: defs.nodes.get(name, 99)):
+        n = nodes[node]
+        panels.append(row(node, y))
+        y += 1
+        if n["lights"]:
+            all_lights += n["lights"]
+            h = 2 + len(n["lights"])
+            panels.append(timeline(f"Lights {node}", events_sql(n["lights"], "ST_LIGHT_"), light_map, 0, y, h=h,
+                                   unit="percent", thresholds=light_steps,
+                                   desc="Output really set: PWM %, relay lights 0 / 100"))
+            y += h
+        if n["bools"]:
+            h = 2 + len(n["bools"])
+            panels.append(timeline(f"Relays {node}", events_sql(n["bools"], "ST_"), bool_map, 0, y, h=h,
+                                   desc="On / off outputs as really set"))
+            y += h
+        for enum, names in n["enums"].items():
+            items = defs.enums[enum]
+            options = {str(k): {"text": v, "color": ENUM_COLORS[i % len(ENUM_COLORS)], "index": i}
+                       for i, (k, v) in enumerate(sorted(items.items()))}
+            options.update(INVALID_MAP)
+            h = 2 + 2 * len(names)
+            panels.append(timeline(f"{enum} {node}", events_sql(names, "ST_"), [{"type": "value", "options": options}],
+                                   0, y, h=h, desc=f"enum {enum} from uha_vars.yaml"))
+            y += h
+        units = {}
+        for d in n["nums"]:
+            units.setdefault(d.unit, []).append(d.name)
+        for unit, names in units.items():
+            grafana_unit = {"°C": "celsius"}.get(unit, "none")
+            panels.append(step_panel(f"Setpoints {node}", events_sql(names, "ST_"), grafana_unit, 0, y,
+                                     desc="Numeric states (setpoints), one point per change"))
+            y += 7
     if all_lights:
         panels.append(table("Lights on now", lights_now_sql(all_lights, "ST_LIGHT_"), 0, y, 8, 9,
                             desc="Newest event row with value > 0"))
