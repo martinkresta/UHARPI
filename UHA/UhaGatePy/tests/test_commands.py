@@ -305,6 +305,64 @@ class ApiTest(unittest.TestCase):
             api.stop()
 
 
+class ApiLogTest(unittest.TestCase):
+    """GET /api/log reads the commands table (written by the DB log) with its own read-only connection."""
+
+    def setUp(self):
+        from uhagatepy.db_log import DbLog
+        self.folder = tempfile.TemporaryDirectory()
+        self.path = os.path.join(self.folder.name, "log.db")
+        self.defs = cmd_defs()
+        db = DbLog(config.Config(log_db=self.path), self.defs)
+        db._writer._ntp_ok = lambda: True
+        db.start()
+        self.assertTrue(db._writer.init_done.wait(10))
+        db.tick(time.time())
+        for i, (cmd_id, value) in enumerate(((201, 100.0), (201, 0.0), (250, 2.0), (299, 1.5), (777, 1.0))):
+            db.on_command(1000 + i, "martin-pc" if i < 4 else "zena-telefon", cmd_id, value, i)
+        db.stop()
+        self.loop = asyncio.new_event_loop()
+        self.thread = threading.Thread(target=self.loop.run_forever, daemon=True)
+        self.thread.start()
+
+    def tearDown(self):
+        self.loop.call_soon_threadsafe(self.loop.stop)
+        self.thread.join(timeout=5)
+        self.loop.close()
+        self.folder.cleanup()
+
+    def get(self, api, path, dn="CN=martin-pc"):
+        self.assertTrue(api.start(self.loop))
+        try:
+            con = http.client.HTTPConnection("127.0.0.1", api.port, timeout=5)
+            con.request("GET", path, headers={"X-Client-DN": dn} if dn else {})
+            r = con.getresponse()
+            answer = r.status, json.loads(r.read())
+            con.close()
+            return answer
+        finally:
+            api.stop()
+
+    def test_newest_first_with_names(self):
+        status, rows = self.get(ApiServer(0, self.defs, None, "https://x", self.path), "/api/log")
+        self.assertEqual(status, 200)
+        self.assertEqual([(r["ts"], r["user"], r["cmd"], r["value"], r["seq"]) for r in rows], [
+            (1004, "zena-telefon", "#777", 1.0, 4),                     # id no longer in the YAML: still shown
+            (1003, "martin-pc", "CMD_TEST_FLOAT", 1.5, 3),
+            (1002, "martin-pc", "CMD_SCREEN_EAST", 2, 2),
+            (1001, "martin-pc", "CMD_LIGHT_LOFT_WEST", 0, 1),
+            (1000, "martin-pc", "CMD_LIGHT_LOFT_WEST", 100, 0)])
+        self.assertEqual(rows[3]["desc"], "Loft west light, 0 = off, 100 = on")
+
+    def test_limit_and_errors(self):
+        api = lambda path="": ApiServer(0, self.defs, None, "https://x", path)     # noqa: E731
+        self.assertEqual(len(self.get(api(self.path), "/api/log?limit=2")[1]), 2)
+        self.assertEqual(self.get(api(self.path), "/api/log?limit=x")[0], 400)
+        self.assertEqual(self.get(api(self.path), "/api/log", dn=None)[0], 403)
+        self.assertEqual(self.get(api(""), "/api/log")[0], 503)                    # no log-db
+        self.assertEqual(self.get(api(os.path.join(self.folder.name, "none.db")), "/api/log")[0], 503)
+
+
 class DbCommandsTest(unittest.TestCase):
     def test_command_rows(self):
         from uhagatepy.db_log import DbLog

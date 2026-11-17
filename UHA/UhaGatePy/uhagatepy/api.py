@@ -2,6 +2,8 @@
 certificate required) proxies /api/ here and sets X-Client-DN.
 
     GET  /api/commands                         -> 200 [{id, name, target, type, min, max, state, unit, desc}, ...]
+    GET  /api/log?limit=n                      -> 200 [{ts, user, cmd, desc, value, seq}, ...] newest first (n <= 200,
+                                                  default 50), from the DB table commands; 503 without the DB log
     POST /api/cmd  {"cmd": name, "value": n}   -> 200 {"ok": true, "seq": n}
          400 unknown command / bad value or body, 403 no X-Client-DN (or a foreign Origin), 415 not JSON,
          429 over the rate limit, 503 serial link down
@@ -21,16 +23,22 @@ opened the gateway runs without the API.
 """
 import concurrent.futures
 import json
+import os
+import pathlib
+import sqlite3
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Callable, Dict, Tuple
+from urllib.parse import parse_qs, urlsplit
 
 from . import commands
 from .log import log
 from .vars_def import CmdDef, VarsFile
 
 MAX_BODY = 1024
+LOG_DEFAULT = 50
+LOG_MAX = 200
 ANSWER_TIMEOUT_S = 3
 ERROR_REPEAT_S = 600
 
@@ -45,10 +53,29 @@ def command_list(defs: VarsFile) -> list:
             for c in defs.commands.values()]
 
 
+def command_log(db_path: str, defs: VarsFile, limit: int) -> list:
+    """Newest commands from the DB (own read-only connection: WAL readers do not block the writer thread)."""
+    by_id = {c.id: c for c in defs.commands.values()}
+    uri = pathlib.Path(os.path.abspath(db_path)).as_uri() + "?mode=ro"     # file:///... (also on Windows)
+    con = sqlite3.connect(uri, uri=True, timeout=2)
+    try:
+        rows = con.execute("SELECT ts, user, cmd_id, value, seq FROM commands ORDER BY rowid DESC LIMIT ?",
+                           (limit,)).fetchall()
+    finally:
+        con.close()
+    out = []
+    for ts, user, cmd_id, value, seq in rows:
+        c = by_id.get(cmd_id)
+        out.append({"ts": ts, "user": user, "cmd": c.name if c else f"#{cmd_id}", "desc": c.desc if c else "",
+                    "value": int(value) if c and c.type != "float" else value, "seq": seq})
+    return out
+
+
 class ApiServer:
-    def __init__(self, port: int, defs: VarsFile, execute: Execute, origin: str) -> None:
+    def __init__(self, port: int, defs: VarsFile, execute: Execute, origin: str, db_path: str = "") -> None:
         self.port = port
         self.defs = defs
+        self.db_path = db_path
         self.execute = execute
         self.origin = origin.rstrip("/")
         self.loop = None
@@ -163,11 +190,25 @@ class _Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         self.api.count()
         try:
-            if self.path.split("?", 1)[0] != "/api/commands":
+            url = urlsplit(self.path)
+            if url.path not in ("/api/commands", "/api/log"):
                 return self._error(404, "not found")
             if self._user() is None:
                 return
-            self._answer(200, command_list(self.api.defs))
+            if url.path == "/api/commands":
+                return self._answer(200, command_list(self.api.defs))
+            if not self.api.db_path:
+                return self._error(503, "no command log (log-db not set)")
+            try:
+                limit = int(parse_qs(url.query).get("limit", [LOG_DEFAULT])[0])
+            except ValueError:
+                return self._error(400, "limit must be a number")
+            try:
+                rows = command_log(self.api.db_path, self.api.defs, max(1, min(limit, LOG_MAX)))
+            except sqlite3.Error as e:
+                self.api.log_error("log", "cannot read the command log: %s", e)
+                return self._error(503, "command log not readable")
+            self._answer(200, rows)
         except Exception:
             self.api.log_error("get", "error in GET %s", self.path, exc=True)
             self._error(500, "internal error")

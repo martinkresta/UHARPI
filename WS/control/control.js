@@ -7,6 +7,8 @@ const POLL_MS = 3000;
 const POLL_PENDING_MS = 1000;     // faster while waiting for a state change
 const WAIT_MS = 10000;            // no change within this time -> "stav se nezměnil"
 const STALE_S = 15;               // uha2.json older than this: the gateway does not write it
+const LOG_MS = 15000;             // command log refresh (and right after a sent command)
+const LOG_ROWS = 30;
 
 let commands = [];                // from /api/commands
 let vars = {};                    // uha2.json "Vars"
@@ -121,6 +123,7 @@ async function send(c, value) {
       pending[c.name] = { expected: value, deadline: Date.now() + WAIT_MS };
       setMsg(c.name, "čekám na změnu…");
       schedulePoll(POLL_PENDING_MS);
+      scheduleLog(1500);            // the gateway writes the row to the DB within a moment
     } else if (resp.status === 429) {
       setMsg(c.name, "příliš mnoho příkazů, chvíli počkejte", "error");
     } else if (resp.status === 503) {
@@ -164,6 +167,53 @@ async function poll() {
   schedulePoll(Object.keys(pending).length ? POLL_PENDING_MS : POLL_MS);
 }
 
+function commandText(row) {
+  const c = commands.find(x => x.name === row.cmd);
+  if (c && isLight(c)) return row.value > 0 ? "zapnout" + (row.value < 100 ? " " + row.value + " %" : "") : "vypnout";
+  if (c && c.type === "enum" && c.enum && c.enum[String(row.value)] !== undefined) return c.enum[String(row.value)];
+  return String(row.value) + (c && c.unit ? " " + c.unit : "");
+}
+
+function cell(text, cls) {
+  const td = document.createElement("td");
+  td.textContent = text;
+  if (cls) td.className = cls;
+  return td;
+}
+
+let logTimer = null;
+function scheduleLog(ms) {
+  clearTimeout(logTimer);
+  logTimer = setTimeout(loadLog, ms);
+}
+
+async function loadLog() {
+  const info = document.getElementById("log-state");
+  try {
+    const resp = await fetch("/api/log?limit=" + LOG_ROWS, { cache: "no-store" });
+    let rowsData = null;
+    try { rowsData = await resp.json(); } catch (e) { /* not JSON */ }
+    if (!resp.ok) throw new Error((rowsData && rowsData.error) || "HTTP " + resp.status);
+    const body = document.querySelector("#log tbody");
+    body.textContent = "";
+    const today = new Date().toDateString();
+    for (const r of rowsData) {
+      const t = new Date(r.ts * 1000);
+      const when = (t.toDateString() === today ? "" : t.toLocaleDateString("cs-CZ") + " ") + t.toLocaleTimeString("cs-CZ");
+      const c = commands.find(x => x.name === r.cmd);
+      const tr = document.createElement("tr");
+      tr.append(cell(when, "time"), cell(r.user), cell((c && c.desc) || r.desc || r.cmd), cell(commandText(r)));
+      body.appendChild(tr);
+    }
+    info.textContent = rowsData.length ? "" : "Zatím žádný příkaz.";
+    info.className = "note";
+  } catch (e) {
+    info.textContent = "Nelze načíst historii příkazů: " + e.message;
+    info.className = "note error";
+  }
+  scheduleLog(LOG_MS);
+}
+
 async function start() {
   const info = document.getElementById("data-state");
   try {
@@ -181,6 +231,7 @@ async function start() {
   }
   buildTable();
   poll();
+  loadLog();
 }
 
 start();

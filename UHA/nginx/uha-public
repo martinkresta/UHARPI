@@ -75,8 +75,12 @@ server {
 		alias /home/pi/Web/uha2.json;
 	}
 
-	# UhaGatePy control API (api-port in uhagatepy.conf); only these two
+	# UhaGatePy control API (api-port in uhagatepy.conf); only these three
 	location = /api/commands {
+		limit_except GET { deny all; }
+		include snippets/uha-ctrl-api.conf;
+	}
+	location = /api/log {
 		limit_except GET { deny all; }
 		include snippets/uha-ctrl-api.conf;
 	}

@@ -382,5 +382,12 @@ ELECON as RPISERP packet `0x52`, ELECON to the target node (CAN `0x200 + node`).
   Backup of the 0.4.2 folder: `/home/pi/UhaGatePy-backup-0.4.2` (rollback: copy back, restart). No command was sent
   from the agent to the real link; the end-to-end check (after flashing ELECON + IOBOARD_U) is Martin's.
 
+**0.5.1 (2026-11-17):** `GET /api/log?limit=n` (default 50, max 200): the newest rows of the DB table `commands`
+with the command name and desc (an id no longer in the YAML is shown as `#id`); 503 without `log-db`. The request
+thread opens its own read-only SQLite connection (WAL: does not block the writer). The control page shows the last
+30 commands ("Poslední příkazy"), refreshed every 15 s and right after a send. nginx proxies `GET /api/log` as well.
+First real use (2026-11-17 12:46, `martin-pc`, after ELECON + IOBOARD_U were flashed): 10 commands, every state
+changed within 1 s (`events`), no drops.
+
 ### Still to do
 1. Watch the 10-minute summaries in the journal for `OFFSET` (a warning is logged) for a few days.

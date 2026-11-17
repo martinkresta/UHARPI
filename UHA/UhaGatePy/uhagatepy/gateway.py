@@ -66,7 +66,8 @@ class Gateway:
         self.counters = Counters()
         self.tunnel_nodes: Dict[int, NodeStats] = {}   # node id -> tunnel packets from that producer
         self.log_nodes: Dict[int, NodeStats] = {}      # node id -> log messages from that node
-        self.api = ApiServer(cfg.api_port, defs, self.execute_command, cfg.api_origin) if cfg.api_port else None
+        self.api = (ApiServer(cfg.api_port, defs, self.execute_command, cfg.api_origin, cfg.log_db)
+                    if cfg.api_port else None)
         self.rate = commands.RateLimit()
         self.cmd_seq = 0                               # byte 7 of packet 0x52, wraps at 256
         self.last_command: Dict[str, object] = {}      # for uha_status.json

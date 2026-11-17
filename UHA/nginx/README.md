@@ -66,7 +66,7 @@ sudo systemctl daemon-reload && sudo systemctl restart grafana-server
 - `ssl_verify_client on`, `ssl_verify_depth 1`, `ssl_crl`. nginx completes the TLS handshake also without a client
   certificate and answers HTTP 400 (it does not abort the handshake); nothing else is reachable.
 - `X-Client-DN` is always set by nginx from `$ssl_client_s_dn` (a header sent by the client is overwritten — checked).
-- Only `GET /api/commands` and `POST /api/cmd` are proxied (`limit_except`), other `/api/` paths 404.
+- Only `GET /api/commands`, `GET /api/log` (0.5.1) and `POST /api/cmd` are proxied (`limit_except`), other `/api/` paths 404.
 - Headers: `Cache-Control: no-store`, `X-Frame-Options: DENY`, CSP `default-src 'self'; frame-ancestors 'none'`
   (the page has no inline script or style).
 - The page files are in `/home/pi/Web/control/`, so `https://uha.mkresta.cz/control/` also serves the static page
