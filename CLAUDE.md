@@ -200,7 +200,7 @@ ELECON re-sends stale values of a dead node as fresh.
 
 **0.3.0 (branch `feature/vars2-logging`, prepared 2026-11-14, not yet in production): VARS2 log into SQLite**
 (`db_log.py`, writer thread) at `/var/lib/uhalog/uha_log.db` for the variables with `log_s` / `agg` in the YAML;
-config `log-db`, `log-raw-days`, `log-max-mb`, `log-min-free-mb`. Grafana 13 (LAN only, `http://192.168.1.10/grafana/`)
+config `log-db`, `log-raw-days`, `log-max-mb`, `log-min-free-mb`. Grafana 13 (`https://uha.mkresta.cz/grafana/`)
 reads it; config and dashboards in `UHA/Grafana/` (`make_dashboards.py`, `deploy_grafana.sh`, README).
 
 Known label mismatch: the gateway's old table (`UHA.h`) calls id 49 `VAR_MPPT_ENERGY_TODAY_WH`, the firmware
@@ -214,6 +214,14 @@ SSH key only (`/etc/ssh/sshd_config.d/10-uha-hardening.conf`), nftables host fir
 incoming drop, SSH only from the LAN, 80/443 public), `unattended-upgrades` without automatic reboot.
 Changing the firewall: always with the 5-min auto-revert from `UHA/hardening/README.md`. A new incoming port
 (e.g. a new service reachable from the PC) must be added to `UHA/hardening/nftables.conf`.
+
+---
+
+## Public HTTPS (2026-11-17, `UHA/nginx/`)
+
+`https://uha.mkresta.cz` (dashboard + `/grafana/`) and `https://ctrl.uha.mkresta.cz` (403 placeholder for the step-3
+mTLS control UI), IPv6 only (AAAA → `2a00:1028:83d2:4216::10`), Let's Encrypt cert via `certbot certonly --nginx`
+(auto-renew, reloads nginx). Separate site `uha-public`; the LAN site `default` (`http://192.168.1.10/`) is unchanged.
 
 ---
 

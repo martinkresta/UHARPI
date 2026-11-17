@@ -3,7 +3,8 @@
 Grafana OSS on the Pi shows the SQLite log written by UhaGatePy 0.3.0 (`db_log.py`, see `UHA/UhaGatePy/README.md`
 "VARS2 DB log"). Task: `tasks/vars2_db_logging_grafana.md`. Monitoring only.
 
-URL: **http://192.168.1.10/grafana/** — home network only until HTTPS exists (phase C).
+URL: **https://uha.mkresta.cz/grafana/** (public, since 2026-11-17, `UHA/nginx/README.md`).
+`http://192.168.1.10/grafana/` still loads (LAN only), but login does not hold there (`cookie_secure`).
 First login `admin` / `admin`, Grafana then asks for a new password (Martin sets it; never written to a file).
 
 ## Files
@@ -25,7 +26,8 @@ changed in the UI cannot be saved over the provisioned file (use "Save as" for e
 
 ## Settings (systemd drop-in)
 
-Listen `127.0.0.1:3000` only (reached through nginx), `root_url = http://192.168.1.10/grafana/`,
+Listen `127.0.0.1:3000` only (reached through nginx), `domain = uha.mkresta.cz`,
+`root_url = https://uha.mkresta.cz/grafana/`, `cookie_secure = true`, brute-force login protection on (default),
 `serve_from_sub_path = true`, anonymous access off, sign-up off, no usage reporting / update checks / news feed,
 no automatic download of "preinstalled" plugins, unused bundled datasources disabled (`GF_PLUGINS_DISABLE_PLUGINS`:
 each one started a backend process, ~190 MB RAM together). Grafana 13.3.1 + `frser-sqlite-datasource` 4.0.6 then
@@ -77,8 +79,8 @@ sudo chown -R grafana:grafana /var/lib/grafana/plugins
 else. nginx backup before the change: `/home/pi/nginx-default.bak-<date>`; the only change in
 `sites-available/default` is the line `include snippets/uha-grafana.conf;` after `server_name _;`.
 
-## Phase C (HTTPS) — not started
+## Phase C (HTTPS) — done 2026-11-17
 
-After Martin creates the AAAA record (subdomain of mkresta.cz -> the Pi's public IPv6): `certbot --nginx` for that
-name, `certbot renew --dry-run`, HTTP -> HTTPS redirect, `GF_SERVER_ROOT_URL=https://<name>/grafana/`, then remove the
-two `include snippets/uha-grafana-lan.conf;` lines. Until then a request from a public IPv6 address gets 403 (checked).
+Done as a separate site `uha-public` (see `UHA/nginx/README.md`): `https://uha.mkresta.cz/grafana/` uses
+`snippets/uha-grafana-public.conf` (no LAN restriction). The plain-HTTP default site keeps `uha-grafana.conf` with
+the LAN-only include, so `deploy_grafana.sh --nginx` still applies to the LAN site only.

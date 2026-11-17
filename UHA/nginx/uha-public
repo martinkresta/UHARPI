@@ -1,0 +1,60 @@
+# /etc/nginx/sites-available/uha-public (symlink in sites-enabled/): public names over HTTPS.
+# LAN access by IP (http://192.168.1.10/) stays in sites-available/default (unchanged, Grafana LAN only).
+# Certificate: Let's Encrypt, one cert for both names (certbot certonly --nginx, renewal reloads nginx).
+# See UHA/nginx/README.md.
+
+# --- port 80: ACME challenges (certbot's nginx plugin adds them while renewing) + redirect to https
+server {
+	listen 80;
+	listen [::]:80;
+	server_name uha.mkresta.cz ctrl.uha.mkresta.cz;
+
+	location / {
+		return 301 https://$host$request_uri;
+	}
+}
+
+# --- 443 default: unknown name / bare IP -> close the TLS handshake (no certificate shown)
+server {
+	listen 443 ssl default_server;
+	listen [::]:443 ssl default_server;
+	ssl_reject_handshake on;
+}
+
+# --- https://uha.mkresta.cz: dashboard + Grafana (Grafana has its own password login)
+server {
+	listen 443 ssl http2;
+	listen [::]:443 ssl http2;
+	server_name uha.mkresta.cz;
+
+	ssl_certificate     /etc/letsencrypt/live/uha.mkresta.cz/fullchain.pem;
+	ssl_certificate_key /etc/letsencrypt/live/uha.mkresta.cz/privkey.pem;
+	include snippets/uha-tls.conf;
+	# HSTS: not yet (add after HTTPS has run well for a while):
+	# add_header Strict-Transport-Security "max-age=31536000" always;
+
+	root /home/pi/Web;
+	index index.html;
+
+	location / {
+		try_files $uri $uri/ =404;
+	}
+
+	include snippets/uha-grafana-public.conf;
+}
+
+# --- https://ctrl.uha.mkresta.cz: placeholder
+server {
+	listen 443 ssl http2;
+	listen [::]:443 ssl http2;
+	server_name ctrl.uha.mkresta.cz;
+
+	ssl_certificate     /etc/letsencrypt/live/uha.mkresta.cz/fullchain.pem;
+	ssl_certificate_key /etc/letsencrypt/live/uha.mkresta.cz/privkey.pem;
+	include snippets/uha-tls.conf;
+
+	# step 3: ssl_verify_client on; control UI + /api/
+	location / {
+		return 403;
+	}
+}
