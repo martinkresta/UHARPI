@@ -208,6 +208,15 @@ Known label mismatch: the gateway's old table (`UHA.h`) calls id 49 `VAR_MPPT_EN
 
 ---
 
+## Pi hardening (2026-11-17, `UHA/hardening/`)
+
+SSH key only (`/etc/ssh/sshd_config.d/10-uha-hardening.conf`), nftables host firewall (`/etc/nftables.conf`:
+incoming drop, SSH only from the LAN, 80/443 public), `unattended-upgrades` without automatic reboot.
+Changing the firewall: always with the 5-min auto-revert from `UHA/hardening/README.md`. A new incoming port
+(e.g. a new service reachable from the PC) must be added to `UHA/hardening/nftables.conf`.
+
+---
+
 ## Known Issues
 
 Open problems of the whole UHA system (also gateway / dashboard ones) are kept in the UHA_FW repo: `UHA_FW/UHA_COMMON/KnownIssues/` (index `README.md`).
