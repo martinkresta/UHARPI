@@ -92,9 +92,15 @@ def build(g: "Gateway", unix_time: int, mono: float, raw: dict) -> dict:
     vars2 = {"Fresh": len(health["fresh"]), "Invalid": health["invalid"], "Stale": health["stale"],
              "NeverReceived": health["never"]}
 
+    c = g.counters
+    control = {"Defined": len(g.defs.commands), "Sent": c.commands_sent, "RateLimited": c.commands_rate_limited,
+               "LinkDown": c.commands_link_down, "Last": g.last_command or None,
+               "Api": g.api.status() if g.api else None}
+
     return {
         "Version": VERSION, "UnixTime": unix_time, "StartUnix": g.start_unix, "UptimeS": int(uptime),
         "Yaml": {"Version": g.defs.version, "Sha": g.defs.sha, "Variables": len(g.defs.by_id)},
         "Link": link, "Counters": counters, "Vars2": vars2, "DbLog": g.db.status(), "Nodes": nodes,
+        "Commands": control,
         "Vars": variables,
     }

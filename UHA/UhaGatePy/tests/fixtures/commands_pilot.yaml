@@ -1,0 +1,27 @@
+# Pilot commands (CMD_spec.md section 6) for tests until the FW brief commits the real `commands:` section to
+# uha_vars.yaml. Appended to the real YAML: cat uha_vars.yaml commands_pilot.yaml > test.yaml
+commands:
+  - {id: 201, name: CMD_LIGHT_LOFT_WEST, target: IOBOARD_U, type: uint32, min: 0, max: 100, unit: '%',
+     state: ST_LIGHT_LOFT_WEST, desc: 'Podkroví západ'}
+  - {id: 202, name: CMD_LIGHT_LOFT_EAST_1, target: IOBOARD_U, type: uint32, min: 0, max: 100, unit: '%',
+     state: ST_LIGHT_LOFT_EAST_1, desc: 'Podkroví východ 1'}
+  - {id: 203, name: CMD_LIGHT_LOFT_EAST_2, target: IOBOARD_U, type: uint32, min: 0, max: 100, unit: '%',
+     state: ST_LIGHT_LOFT_EAST_2, desc: 'Podkroví východ 2'}
+  - {id: 204, name: CMD_LIGHT_BEDROOM_SOUTH, target: IOBOARD_U, type: uint32, min: 0, max: 100, unit: '%',
+     state: ST_LIGHT_BEDROOM_SOUTH, desc: 'Ložnice jih'}
+  - {id: 205, name: CMD_LIGHT_BEDROOM_NORTH, target: IOBOARD_U, type: uint32, min: 0, max: 100, unit: '%',
+     state: ST_LIGHT_BEDROOM_NORTH, desc: 'Ložnice sever'}
+  - {id: 206, name: CMD_LIGHT_BATHROOM, target: IOBOARD_U, type: uint32, min: 0, max: 100, unit: '%',
+     state: ST_LIGHT_BATHROOM, desc: 'Koupelna'}
+  - {id: 207, name: CMD_LIGHT_STAIR_STEPS, target: IOBOARD_U, type: uint32, min: 0, max: 100, unit: '%',
+     state: ST_LIGHT_STAIR_STEPS, desc: 'Podstupně'}
+  - {id: 208, name: CMD_LIGHT_STAIRS, target: IOBOARD_U, type: uint32, min: 0, max: 100, unit: '%',
+     state: ST_LIGHT_STAIRS, desc: 'Schody'}
+  - {id: 209, name: CMD_LIGHT_HALLWAY, target: IOBOARD_U, type: uint32, min: 0, max: 100, unit: '%',
+     state: ST_LIGHT_HALLWAY, desc: 'Chodba + předsíň'}
+  - {id: 210, name: CMD_LIGHT_LIVING_ROOM, target: IOBOARD_U, type: uint32, min: 0, max: 100, unit: '%',
+     state: ST_LIGHT_LIVING_ROOM, desc: 'Obývák'}
+  - {id: 211, name: CMD_LIGHT_DINING_ROOM, target: IOBOARD_U, type: uint32, min: 0, max: 100, unit: '%',
+     state: ST_LIGHT_DINING_ROOM, desc: 'Jídelna'}
+  - {id: 212, name: CMD_LIGHT_KITCHEN, target: IOBOARD_U, type: uint32, min: 0, max: 100, unit: '%',
+     state: ST_LIGHT_KITCHEN, desc: 'Kuchyň'}

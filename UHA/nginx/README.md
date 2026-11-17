@@ -5,7 +5,7 @@ Brief: `tasks/https_letsencrypt.md`. DNS (Hukot.cz): both names AAAA → `2a00:1
 | URL | Content |
 |-----|---------|
 | `https://uha.mkresta.cz/` | dashboard (`/home/pi/Web/`) + `/grafana/` (password login, from anywhere) |
-| `https://ctrl.uha.mkresta.cz/` | placeholder, `403` (step 3: mTLS control UI) |
+| `https://ctrl.uha.mkresta.cz/` | control page (`WS/control/` → `/home/pi/Web/control/`) + `/uha2.json` + `/api/commands`, `/api/cmd` → UhaGatePy `127.0.0.1:8091`; **client certificate of the UHA CA required** (`UHA/ca/`), else 400 |
 | `http://<name>/` | `301` → https (ACME challenges for renewal also on 80) |
 | `https://<IP or other name>` | TLS handshake rejected (`ssl_reject_handshake`) |
 | `http://192.168.1.10/` | unchanged `sites-available/default`, Grafana LAN only (`UHA/Grafana/nginx/`) |
@@ -18,6 +18,8 @@ Brief: `tasks/https_letsencrypt.md`. DNS (Hukot.cz): both names AAAA → `2a00:1
 | `uha-tls.conf` | `/etc/nginx/snippets/uha-tls.conf` (TLS 1.2/1.3, Mozilla intermediate) |
 | `uha-grafana-public.conf` | `/etc/nginx/snippets/uha-grafana-public.conf` (`/grafana/` proxy without LAN restriction) |
 | `uha-security.conf` | `/etc/nginx/conf.d/uha-security.conf` (`server_tokens off`) |
+| `uha-ctrl-api.conf` | `/etc/nginx/snippets/uha-ctrl-api.conf` (proxy to the API, sets `X-Client-DN` from the verified certificate) |
+| — | `/etc/nginx/uha-ca/ca.crt`, `crl.pem` (`UHA/ca/deploy_ca.sh`; without them nginx -t fails) |
 
 Grafana settings for the public name are in `UHA/Grafana/systemd/grafana-uha.conf` (`GF_SERVER_DOMAIN`,
 `GF_SERVER_ROOT_URL=https://uha.mkresta.cz/grafana/`, `GF_SECURITY_COOKIE_SECURE=true`); `grafana.ini` is untouched.
@@ -35,10 +37,10 @@ Grafana settings for the public name are in `UHA/Grafana/systemd/grafana-uha.con
 ## Install / change
 
 ```bash
-scp UHA/nginx/uha-public UHA/nginx/*.conf uharpi:/tmp/
+scp UHA/nginx/uha-public UHA/nginx/*.conf uharpi:/tmp/            # CA files first: UHA/ca/deploy_ca.sh
 ssh uharpi 'cd /tmp && sed -i "s/\r$//" uha-public *.conf \
   && sudo install -m 644 uha-public /etc/nginx/sites-available/uha-public \
-  && sudo install -m 644 uha-tls.conf uha-grafana-public.conf /etc/nginx/snippets/ \
+  && sudo install -m 644 uha-tls.conf uha-grafana-public.conf uha-ctrl-api.conf /etc/nginx/snippets/ \
   && sudo install -m 644 uha-security.conf /etc/nginx/conf.d/ \
   && sudo nginx -t && sudo systemctl reload nginx'
 ```
@@ -58,6 +60,21 @@ sudo certbot delete --cert-name uha.mkresta.cz
 sudo cp /home/pi/grafana-uha.conf.bak-20261117 /etc/systemd/system/grafana-server.service.d/uha.conf
 sudo systemctl daemon-reload && sudo systemctl restart grafana-server
 ```
+
+## Control site (step 3a, 2026-11-17)
+
+- `ssl_verify_client on`, `ssl_verify_depth 1`, `ssl_crl`. nginx completes the TLS handshake also without a client
+  certificate and answers HTTP 400 (it does not abort the handshake); nothing else is reachable.
+- `X-Client-DN` is always set by nginx from `$ssl_client_s_dn` (a header sent by the client is overwritten — checked).
+- Only `GET /api/commands`, `GET /api/log` (0.5.1) and `POST /api/cmd` are proxied (`limit_except`), other `/api/` paths 404.
+- Headers: `Cache-Control: no-store`, `X-Frame-Options: DENY`, CSP `default-src 'self'; frame-ancestors 'none'`
+  (the page has no inline script or style).
+- The page files are in `/home/pi/Web/control/`, so `https://uha.mkresta.cz/control/` also serves the static page
+  (harmless: the API is only on the ctrl name).
+- Both names share one certificate and one IP: a browser may reuse an HTTP/2 connection of `uha.mkresta.cz` for
+  `ctrl.uha.mkresta.cz`; nginx then answers 421 and the browser opens a new connection with the client certificate.
+- Backup before the change: `/home/pi/nginx-backup-20261117-ctrl.tgz`.
+- Undo (back to the 403 placeholder): restore that backup, `sudo nginx -t && sudo systemctl reload nginx`.
 
 ## Open
 

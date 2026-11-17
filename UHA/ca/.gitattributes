@@ -1,0 +1,2 @@
+# bash scripts must keep LF also on Windows checkouts (Git Bash fails on CR)
+*.sh text eol=lf

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UHA – ovládání</title>
+  <link rel="stylesheet" href="control.css">
+</head>
+<body>
+  <header>
+    <h1>Ovládání</h1>
+    <a href="https://uha.mkresta.cz/">← zpět na přehled</a>
+  </header>
+
+  <p id="data-state" class="note">Načítám…</p>
+
+  <table id="commands">
+    <thead>
+      <tr><th>Funkce</th><th>Stav</th><th></th><th></th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <p class="note">Příkaz je žádost: modul ho provede, jen pokud to jeho místní logika dovolí.
+    Stav ukazuje, co modul skutečně nastavil.</p>
+
+  <h2>Poslední příkazy</h2>
+  <table id="log">
+    <thead>
+      <tr><th>Čas</th><th>Kdo</th><th>Funkce</th><th>Příkaz</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <p id="log-state" class="note"></p>
+
+  <script src="control.js"></script>
+</body>
+</html>

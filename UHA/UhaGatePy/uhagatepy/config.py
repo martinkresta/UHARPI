@@ -33,6 +33,8 @@ class Config:
     log_raw_days: int = 30                             # keep the `raw` table this many days (agg_15min forever)
     log_max_mb: int = 2048                             # stop writing when the database (+ WAL) is bigger
     log_min_free_mb: int = 1024                        # stop writing when the disk has less free space
+    api_port: int = 0                                  # control API on 127.0.0.1 (api.py), 0 = off
+    api_origin: str = "https://ctrl.uha.mkresta.cz"    # the only Origin a POST may come from (CSRF check)
     verbose: bool = False                              # debug log (every packet, every mismatch)
 
 
@@ -53,6 +55,8 @@ OPTIONS = (
     ("log_max_mb", "maximum database size [MB]", 1),
     ("log_min_free_mb", "minimum free disk space for logging [MB]", 0),
     ("frozen_after_s", "report a node as frozen when none of its variables changed for this long [s]", 10),
+    ("api_port", "control API port on 127.0.0.1 (0 = off)", 0),
+    ("api_origin", "allowed Origin of control API POSTs", None),
 )
 
 

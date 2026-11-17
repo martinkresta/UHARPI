@@ -2,18 +2,20 @@
 
   - reads the serial port when data arrives and sorts the packets (VARS2 tunnel, log; old 0x221 packets are only counted),
   - once per second writes the JSON files, sends the RTC sync every minute and checks the link,
-  - logs start-up, link changes and periodic summaries (never one line per second).
+  - logs start-up, link changes and periodic summaries (never one line per second),
+  - sends the commands of the control web (api.py hands them into the loop) as RPISERP packet 0x52.
 
-Everything runs in one thread, so the stores need no locks.
+Everything runs in one thread, so the stores need no locks (the API threads only hand requests over).
 """
 import asyncio
 import os
 import signal
 import time
 from dataclasses import dataclass, field
-from typing import Callable, Dict, Set
+from typing import Callable, Dict, Set, Tuple
 
-from . import VERSION, config, event_log, outputs, rpiserp, rtc, status, tunnel
+from . import VERSION, commands, config, event_log, outputs, rpiserp, rtc, status, tunnel
+from .api import ApiServer
 from .db_log import DbLog
 from .node_watch import NodeWatch
 from .log import log
@@ -38,6 +40,9 @@ class Counters:
     write_errors: int = 0             # output files
     event_log_errors: int = 0         # log.txt
     tunnel_drops: Dict[str, int] = field(default_factory=lambda: {"length": 0, "unknown_id": 0, "bad_value": 0})
+    commands_sent: int = 0
+    commands_rate_limited: int = 0    # 429
+    commands_link_down: int = 0       # 503: serial link down or the write failed
 
 
 @dataclass
@@ -61,6 +66,11 @@ class Gateway:
         self.counters = Counters()
         self.tunnel_nodes: Dict[int, NodeStats] = {}   # node id -> tunnel packets from that producer
         self.log_nodes: Dict[int, NodeStats] = {}      # node id -> log messages from that node
+        self.api = (ApiServer(cfg.api_port, defs, self.execute_command, cfg.api_origin, cfg.log_db)
+                    if cfg.api_port else None)
+        self.rate = commands.RateLimit()
+        self.cmd_seq = 0                               # byte 7 of packet 0x52, wraps at 256
+        self.last_command: Dict[str, object] = {}      # for uha_status.json
 
         self.start_mono = time.monotonic()
         self.start_unix = int(time.time())
@@ -105,9 +115,12 @@ class Gateway:
 
         self._start_db_log()
         self._open_link()
+        self._start_api()
         ticker = asyncio.create_task(self._tick_loop())
         await self._stop.wait()
         ticker.cancel()
+        if self.api:
+            self.api.stop()
         self._close_link()
         self.db.stop()
         log.info("UhaGatePy stopped")
@@ -119,6 +132,17 @@ class Gateway:
         except Exception:                                  # logging is optional, the gateway runs without it
             log.exception("DB log: cannot start, running without it")
             self.db.enabled = False
+
+    def _start_api(self) -> None:
+        if self.api is None:
+            log.info("API: off (api-port not set), %d commands in the YAML", len(self.defs.commands))
+            return
+        try:
+            if not self.api.start(self._loop):
+                self.api = None
+        except Exception:                                  # the control API is optional as well
+            log.exception("API: cannot start, running without it")
+            self.api = None
 
     def _on_stop_signal(self, sig: int) -> None:
         log.info("stopping on signal %s", signal.Signals(sig).name)
@@ -308,6 +332,32 @@ class Gateway:
         else:
             log.warning("RTC sync not sent: %s", self.link.last_error)
 
+    def execute_command(self, cmd, value, user: str) -> Tuple[int, dict]:
+        """A checked command from the control API (called in the loop): send it as packet 0x52, log it."""
+        mono = time.monotonic()
+        if not self.link.is_open:
+            self.counters.commands_link_down += 1
+            self._log_once("cmd link", log.warning, "command %s from %s not sent: serial link down", cmd.name, user)
+            return 503, {"ok": False, "error": "serial link down"}
+        if not self.rate.allowed(mono):
+            self.counters.commands_rate_limited += 1
+            self._log_once("cmd rate", log.warning, "command %s from %s refused: over the rate limit (%d/s, %d/min)",
+                           cmd.name, user, self.rate.per_s, self.rate.per_min)
+            return 429, {"ok": False, "error": "too many commands, wait a moment"}
+        seq = self.cmd_seq
+        if not self._send(commands.PACKET_COMMAND, commands.packet_data(cmd, value, seq)):
+            self.counters.commands_link_down += 1
+            log.warning("command %s from %s not sent: %s", cmd.name, user, self.link.last_error or "write failed")
+            return 503, {"ok": False, "error": "serial link: write failed"}
+        self.rate.sent(mono)
+        self.cmd_seq = (seq + 1) & 0xFF
+        self.counters.commands_sent += 1
+        unix = int(time.time())
+        log.info("command %s = %g from %s (seq %d, id %d, to %s)", cmd.name, value, user, seq, cmd.id, cmd.target)
+        self.last_command = {"Unix": unix, "User": user, "Cmd": cmd.name, "Value": value, "Seq": seq}
+        self.db.on_command(unix, user, cmd.id, float(value), seq)          # catches its own errors
+        return 200, {"ok": True, "seq": seq}
+
     # ---- once per period -------------------------------------------------------------------
 
     def _on_tick(self) -> None:
@@ -404,6 +454,8 @@ class Gateway:
             "transmit errors": self._delta("tx", c.tx_errors),
             "output write errors": self._delta("write", c.write_errors),
             "log.txt write errors": self._delta("logfile", c.event_log_errors),
+            "commands refused by the rate limit": self._delta("cmd rate", c.commands_rate_limited),
+            "commands not sent (link down)": self._delta("cmd link", c.commands_link_down),
         }
         found = [f"{count} {what}" for what, count in problems.items() if count > 0]
         if found:

@@ -104,6 +104,8 @@ every minute:  rtc.send()                ─► 0x051, identical to UhaGate6
 | `status.py` | content of `uha_status.json` |
 | `gateway.py` | the event loop: serial link, packet handling, timers, summaries |
 | `db_log.py` | (0.3.0) VARS2 log into SQLite: collects intervals in the loop, one writer thread does all disk work |
+| `commands.py` | (0.5.0) command channel logic: CN from the client DN, value check, packet `0x52` bytes, rate limit |
+| `api.py` | (0.5.0) control API on 127.0.0.1 (`GET /api/commands`, `POST /api/cmd`), stdlib HTTP server thread |
 
 ### Values (0.2.0: VARS2 only)
 
@@ -346,6 +348,46 @@ refreshed every 20 s, so `WS/js/uha-common.js` (`ageClass()`) no longer greys th
 node is silent or being flashed) gets one invalid row (`NULL`) in `events`, so Grafana does not draw its last state on
 as if it were still true. The Grafana state timelines add the last state again at the range end / now, so the current
 state is drawn up to the right edge.
+
+### Command channel (0.5.0, 2026-11-17)
+Task: `tasks/control_web_api.md`, spec `UHA_FW/UHA_COMMON/VarDefs/CMD_spec.md`. The control page
+`https://ctrl.uha.mkresta.cz` (client certificate, `UHA/ca/`, `UHA/nginx/`) sends commands; the gateway forwards them to
+ELECON as RPISERP packet `0x52`, ELECON to the target node (CAN `0x200 + node`). Feedback = the node's VARS2 state.
+
+- `vars_def.py`: optional YAML section `commands:` (id, name, target, type, min, max, unit, state, desc), checked like
+  the FW generator: unique id/name, `CMD_` prefix, id in the target's range (node id × 100 .. +99), target not RPI, known
+  type, min <= max (whole numbers for integer types), `state` produced by the target. A broken section = no start.
+- `api.py`: `ThreadingHTTPServer` (stdlib) on `127.0.0.1:<api-port>` in its own thread. The request thread only parses
+  and checks; the send runs in the asyncio loop (`loop.call_soon_threadsafe`, answer awaited ≤ 3 s), so serial port,
+  seq, rate limit and DB stay single-threaded. Errors: 400 unknown command / bad value / bad body, 403 no `X-Client-DN`
+  (or a foreign `Origin`), 404 other paths, 405 other methods, 411/413 body length, 415 not `application/json`
+  (CSRF: an HTML form cannot send it), 429 rate limit, 503 link down / loop busy. Values are not checked against
+  min/max (the node clamps, spec "Principles"), only against the type.
+- Packet `0x52`: `target | cmd id u16 LE | value 4 B LE (float32 / int32 / uint32; bool, enum as int32) | seq`, seq
+  0..255 per gateway start. Rate limit 10/s and 20/min (sliding windows, never more than ELECON's fixed windows).
+- Log: journal `command CMD_X = v from <CN> (seq n, id i, to NODE)`; DB table
+  `commands(ts, user, cmd_id, value, seq)` (kept forever; handed to the writer at once; while the DB is not ready up
+  to 1000 wait in memory). `uha_status.json` -> `Commands` (Defined, Sent, RateLimited, LinkDown, Last, Api).
+- Config `api-port` (0 = off; `uhagatepy.conf`: 8091), `api-origin` (default `https://ctrl.uha.mkresta.cz`).
+- `tools/fake_elecon.py` prints received `0x52` packets (own decoding) and sets the command's state like the node.
+- Tests: `tests/test_commands.py` (YAML rules, packet bytes, rate limit, gateway send, the real HTTP server, DB rows),
+  fixtures `cmd_vars.yaml` and `commands_pilot.yaml` (the 12 IOBOARD_U lights of spec section 6, appended to the real
+  YAML until the FW commits its `commands:` section).
+- Checked on the Pi with a separate test instance + fake ELECON (production untouched): full path through nginx with a
+  client certificate, forged `X-Client-DN` overwritten by nginx, CSRF checks, revoked certificate refused, 429 after
+  20/min, 503 with the link down, rows in `commands`.
+- **In production since 2026-11-17 12:3x** (Martin approved the restart). The real YAML already had the FW's
+  `commands:` section (UHA_COMMON `e0cfb05`, the 12 IOBOARD_U lights; same ids / names / states as the pilot fixture).
+  Start-up: `API: listening on 127.0.0.1:8091, 12 commands`, link and DB log continue, 302 variables fresh.
+  Backup of the 0.4.2 folder: `/home/pi/UhaGatePy-backup-0.4.2` (rollback: copy back, restart). No command was sent
+  from the agent to the real link; the end-to-end check (after flashing ELECON + IOBOARD_U) is Martin's.
+
+**0.5.1 (2026-11-17):** `GET /api/log?limit=n` (default 50, max 200): the newest rows of the DB table `commands`
+with the command name and desc (an id no longer in the YAML is shown as `#id`); 503 without `log-db`. The request
+thread opens its own read-only SQLite connection (WAL: does not block the writer). The control page shows the last
+30 commands ("Poslední příkazy"), refreshed every 15 s and right after a send. nginx proxies `GET /api/log` as well.
+First real use (2026-11-17 12:46, `martin-pc`, after ELECON + IOBOARD_U were flashed): 10 commands, every state
+changed within 1 s (`events`), no drops.
 
 ### Still to do
 1. Watch the 10-minute summaries in the journal for `OFFSET` (a warning is logged) for a few days.
