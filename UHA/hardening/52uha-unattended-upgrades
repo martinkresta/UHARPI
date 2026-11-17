@@ -1,0 +1,10 @@
+// UHA hardening 2026-11-17 (UHARPI/UHA/hardening/README.md). Installed as /etc/apt/apt.conf.d/52uha-unattended-upgrades.
+// Adds to Debian's 50unattended-upgrades (which already has origin=Debian,codename=bookworm-security).
+Unattended-Upgrade::Origins-Pattern {
+        "origin=Debian,codename=${distro_codename}-security,label=Debian-Security";
+        "origin=Raspberry Pi Foundation,codename=${distro_codename},label=Raspberry Pi Foundation";
+        "site=apt.grafana.com";
+};
+Unattended-Upgrade::Automatic-Reboot "false";
+Unattended-Upgrade::Remove-Unused-Dependencies "false";
+Unattended-Upgrade::SyslogEnable "true";
