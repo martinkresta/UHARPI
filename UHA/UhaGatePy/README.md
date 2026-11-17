@@ -376,6 +376,11 @@ ELECON as RPISERP packet `0x52`, ELECON to the target node (CAN `0x200 + node`).
 - Checked on the Pi with a separate test instance + fake ELECON (production untouched): full path through nginx with a
   client certificate, forged `X-Client-DN` overwritten by nginx, CSRF checks, revoked certificate refused, 429 after
   20/min, 503 with the link down, rows in `commands`.
+- **In production since 2026-11-17 12:3x** (Martin approved the restart). The real YAML already had the FW's
+  `commands:` section (UHA_COMMON `e0cfb05`, the 12 IOBOARD_U lights; same ids / names / states as the pilot fixture).
+  Start-up: `API: listening on 127.0.0.1:8091, 12 commands`, link and DB log continue, 302 variables fresh.
+  Backup of the 0.4.2 folder: `/home/pi/UhaGatePy-backup-0.4.2` (rollback: copy back, restart). No command was sent
+  from the agent to the real link; the end-to-end check (after flashing ELECON + IOBOARD_U) is Martin's.
 
 ### Still to do
 1. Watch the 10-minute summaries in the journal for `OFFSET` (a warning is logged) for a few days.
