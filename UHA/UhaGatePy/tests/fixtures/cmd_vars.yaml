@@ -28,8 +28,11 @@ commands:
     unit: "%"
     state: ST_LIGHT_LOFT_WEST
     desc: Loft west light, 0 = off, 100 = on
+    category: light
   - {id: 202, name: CMD_LIGHT_LOFT_EAST_1, target: IOBOARD_U, type: uint32, min: 0, max: 100, unit: "%",
      state: ST_LIGHT_LOFT_EAST_1, desc: Loft east 1}
   - {id: 250, name: CMD_SCREEN_EAST, target: IOBOARD_U, type: enum, enum: BlindCmd, state: ST_SCREEN_EAST,
-     desc: East sunscreen}
-  - {id: 299, name: CMD_TEST_FLOAT, target: IOBOARD_U, type: float, min: -2.5, max: 2.5, state: ST_LIGHT_LOFT_WEST}
+     desc: East sunscreen, category: blind}
+  - {id: 299, name: CMD_TEST_FLOAT, target: IOBOARD_U, type: float, min: -2.5, max: 2.5, state: ST_LIGHT_LOFT_WEST,
+     step: 0.5, category: heating}
+  - {id: 298, name: CMD_TEST_BOOL, target: IOBOARD_U, type: bool, state: ST_LIGHT_LOFT_WEST}

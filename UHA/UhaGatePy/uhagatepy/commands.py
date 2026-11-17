@@ -9,13 +9,15 @@ Pure logic, no I/O (tested without a serial port):
                  clear 429 instead of commands silently dropped by ELECON. Sliding windows: never more than
                  ELECON's fixed windows allow.
 
-The value is not checked against min / max: the target node clamps it (spec "Principles").
+The value is not checked against min / max (nor an enum number against the items): the target node clamps it
+(spec "Principles"). Only the type is checked: integers for uint32 / int32, numbers for float, 0 / 1 / true / false
+for bool, the item number or name for enum.
 """
 import collections
 import math
 import re
 import struct
-from typing import Deque, Optional, Union
+from typing import Deque, Dict, Optional, Union
 
 from .vars_def import CmdDef
 
@@ -41,10 +43,22 @@ def user_from_dn(dn: Optional[str]) -> Optional[str]:
     return name or None
 
 
-def check_value(cmd: CmdDef, value) -> Union[int, float]:
-    """The value from the request as the number that will be sent. Raises BadValue."""
+def check_value(cmd: CmdDef, value, enums: Optional[Dict[str, Dict[int, str]]] = None) -> Union[int, float]:
+    """The value from the request as the number that will be sent. Raises BadValue.
+
+    bool: 0 / 1 or true / false. enum: the item number or its name (names from `enums`, VarsFile.enums).
+    """
+    if cmd.type == "bool" and isinstance(value, bool):
+        return int(value)
+    if cmd.type == "enum" and isinstance(value, str):
+        items = (enums or {}).get(cmd.enum, {})
+        for number, name in items.items():
+            if name == value:
+                return number
+        raise BadValue(f"unknown item '{value}' of enum {cmd.enum}")
     if isinstance(value, bool) or not isinstance(value, (int, float)):
-        raise BadValue("value must be a number")
+        raise BadValue("value must be a number" + (" or an item name" if cmd.type == "enum" else
+                                                   " or true / false" if cmd.type == "bool" else ""))
     if not math.isfinite(value):
         raise BadValue("value must be finite")
     if cmd.type == "float":

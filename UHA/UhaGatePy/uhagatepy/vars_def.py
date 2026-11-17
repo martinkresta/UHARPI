@@ -31,6 +31,7 @@ from .legacy_table import NAME_TO_ID
 _ID_TO_NAME = {var_id: name for name, var_id in NAME_TO_ID.items()}
 
 TYPES = ("float", "int32", "uint32", "bool", "enum")
+CATEGORIES = ("light", "blind", "heating", "inverter", "ventilation")   # commands: category (UI grouping)
 _RANGE = re.compile(r"\{(\d+)\.\.(\d+)\}")
 
 
@@ -69,6 +70,8 @@ class CmdDef:
     unit: str
     state: str           # VARS2 state variable (feedback), produced by the target
     desc: str
+    step: float = 0.0    # UI hint for the number input (0 = none); not used by the gateway or the FW
+    category: str = ""   # UI grouping (CATEGORIES), "" = none
 
 
 @dataclass
@@ -249,10 +252,18 @@ def _commands(section, nodes: Dict[str, int], enums: Dict[str, Dict[int, str]],
             _fail(f"{where}: state '{state}' is not a variable")
         if producers[state] != target:
             _fail(f"{where}: state {state} is produced by {producers[state]}, not by the target {target}")
+        step = 0.0
+        if "step" in entry:
+            step = _number(entry["step"], f"{where}: step")
+            if step <= 0:
+                _fail(f"{where}: step must be > 0")
+        category = entry.get("category") or ""
+        if category and category not in CATEGORIES:
+            _fail(f"{where}: unknown category '{category}' (allowed: {', '.join(CATEGORIES)})")
         ids.add(cmd_id)
         commands[name] = CmdDef(id=cmd_id, name=name, target=target, target_id=node_id, type=ctype, enum=enum,
                                 min=low, max=high, unit=str(entry.get("unit", "")), state=state,
-                                desc=str(entry.get("desc", "")))
+                                desc=str(entry.get("desc", "")), step=step, category=str(category))
     return commands
 
 

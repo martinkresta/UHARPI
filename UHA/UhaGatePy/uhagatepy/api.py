@@ -1,10 +1,12 @@
 """HTTP API for the control web (CMD_spec.md section 1), on 127.0.0.1 only. nginx (ctrl.uha.mkresta.cz, client
 certificate required) proxies /api/ here and sets X-Client-DN.
 
-    GET  /api/commands                         -> 200 [{id, name, target, type, min, max, state, unit, desc}, ...]
+    GET  /api/commands                         -> 200 [{id, name, target, type, min, max, state, unit, desc, step,
+                                                  category, enum (type enum: {number: name})}, ...]
     GET  /api/log?limit=n                      -> 200 [{ts, user, cmd, desc, value, seq}, ...] newest first (n <= 200,
                                                   default 50), from the DB table commands; 503 without the DB log
-    POST /api/cmd  {"cmd": name, "value": n}   -> 200 {"ok": true, "seq": n}
+    POST /api/cmd  {"cmd": name, "value": v}   -> 200 {"ok": true, "seq": n}   (v: number; bool also true/false,
+                                                  enum also the item name)
          400 unknown command / bad value or body, 403 no X-Client-DN (or a foreign Origin), 415 not JSON,
          429 over the rate limit, 503 serial link down
 
@@ -48,7 +50,7 @@ Execute = Callable[[CmdDef, object, str], Tuple[int, dict]]
 
 def command_list(defs: VarsFile) -> list:
     return [{"id": c.id, "name": c.name, "target": c.target, "type": c.type, "min": c.min, "max": c.max,
-             "state": c.state, "unit": c.unit, "desc": c.desc,
+             "state": c.state, "unit": c.unit, "desc": c.desc, "step": c.step or None, "category": c.category,
              **({"enum": defs.enums[c.enum]} if c.type == "enum" else {})}
             for c in defs.commands.values()]
 
@@ -246,12 +248,12 @@ class _Handler(BaseHTTPRequestHandler):
         except (UnicodeDecodeError, ValueError):
             return self._error(400, "body is not valid JSON")
         if not isinstance(body, dict) or not isinstance(body.get("cmd"), str) or "value" not in body:
-            return self._error(400, 'body must be {"cmd": "<name>", "value": <number>}')
+            return self._error(400, 'body must be {"cmd": "<name>", "value": <number | bool | enum name>}')
         cmd = self.api.defs.commands.get(body["cmd"])
         if cmd is None:
             return self._error(400, "unknown command")
         try:
-            value = commands.check_value(cmd, body["value"])
+            value = commands.check_value(cmd, body["value"], self.api.defs.enums)
         except commands.BadValue as e:
             return self._error(400, str(e))
         status, answer = self.api.run_in_loop(cmd, value, user)
