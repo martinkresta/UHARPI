@@ -9,6 +9,8 @@ It creates a pseudo-terminal, links it to /tmp/fake_elecon (--link) and then sen
   - with --old also in the old format (packet 0x221), which the gateway must ignore,
   - a node log message (0x620) every 20 s,
 and prints the RTC sync packets (0x051) it receives from the gateway.
+Command packets (0x52, CMD_spec.md section 2) are printed decoded; like the target node it then sets the command's
+`state` variable to the value (clamped to min..max), sends it at once and keeps it (no more random walk).
 The frames are built here with plain struct calls (not with the gateway's tunnel module), so the test
 does not simply repeat the gateway's own mistakes.
 """
@@ -84,6 +86,10 @@ def main() -> None:
     due = {i: now + rng.uniform(0, d.period_ms / 1000) for i, d in defs.by_id.items()}
     sent = {"old": 0, "tunnel": 0, "log": 0, "dropped": 0}
     rtc_seen = 0
+    commands_seen = 0
+    commands = {c.id: c for c in defs.commands.values()}
+    state_ids = {d.name: i for i, d in defs.by_id.items()}
+    held = set()                                 # state variables set by a command: no random walk
     next_log = now + 5
     end = now + args.seconds if args.seconds else None
     parser_rx = rpiserp.Parser()
@@ -94,7 +100,8 @@ def main() -> None:
             for var_id, when in due.items():
                 if when <= now:
                     d = defs.by_id[var_id]
-                    values[var_id] = next_value(rng, d, values[var_id], defs.enums)
+                    if var_id not in held:
+                        values[var_id] = next_value(rng, d, values[var_id], defs.enums)
                     frames.append(tunnel_frame(defs, d, values[var_id]))
                     sent["tunnel"] += 1
                     if args.old:
@@ -117,11 +124,33 @@ def main() -> None:
                     if packet.id == 0x051:
                         rtc_seen += 1
                         print(f"RTC sync received: {int.from_bytes(packet.data, 'big')}", flush=True)
+                    elif packet.id == 0x052:
+                        commands_seen += 1
+                        on_command(packet.data, commands, defs, state_ids, values, due, held)
     except KeyboardInterrupt:
         pass
     finally:
         os.unlink(args.link)
-        print(f"fake ELECON done: sent {sent}, RTC syncs received {rtc_seen}", flush=True)
+        print(f"fake ELECON done: sent {sent}, RTC syncs received {rtc_seen}, commands received {commands_seen}",
+              flush=True)
+
+
+def on_command(data, commands, defs, state_ids, values, due, held):
+    """Packet 0x52: target | cmd id u16 LE | value 4 B LE | seq. Act like the target node: set the state."""
+    if len(data) != 8:
+        print(f"command packet with {len(data)} data bytes - dropped", flush=True)
+        return
+    target, cmd_id, raw, seq = data[0], struct.unpack("<H", data[1:3])[0], data[3:7], data[7]
+    cmd = commands.get(cmd_id)
+    if cmd is None:
+        print(f"command id {cmd_id} for node {target} (seq {seq}): unknown id - ignored", flush=True)
+        return
+    value = struct.unpack("<f" if cmd.type == "float" else "<I" if cmd.type == "uint32" else "<i", raw)[0]
+    print(f"command received: {cmd.name} = {value} for node {target} (seq {seq})", flush=True)
+    state = state_ids[cmd.state]
+    values[state] = min(max(value, cmd.min), cmd.max)
+    held.add(state)
+    due[state] = time.monotonic()                # the node sends a changed state at once (send: on_change)
 
 
 if __name__ == "__main__":

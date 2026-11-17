@@ -27,6 +27,8 @@ Tables (time = UTC unix seconds, ts = start of the interval, a multiple of its l
   counter_state  var_id, ts, value - last counter value of each delta variable, so a restart continues the deltas
   events         var_id, ts, value - one row per change of an event variable (ts = receive time; two changes in
                  one second: the last one is kept), kept forever
+  commands       ts, user, cmd_id, value, seq - every command sent by the control web (on_command), kept forever.
+                 Handed to the writer at once (not with the 60 s batch); before the DB is ready they wait in memory.
 """
 import os
 import queue
@@ -49,6 +51,7 @@ NTP_RETRY_S = 10             # re-check the NTP state while waiting
 ERROR_REPEAT_S = 600         # the same error is logged at most once in this time
 SPACE_WARN_S = 3600          # "not writing, no space" at most once an hour
 QUEUE_BATCHES = 30           # batches the loop may hand over before the writer catches up (30 min)
+MAX_PENDING_COMMANDS = 1000  # commands kept in memory while the DB is not ready
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS vars (id INTEGER PRIMARY KEY, name TEXT, unit TEXT, log_s INTEGER, agg TEXT);
@@ -56,6 +59,7 @@ CREATE TABLE IF NOT EXISTS raw (var_id INTEGER, ts INTEGER, value REAL, PRIMARY 
 CREATE TABLE IF NOT EXISTS agg_15min (var_id INTEGER, ts INTEGER, value REAL, PRIMARY KEY (var_id, ts)) WITHOUT ROWID;
 CREATE TABLE IF NOT EXISTS counter_state (var_id INTEGER PRIMARY KEY, ts INTEGER, value REAL);
 CREATE TABLE IF NOT EXISTS events (var_id INTEGER, ts INTEGER, value REAL, PRIMARY KEY (var_id, ts)) WITHOUT ROWID;
+CREATE TABLE IF NOT EXISTS commands (ts INTEGER, user TEXT, cmd_id INTEGER, value REAL, seq INTEGER);
 """
 
 # AVG or SUM of the raw rows per variable and 15 min window. "vars CROSS JOIN raw" makes SQLite loop over the
@@ -90,6 +94,7 @@ class Batch:
     counters: List[Tuple[int, int, float]]                # (var_id, ts, value) for counter_state
     closed_until: int                                     # all 60 s intervals before this time are in `rows`
     events: List[Tuple[int, int, Optional[float]]] = field(default_factory=list)   # (var_id, ts, value) for events
+    commands: List[Tuple[int, str, int, float, int]] = field(default_factory=list)  # (ts, user, cmd_id, value, seq)
 
 
 @dataclass
@@ -103,6 +108,7 @@ class Stats:
     dropped_batches: int = 0    # queue full (writer too slow or stuck)
     write_errors: int = 0
     event_rows: int = 0         # rows written into events
+    command_rows: int = 0       # rows written into commands
     max_write_ms: float = 0.0
     reported: Dict[str, int] = field(default_factory=dict)
 
@@ -131,6 +137,7 @@ class DbLog:
         self._ev_last: Dict[int, Optional[float]] = {}    # event: var_id -> value last stored (None = invalid)
         self._ev_rows: List[Tuple[int, int, Optional[float]]] = []
         self._ev_seen: Dict[int, int] = {}                # event: var_id -> unix time of the last frame
+        self._cmd_rows: List[Tuple[int, str, int, float, int]] = []   # commands not yet handed to the writer
         self._queue: "queue.Queue[Optional[Batch]]" = queue.Queue(maxsize=QUEUE_BATCHES)
         self._writer = _Writer(self, defs) if self.enabled else None
 
@@ -176,6 +183,26 @@ class DbLog:
         except Exception:
             _log_error("on_value", "error while collecting a value", exc=True)
 
+    def on_command(self, unix: int, user: str, cmd_id: int, value: float, seq: int) -> None:
+        """A command was sent (from Gateway.execute_command): one row in `commands`."""
+        if not self.enabled:
+            return
+        try:
+            if len(self._cmd_rows) >= MAX_PENDING_COMMANDS:
+                _log_error("commands", "%d commands waiting for the database, the oldest is dropped",
+                           len(self._cmd_rows))
+                self._cmd_rows.pop(0)
+            self._cmd_rows.append((int(unix), str(user), int(cmd_id), float(value), int(seq)))
+            if self.ready:
+                batch = Batch([], [], 0, [], self._cmd_rows)
+                self._cmd_rows = []
+                self._queue.put_nowait(batch)
+        except queue.Full:
+            self.stats.dropped_batches += 1
+            _log_error("queue", "writer is behind, a command row was dropped (queue full)")
+        except Exception:
+            _log_error("on_command", "error while logging a command", exc=True)
+
     def _on_event(self, var_id: int, value: float, valid: bool, unix: int) -> None:
         """Event variable: a row only when value or valid differ from what was stored last (first value: always)."""
         try:
@@ -215,7 +242,7 @@ class DbLog:
         if not self.enabled or not self._writer.is_alive():
             return
         try:
-            if self.ready and (self._rows or self._ev_rows):
+            if self.ready and (self._rows or self._ev_rows or self._cmd_rows):
                 self._send(closed_until=0)
             self._queue.put(None, timeout=2)
         except Exception:
@@ -232,7 +259,7 @@ class DbLog:
             "Enabled": self.enabled, "Writing": self.ready and not (w and w.space_blocked),
             "State": w.state if w else "off",
             "Rows": s.rows, "NullRows": s.null_rows, "Batches": s.batches, "AggRows": s.agg_rows,
-            "EventRows": s.event_rows, "SkippedBatches": s.skipped_batches, "DroppedBatches": s.dropped_batches, "WriteErrors": s.write_errors,
+            "EventRows": s.event_rows, "CommandRows": s.command_rows, "SkippedBatches": s.skipped_batches, "DroppedBatches": s.dropped_batches, "WriteErrors": s.write_errors,
             "DbMb": round(w.db_bytes / 1e6, 1) if w else None, "FreeMb": int(w.free_bytes / 1e6) if w else None,
             "LastWriteUnix": w.last_write_unix if w else None,
         }
@@ -304,9 +331,10 @@ class DbLog:
 
     def _send(self, closed_until: int) -> None:
         counters = [(var_id, ts, value) for var_id, (ts, value) in self._prev.items()]
-        batch = Batch(self._rows, counters, closed_until, self._ev_rows)
+        batch = Batch(self._rows, counters, closed_until, self._ev_rows, self._cmd_rows)
         self._rows = []
         self._ev_rows = []
+        self._cmd_rows = []
         try:
             self._queue.put_nowait(batch)
         except queue.Full:
@@ -519,6 +547,8 @@ class _Writer(threading.Thread):
                             batch.counters)
             # same second twice: the later row replaces the earlier one (the last change is kept)
             con.executemany("INSERT OR REPLACE INTO events (var_id, ts, value) VALUES (?, ?, ?)", batch.events)
+            con.executemany("INSERT INTO commands (ts, user, cmd_id, value, seq) VALUES (?, ?, ?, ?, ?)",
+                            batch.commands)
             agg_rows = self._aggregate(batch.closed_until) if batch.closed_until else 0
             con.execute("COMMIT")
         except sqlite3.Error as e:
@@ -534,6 +564,7 @@ class _Writer(threading.Thread):
         s.rows += len(batch.rows)
         s.null_rows += sum(1 for row in batch.rows if row[2] is None)
         s.event_rows += len(batch.events)
+        s.command_rows += len(batch.commands)
         s.batches += 1
         s.agg_rows += agg_rows
         s.max_write_ms = max(s.max_write_ms, ms)

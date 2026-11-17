@@ -43,7 +43,8 @@ server {
 	include snippets/uha-grafana-public.conf;
 }
 
-# --- https://ctrl.uha.mkresta.cz: placeholder
+# --- https://ctrl.uha.mkresta.cz: control page + command API, ONLY with a client certificate of the UHA CA
+#     (UHA/ca/README.md). Without one nginx answers 400 "No required SSL certificate was sent".
 server {
 	listen 443 ssl http2;
 	listen [::]:443 ssl http2;
@@ -53,8 +54,37 @@ server {
 	ssl_certificate_key /etc/letsencrypt/live/uha.mkresta.cz/privkey.pem;
 	include snippets/uha-tls.conf;
 
-	# step 3: ssl_verify_client on; control UI + /api/
+	ssl_client_certificate /etc/nginx/uha-ca/ca.crt;     # UHA/ca/deploy_ca.sh
+	ssl_verify_client      on;
+	ssl_verify_depth       1;
+	ssl_crl                /etc/nginx/uha-ca/crl.pem;    # revoked devices (revoke.sh + deploy_ca.sh)
+
+	add_header Cache-Control "no-store" always;
+	add_header X-Frame-Options "DENY" always;
+	add_header Content-Security-Policy "default-src 'self'; frame-ancestors 'none'" always;
+
+	root /home/pi/Web/control;                           # from UHARPI/WS/control/
+	index index.html;
+
 	location / {
-		return 403;
+		try_files $uri $uri/ =404;
+	}
+
+	# states for the feedback: the same file as on the monitoring site, read only
+	location = /uha2.json {
+		alias /home/pi/Web/uha2.json;
+	}
+
+	# UhaGatePy control API (api-port in uhagatepy.conf); only these two
+	location = /api/commands {
+		limit_except GET { deny all; }
+		include snippets/uha-ctrl-api.conf;
+	}
+	location = /api/cmd {
+		limit_except POST { deny all; }
+		include snippets/uha-ctrl-api.conf;
+	}
+	location /api/ {
+		return 404;
 	}
 }

@@ -14,6 +14,9 @@ Rules (see VARS2_spec.md section 3 and the header of uha_vars.yaml):
   - `timeout_ms: auto` means 3 x period_ms
   - `count: n` makes an array: ids id .. id+n-1, names NAME_1 .. NAME_n and the legacy
     name 'VAR_BMS1_CELL{1..16}_MV' becomes VAR_BMS1_CELL1_MV .. VAR_BMS1_CELL16_MV
+  - `commands:` (optional, CMD_spec.md section 5): requests the web sends to a node. Checked like the FW generator
+    does: unique id / name (CMD_ prefix), id in the target's range (node id x 100 .. +99), target a node but not
+    RPI, known type, min <= max, `state` a variable produced by the target. Missing section = no commands.
 A broken file raises VarsDefError with the reason - the gateway then refuses to start.
 """
 import hashlib
@@ -53,6 +56,21 @@ class VarDef:
     send: str = "periodic"   # periodic | on_change (firmware TX mode; not used by the gateway)
 
 
+@dataclass(frozen=True)
+class CmdDef:
+    id: int              # command id (CMD_spec section 5: target node id x 100 .. +99)
+    name: str            # CMD_...
+    target: str          # node name
+    target_id: int       # node id (byte 0 of the 0x52 packet)
+    type: str            # float | int32 | uint32 | bool | enum
+    enum: str            # enum name when type is enum, else ""
+    min: float
+    max: float
+    unit: str
+    state: str           # VARS2 state variable (feedback), produced by the target
+    desc: str
+
+
 @dataclass
 class VarsFile:
     version: int
@@ -62,6 +80,7 @@ class VarsFile:
     enums: Dict[str, Dict[int, str]]  # enum name -> {number: name}
     by_id: Dict[int, VarDef]          # VARS2 id == old variable id
     warnings: List[str] = field(default_factory=list)   # harmless differences to the old table, to be logged
+    commands: Dict[str, CmdDef] = field(default_factory=dict)   # name -> command, in file order
 
 
 def _fail(message: str) -> None:
@@ -163,9 +182,78 @@ def _build(data: dict, sha: str) -> VarsFile:
                     period_ms=period, timeout_ms=timeout, on_can=bool(item.get("on_can", True)),
                     log_s=log_s, agg=agg, send=send)
 
+    commands = _commands(data.get("commands"), nodes, enums, by_id)
     return VarsFile(version=int(data.get("version", 0)), sha=sha, nodes=nodes,
                     node_names={number: name for name, number in nodes.items()}, enums=enums, by_id=by_id,
-                    warnings=warnings)
+                    warnings=warnings, commands=commands)
+
+
+_INT_LIMITS = {"int32": (-2 ** 31, 2 ** 31 - 1), "uint32": (0, 2 ** 32 - 1), "bool": (0, 1),
+               "enum": (-2 ** 31, 2 ** 31 - 1)}
+
+
+def _number(value, what: str) -> float:
+    if not isinstance(value, (int, float)) or isinstance(value, bool):
+        _fail(f"{what} must be a number")
+    return float(value)
+
+
+def _commands(section, nodes: Dict[str, int], enums: Dict[str, Dict[int, str]],
+              by_id: Dict[int, VarDef]) -> Dict[str, CmdDef]:
+    """The `commands:` list (CMD_spec.md section 5)."""
+    if section is None:
+        return {}
+    if not isinstance(section, list):
+        _fail("commands must be a list")
+    producers = {d.name: d.producer for d in by_id.values()}
+    commands: Dict[str, CmdDef] = {}
+    ids = set()
+    for entry in section:
+        if not isinstance(entry, dict):
+            _fail("every entry of commands must be a mapping")
+        name = str(entry.get("name", ""))
+        where = f"command {name or entry.get('id')}"
+        if not name.startswith("CMD_"):
+            _fail(f"{where}: name must start with CMD_")
+        cmd_id = entry.get("id")
+        if not isinstance(cmd_id, int) or isinstance(cmd_id, bool):
+            _fail(f"{where}: id must be an integer")
+        if cmd_id in ids or name in commands:
+            _fail(f"{where}: duplicate command id {cmd_id} or name")
+        target = entry.get("target")
+        if target not in nodes or target == "RPI":
+            _fail(f"{where}: target '{target}' must be a node from nodes (not RPI)")
+        node_id = nodes[target]
+        if not node_id * 100 <= cmd_id <= node_id * 100 + 99:
+            _fail(f"{where}: id {cmd_id} is outside the range of {target} ({node_id * 100}..{node_id * 100 + 99})")
+        ctype = entry.get("type")
+        if ctype not in TYPES:
+            _fail(f"{where}: unknown type '{ctype}'")
+        enum = entry.get("enum") or ""
+        if ctype == "enum" and enum not in enums:
+            _fail(f"{where}: unknown enum '{enum}'")
+        if ctype == "bool":
+            low, high = _number(entry.get("min", 0), f"{where}: min"), _number(entry.get("max", 1), f"{where}: max")
+        elif ctype == "enum" and "min" not in entry and "max" not in entry:
+            low, high = float(min(enums[enum])), float(max(enums[enum]))
+        else:
+            low, high = _number(entry.get("min"), f"{where}: min"), _number(entry.get("max"), f"{where}: max")
+        if low > high:
+            _fail(f"{where}: min {low:g} > max {high:g}")
+        if ctype in _INT_LIMITS:
+            lo, hi = _INT_LIMITS[ctype]
+            if low < lo or high > hi or low != int(low) or high != int(high):
+                _fail(f"{where}: min / max must be whole numbers in {lo}..{hi} for type {ctype}")
+        state = entry.get("state")
+        if state not in producers:
+            _fail(f"{where}: state '{state}' is not a variable")
+        if producers[state] != target:
+            _fail(f"{where}: state {state} is produced by {producers[state]}, not by the target {target}")
+        ids.add(cmd_id)
+        commands[name] = CmdDef(id=cmd_id, name=name, target=target, target_id=node_id, type=ctype, enum=enum,
+                                min=low, max=high, unit=str(entry.get("unit", "")), state=state,
+                                desc=str(entry.get("desc", "")))
+    return commands
 
 
 def _expand_legacy(legacy: str, index: int) -> str:

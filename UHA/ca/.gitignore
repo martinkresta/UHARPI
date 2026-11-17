@@ -1,0 +1,13 @@
+# Never commit CA or client keys / certificates / PKCS#12 files (the CA lives in ~/uha-ca, outside the repo).
+*.key
+*.pem
+*.crt
+*.csr
+*.p12
+*.pfx
+private/
+clients/
+newcerts/
+index.txt*
+serial*
+crlnumber*

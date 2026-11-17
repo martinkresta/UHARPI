@@ -54,6 +54,7 @@ checksum = 8-bit sum of all preceding frame bytes (from `0x7F`).
 | `0x620` (`CMD_LOG_MSG`) | STM32 → RPi | 8-byte log event (node-id, event-type, data) |
 | `0x50` (`CMD_RPI_VAR_VALUE`) | RPi → STM32 | Send a variable value to nodes |
 | `0x51` (`CMD_RPI_RTC_SYNC`) | RPi → STM32 | 4 B big-endian local time = unix + 3600 (+3600 in DST), every minute change |
+| `0x52` (`CMD_RPI_COMMAND`) | RPi → ELECON | command from the control web: target, cmd id u16 LE, value 4 B LE, seq (UhaGatePy 0.5.0, `CMD_spec.md`) |
 
 A background pthread (`RPISERP_Start`) reads serial continuously. `UHA_ProcessMessage()` drains the buffer in a tight loop in `Main.cpp`.
 
@@ -219,9 +220,15 @@ Changing the firewall: always with the 5-min auto-revert from `UHA/hardening/REA
 
 ## Public HTTPS (2026-11-17, `UHA/nginx/`)
 
-`https://uha.mkresta.cz` (dashboard + `/grafana/`) and `https://ctrl.uha.mkresta.cz` (403 placeholder for the step-3
-mTLS control UI), IPv6 only (AAAA → `2a00:1028:83d2:4216::10`), Let's Encrypt cert via `certbot certonly --nginx`
+`https://uha.mkresta.cz` (dashboard + `/grafana/`) and `https://ctrl.uha.mkresta.cz` (control page, step 3a),
+IPv6 only (AAAA → `2a00:1028:83d2:4216::10`), Let's Encrypt cert via `certbot certonly --nginx`
 (auto-renew, reloads nginx). Separate site `uha-public`; the LAN site `default` (`http://192.168.1.10/`) is unchanged.
+
+**Control (step 3a, 2026-11-17):** `ctrl.uha.mkresta.cz` requires a client certificate of the own CA (`UHA/ca/`,
+CA key in `~/uha-ca` on the PC, never in the repo; only `ca.crt` + `crl.pem` on the Pi). Page `WS/control/` →
+`/home/pi/Web/control/`; `/api/` → UhaGatePy 0.5.0 API on `127.0.0.1:8091` (`api.py`, `api-port`), which sends
+RPISERP `0x52` (`UHA_FW/UHA_COMMON/VarDefs/CMD_spec.md`) and logs every command (journal + DB table `commands`).
+Commands are defined in the YAML section `commands:` (owned by the FW side).
 
 ---
 

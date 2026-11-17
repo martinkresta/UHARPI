@@ -1,0 +1,29 @@
+/* UHA control page: deliberately plain (the look is refined later). */
+body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; margin: 0 auto; max-width: 720px;
+       padding: 12px 16px; background: #f6f7f9; color: #222; }
+header { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+h1 { font-size: 1.4rem; margin: 0 0 8px; }
+a { color: #0b5cad; }
+table { width: 100%; border-collapse: collapse; background: #fff; }
+th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #e3e5e8; vertical-align: middle; }
+th { font-size: 0.8rem; color: #666; font-weight: 600; }
+td.state { white-space: nowrap; }
+td.msg { font-size: 0.85rem; color: #666; min-width: 7em; }
+td.msg.error { color: #b00020; }
+td.msg.ok { color: #1b7f3b; }
+td.actions { white-space: nowrap; text-align: right; }
+button { font-size: 0.95rem; padding: 6px 12px; margin-left: 4px; border: 1px solid #aab; border-radius: 4px;
+         background: #fff; cursor: pointer; }
+button:disabled { opacity: 0.5; cursor: default; }
+button.on { border-color: #1b7f3b; }
+.badge { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 0.85rem; background: #e3e5e8; }
+.badge.on { background: #ffe58a; }
+.badge.unknown { background: #f3d1d6; }
+.note { font-size: 0.85rem; color: #666; }
+.note.error { color: #b00020; }
+@media (max-width: 480px) {
+  thead { display: none; }
+  td { display: block; border: 0; padding: 2px 4px; }
+  tr { display: block; border-bottom: 1px solid #e3e5e8; padding: 6px 0; }
+  td.actions { text-align: left; }
+}

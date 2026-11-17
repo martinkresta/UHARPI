@@ -1,0 +1,35 @@
+# Small definition file with a commands: section (CMD_spec.md section 5) for the unit tests.
+version: 3
+nodes: {IOBOARD_D: 1, IOBOARD_U: 2, TECHM: 3, ELECON: 4, RPI: 15}
+defaults: {type: float, timeout_ms: auto, on_can: true}
+enums:
+  BlindCmd: {0: None, 1: Up, 2: Down, 3: Stop}
+groups:
+  energy:
+    producer: ELECON
+    vars:
+      - {id: 10, name: BAT_SOC, legacy: VAR_BAT_SOC, unit: "%", period_ms: 1000}
+  States:
+    send: on_change
+    subgroups:
+      IoboardU:
+        producer: IOBOARD_U
+        vars:
+          - {id: 400, name: ST_LIGHT_LOFT_WEST, type: uint32, unit: "%", period_ms: 20000, agg: event}
+          - {id: 401, name: ST_LIGHT_LOFT_EAST_1, type: uint32, unit: "%", period_ms: 20000, agg: event}
+          - {id: 412, name: ST_SCREEN_EAST, type: enum, enum: BlindCmd, period_ms: 20000, agg: event}
+commands:
+  - id: 201
+    name: CMD_LIGHT_LOFT_WEST
+    target: IOBOARD_U
+    type: uint32
+    min: 0
+    max: 100
+    unit: "%"
+    state: ST_LIGHT_LOFT_WEST
+    desc: Loft west light, 0 = off, 100 = on
+  - {id: 202, name: CMD_LIGHT_LOFT_EAST_1, target: IOBOARD_U, type: uint32, min: 0, max: 100, unit: "%",
+     state: ST_LIGHT_LOFT_EAST_1, desc: Loft east 1}
+  - {id: 250, name: CMD_SCREEN_EAST, target: IOBOARD_U, type: enum, enum: BlindCmd, state: ST_SCREEN_EAST,
+     desc: East sunscreen}
+  - {id: 299, name: CMD_TEST_FLOAT, target: IOBOARD_U, type: float, min: -2.5, max: 2.5, state: ST_LIGHT_LOFT_WEST}
