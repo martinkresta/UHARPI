@@ -11,6 +11,8 @@ Pi: Debian 12 bookworm (oldstable, security updates via Debian LTS until mid-202
 | Firewall | `/etc/nftables.conf` (= `nftables.conf` here), `nftables.service` enabled | input policy drop, forward drop, output accept (details below) |
 | Updates | `unattended-upgrades` package (apt), `/etc/apt/apt.conf.d/52uha-unattended-upgrades` (= file here) | Debian security, Raspberry Pi archive, Grafana repo; `Automatic-Reboot "false"` |
 
+| Grafana major | `/etc/apt/preferences.d/grafana-13.pref` (= `grafana-13.pref` here) | apt pin: only `13.*` installable (prio 500), all other versions -1 → unattended-upgrades stays on 13.x |
+
 `/etc/apt/apt.conf.d/20auto-upgrades` (daily update + unattended-upgrade) was created by the package itself.
 Backups on the Pi: `/root/nftables.conf.orig-debian` (Debian's empty default), `/root/nft-before-hardening.conf`
 (the ruleset before: empty).
@@ -41,6 +43,9 @@ sudo cp /root/nftables.conf.orig-debian /etc/nftables.conf     # optional
 # Automatic updates off:
 sudo rm /etc/apt/apt.conf.d/52uha-unattended-upgrades
 sudo apt-get remove unattended-upgrades                         # or: set APT::Periodic::Unattended-Upgrade "0" in 20auto-upgrades
+
+# Grafana pin off (or change "13.*" to the next major when upgrading by hand):
+sudo rm /etc/apt/preferences.d/grafana-13.pref
 ```
 
 ## Changing the firewall safely

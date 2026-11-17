@@ -1,0 +1,9 @@
+# UHA hardening: keep Grafana on 13.x (also for unattended-upgrades). Installed as /etc/apt/preferences.d/grafana-13.pref
+# Major upgrade later by hand: change "13.*" to the new major, apt update, apt install grafana, check dashboards.
+Package: grafana
+Pin: version 13.*
+Pin-Priority: 500
+
+Package: grafana
+Pin: version *
+Pin-Priority: -1
