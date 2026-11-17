@@ -55,6 +55,16 @@ ssh uharpi 'sudo systemctl stop fw-revert.timer && sudo install -m 755 /tmp/nfta
 
 If the new session fails: wait 5 minutes, the previous `/etc/nftables.conf` is loaded again.
 
+## Upgrade 2026-11-17 (supervised, before automatic updates start)
+
+`apt-get upgrade` (not dist-upgrade), keep local configs: 194 upgraded, 0 removed, exit 0, no reboot required.
+Log: `/var/log/uha-upgrade-2026-11-17.log` on the Pi. SSH, nginx, Grafana, UhaGatePy checked afterwards: OK.
+
+Kept back (11; need new packages, i.e. `full-upgrade`, plus a reboot): kernel `linux-image-rpi-v8`/`-2712`
+6.6.74 → 6.12.115 and headers, `rpi-eeprom`, `raspi-utils-core/-dt`, `libcamera-ipa`, `rpicam-apps-lite`,
+`firmware-libertas`, `firmware-misc-nonfree`. To do later with Martin present: `sudo apt full-upgrade`, reboot,
+check firewall/SSH/dashboard/serial port (CP2102) and UhaGatePy.
+
 ## Logs
 
 - unattended-upgrades: `/var/log/unattended-upgrades/`, `journalctl -u apt-daily-upgrade`
