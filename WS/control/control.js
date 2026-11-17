@@ -46,7 +46,11 @@ function stateText(c, v) {
   switch (kind(c)) {
     case "light": return v.value > 0 ? { text: "zapnuto" + (v.value < 100 ? " " + v.value + " %" : ""), cls: "on" }
                                      : { text: "vypnuto", cls: "" };
-    case "bool": return v.value ? { text: "zapnuto", cls: "on" } : { text: "vypnuto", cls: "" };
+    case "bool": {
+      // the state may be an enum (inverters: InverterState, every item except 0 = Off means running): show the item
+      const detail = v.enum_name && !/^(on|off)$/i.test(v.enum_name) ? " (" + v.enum_name + ")" : "";
+      return v.value ? { text: "zapnuto" + detail, cls: "on" } : { text: "vypnuto" + detail, cls: "" };
+    }
     case "enum": return { text: v.enum_name || c.enum[String(v.value)] || String(v.value), cls: "" };
     default: return { text: fmt(c, v.value) + (c.unit ? " " + c.unit : ""), cls: "" };
   }
