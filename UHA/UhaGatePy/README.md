@@ -389,5 +389,16 @@ thread opens its own read-only SQLite connection (WAL: does not block the writer
 First real use (2026-11-17 12:46, `martin-pc`, after ELECON + IOBOARD_U were flashed): 10 commands, every state
 changed within 1 s (`events`), no drops.
 
+**0.5.2 (2026-11-17, `tasks/control_ui_types.md`, for FW steps 3b/3c):** generic support of every command type.
+- YAML: new optional command keys `step:` (> 0, UI hint for the number input) and `category:` (`light`, `blind`,
+  `heating`, `inverter`, `ventilation`; anything else = no start, like the other rules). Both are passed through
+  `GET /api/commands` (`step` null when not set, `category` "" when not set; enum commands also get `enum`).
+- `POST /api/cmd` value by type: `uint32` / `int32` whole numbers, `float` any number, `bool` 0 / 1 / true / false,
+  `enum` the item number or its **name** (`"Up"`; an unknown name -> 400). Still no min/max clamping in the gateway.
+- Control page: sections by category (Světla, Žaluzie, Topení, Střídače, Rekuperace, Ostatní); widget by type:
+  % 0..100 -> Zapnout / Vypnout, `bool` -> Zapnout / Vypnout, `enum` -> one button per item (current one highlighted),
+  `float` and other numbers -> number input (min / max / step, prefilled with the current state) + "Nastavit". The
+  feedback expects the clamped value (a sent 30 °C with max 25 -> "hotovo" once the state shows 25 °C).
+
 ### Still to do
 1. Watch the 10-minute summaries in the journal for `OFFSET` (a warning is logged) for a few days.

@@ -46,7 +46,7 @@ class YamlCommandsTest(unittest.TestCase):
     def test_fixture(self):
         defs = cmd_defs()
         self.assertEqual(list(defs.commands), ["CMD_LIGHT_LOFT_WEST", "CMD_LIGHT_LOFT_EAST_1", "CMD_SCREEN_EAST",
-                                               "CMD_TEST_FLOAT"])
+                                               "CMD_TEST_FLOAT", "CMD_TEST_BOOL"])
         c = defs.commands["CMD_LIGHT_LOFT_WEST"]
         self.assertEqual((c.id, c.target, c.target_id, c.type, c.min, c.max, c.unit, c.state),
                          (201, "IOBOARD_U", 2, "uint32", 0, 100, "%", "ST_LIGHT_LOFT_WEST"))
@@ -75,12 +75,21 @@ class YamlCommandsTest(unittest.TestCase):
             (GOOD.replace("ST_LIGHT_A", "ST_NONE"), "is not a variable"),
             (GOOD.replace("ST_LIGHT_A", "ST_TECHM"), "produced by TECHM, not by the target IOBOARD_U"),
             (GOOD.replace("type: uint32", "type: enum, enum: Nope"), "unknown enum"),
+            (GOOD.replace("min: 0,", "step: 0, min: 0,"), "step must be > 0"),
+            (GOOD.replace("min: 0,", "step: x, min: 0,"), "step must be a number"),
+            (GOOD.replace("min: 0,", "category: lights, min: 0,"), "unknown category 'lights'"),
         )
         for entry, reason in cases:
             with self.subTest(reason=reason):
                 with self.assertRaises(vars_def.VarsDefError) as ctx:
                     load_text(BASE + entry)
                 self.assertIn(reason, str(ctx.exception))
+
+    def test_step_and_category(self):
+        cmd = load_text(BASE + GOOD.replace("min: 0,", "step: 5, category: light, min: 0,")).commands["CMD_A"]
+        self.assertEqual((cmd.step, cmd.category), (5.0, "light"))
+        cmd = load_text(BASE + GOOD).commands["CMD_A"]
+        self.assertEqual((cmd.step, cmd.category), (0.0, ""))
 
     def test_not_a_list(self):
         with self.assertRaises(vars_def.VarsDefError):
@@ -124,7 +133,27 @@ class PureLogicTest(unittest.TestCase):
         self.assertEqual(commands.check_value(f, 1), 1.0)
         self.assertIsInstance(commands.check_value(f, 1), float)
         screen = self.defs.commands["CMD_SCREEN_EAST"]
-        self.assertEqual(commands.check_value(screen, -5), -5)          # enum = int32
+        self.assertEqual(commands.check_value(screen, -5), -5)          # enum = int32, the node ignores unknown
+        enums = self.defs.enums
+        self.assertEqual(commands.check_value(screen, "Down", enums), 2)
+        self.assertEqual(commands.check_value(screen, 3, enums), 3)
+        for bad in ("down", "Nope", True, None, 1.5):
+            with self.subTest(enum_value=bad):
+                with self.assertRaises(commands.BadValue):
+                    commands.check_value(screen, bad, enums)
+        flag = self.defs.commands["CMD_TEST_BOOL"]
+        for good, number in ((True, 1), (False, 0), (1, 1), (0, 0), (1.0, 1)):
+            with self.subTest(bool_value=good):
+                self.assertEqual(commands.check_value(flag, good), number)
+        for bad in (2, -1, "true", 0.5, None):
+            with self.subTest(bool_bad=bad):
+                with self.assertRaises(commands.BadValue):
+                    commands.check_value(flag, bad)
+        for bad in (True, "1.5", None, float("inf")):
+            with self.subTest(float_bad=bad):
+                with self.assertRaises(commands.BadValue):
+                    commands.check_value(f, bad)
+        self.assertEqual(commands.check_value(f, 30), 30.0)              # out of min/max: the node clamps
 
     def test_packet_data_spec_layout(self):
         """Spec section 2: target | cmd id u16 LE | value 4 B LE | seq, built here byte by byte."""
@@ -211,7 +240,7 @@ class GatewaySendTest(unittest.TestCase):
         with open(os.path.join(self.folder.name, "uha_status.json")) as f:
             block = json.load(f)["Commands"]
         self.assertEqual((block["Defined"], block["Sent"], block["Last"]["Cmd"], block["Api"]),
-                         (4, 1, "CMD_LIGHT_LOFT_WEST", None))
+                         (5, 1, "CMD_LIGHT_LOFT_WEST", None))
 
 
 class ApiTest(unittest.TestCase):
@@ -259,6 +288,22 @@ class ApiTest(unittest.TestCase):
         self.assertEqual([c["name"] for c in body][:2], ["CMD_LIGHT_LOFT_WEST", "CMD_LIGHT_LOFT_EAST_1"])
         self.assertEqual(body[0]["state"], "ST_LIGHT_LOFT_WEST")
         self.assertEqual(body[2]["enum"], {"0": "None", "1": "Up", "2": "Down", "3": "Stop"})
+        by_name = {c["name"]: c for c in body}
+        self.assertEqual((by_name["CMD_LIGHT_LOFT_WEST"]["category"], by_name["CMD_LIGHT_LOFT_WEST"]["step"]),
+                         ("light", None))
+        self.assertEqual((by_name["CMD_TEST_FLOAT"]["category"], by_name["CMD_TEST_FLOAT"]["step"]), ("heating", 0.5))
+        self.assertEqual(by_name["CMD_LIGHT_LOFT_EAST_1"]["category"], "")
+
+    def test_send_enum_name_and_bool(self):
+        status, body = self.request("POST", "/api/cmd", {"cmd": "CMD_SCREEN_EAST", "value": "Up"})
+        self.assertEqual((status, self.calls[-1][:2]), (200, ("CMD_SCREEN_EAST", 1)))
+        status, body = self.request("POST", "/api/cmd", {"cmd": "CMD_TEST_BOOL", "value": True})
+        self.assertEqual((status, self.calls[-1][:2]), (200, ("CMD_TEST_BOOL", 1)))
+        before = len(self.calls)
+        status, body = self.request("POST", "/api/cmd", {"cmd": "CMD_SCREEN_EAST", "value": "Sideways"})
+        self.assertEqual(status, 400)
+        self.assertIn("unknown item", body["error"])
+        self.assertEqual(len(self.calls), before)
 
     def test_send(self):
         status, body = self.request("POST", "/api/cmd", {"cmd": "CMD_LIGHT_LOFT_WEST", "value": 100},
