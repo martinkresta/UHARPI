@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UHA</title>
+  <link rel="stylesheet" href="css/uha.css?v=20261122b">
+</head>
+<body>
+<script src="js/uha-common.js?v=20261122b"></script>
+<script>
+// Solar: production only (house MPPT, workshop Axpert PV side). Storage and inverters are on their own pages.
+UHA.start(U => {
+  const mtile = (name, o) => U.tile(U.vmeasure(name), name, o);
+  const pv = U.num('SOLAR_POWER_W');
+  const pvRow = n => U.rowText(U.vshort(`AXPERT_PVS${n}_W`),
+    `${U.show(`AXPERT_PVS${n}_W`)} · ${U.show(`AXPERT_PVS${n}_V`)} · ${U.show(`AXPERT_PVS${n}_A`)}`, U.ageClass(`AXPERT_PVS${n}_W`));
+  return U.pageHead(U.t('mon.solar.title'), U.t('mon.solar.sub'), [['uha-energy-scheme.html', U.t('mon.scheme.link')]]) +
+    `<div class="grid wide">` +
+    U.card(U.t('mon.solar.total'),
+      `<div class="tiles">${U.tile(U.vmeasure('SOLAR_POWER_W'), 'SOLAR_POWER_W', { big: true })}` +
+      `${U.tile(U.vmeasure('SOLAR_ENERGY_TODAY_WH'), 'SOLAR_ENERGY_TODAY_WH', { big: true })}</div>` +
+      `<div class="meter"><div class="head"><span class="l">${U.t('mon.home.peak', { x: U.format(U.SOLAR_PEAK_W, 'W') })}</span>` +
+      `<span class="v">${pv === null ? '–' : U.format(pv / U.SOLAR_PEAK_W * 100, '%', 0)}</span></div>` +
+      U.bar(pv === null ? 0 : pv / U.SOLAR_PEAK_W, 'solar') + `</div>`, { cls: 'solar' }) +
+    U.card(U.t('mon.solar.mppt'),
+      `<div class="tiles">${mtile('MPPT_SOLAR_POWER_W')}${mtile('MPPT_SOLAR_VOLTAGE_V')}${mtile('MPPT_SOLAR_CURRENT_A')}</div>` +
+      U.mrow('MPPT_BAT_VOLTAGE_V') + U.mrow('MPPT_BAT_CURRENT_A') + U.mrow('MPPT_YIELD_TODAY_WH') + U.mrow('MPPT_MAX_TODAY_W') +
+      U.mrow('MPPT_SOLAR_MAX_VOLTAGE_V') + U.mrow('MPPT_MAX_BAT_CURRENT_A') + U.mrow('MPPT_TEMP_C'), { cls: 'solar' }) +
+    U.card(U.t('mon.solar.axpv'),
+      `<div class="tiles">${mtile('AXPERT_SOLAR_W')}${U.tile(U.t('mon.energy.ax_pv'), 'LPV2_PROD_WH')}</div>` +
+      `<h3>${U.t('mon.energy.pvinputs')}</h3>` + pvRow(1) + pvRow(2), { cls: 'solar' }) +
+    `</div><p class="note"><a href="uha-detail.html#energy">${U.t('mon.energy.more')}</a></p>`;
+});
+</script>
+</body>
+</html>

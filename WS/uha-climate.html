@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UHA</title>
-  <link rel="stylesheet" href="css/uha.css?v=20261122a">
+  <link rel="stylesheet" href="css/uha.css?v=20261122b">
 </head>
 <body>
-<script src="js/uha-common.js?v=20261122a"></script>
+<script src="js/uha-common.js?v=20261122b"></script>
 <script>
 UHA.start(U => {
   const co2 = U.num('CO2_RECU');
@@ -20,6 +20,7 @@ UHA.start(U => {
     U.card(U.t('mon.climate.vent'),
       `<div class="tiles">${U.tile(U.vshort('CO2_RECU'), 'CO2_RECU', { cls: co2 !== null && co2 > 1000 ? 'old' : '' })}` +
       `${U.tile(U.vmeasure('RECU_FAN_F'), 'RECU_FAN_F')}${U.tile(U.vmeasure('RECU_FAN_WASTE'), 'RECU_FAN_WASTE')}</div>` +
+      U.row(U.vmeasure('ST_RECU_REMOTE_MODE'), 'ST_RECU_REMOTE_MODE') +
       `<p class="note"><a href="uha-recu-scheme.html">${U.t('mon.climate.recumore')}</a></p>`, { cls: 'home', ctrl: 'ventilation' }) +
     U.card(U.t('mon.climate.wind'),
       `<div class="tiles">${U.tile(U.vmeasure('METEO_WIND_AVG'), 'METEO_WIND_AVG')}${U.tile(U.vmeasure('METEO_WIND_BURST'), 'METEO_WIND_BURST')}</div>` +

@@ -4,25 +4,45 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UHA</title>
-  <link rel="stylesheet" href="css/uha.css?v=20261122a">
+  <link rel="stylesheet" href="css/uha.css?v=20261122b">
 </head>
 <body>
-<script src="js/uha-common.js?v=20261122a"></script>
+<script src="js/uha-common.js?v=20261122b"></script>
 <script>
+// Compact tank: narrow vertical tank, 6 bands (layer 6 top ... 1 bottom) coloured by temperature, value in each band
+const TANK = { w: 84, h: 176, pad: 4 };
+function compactTank(U) {
+  const { w, h, pad } = TANK, band = (h - 2 * pad) / 6;
+  let s = '';
+  for (let i = 6; i >= 1; i--) {
+    const n = `TEMP_TANK_${i}_C`, t = U.num(n), y = pad + (6 - i) * band;
+    s += `<rect x="${pad}" y="${y.toFixed(1)}" width="${w - 2 * pad}" height="${(band + 0.5).toFixed(1)}" fill="${U.tempColor(t)}"${U.ageClass(n) === 'bad' ? ' opacity=".4"' : ''}/>` +
+      `<text x="${w / 2}" y="${(y + band / 2 + 5).toFixed(1)}" text-anchor="middle">${t === null ? '–' : U.fmtNum(t, 1) + '°'}</text>`;
+  }
+  return `<svg class="tankc" viewBox="0 0 ${w} ${h}" role="img" aria-label="${U.t('mon.heat.tank')}">` +
+    `<clipPath id="tankclip"><rect x="${pad}" y="${pad}" width="${w - 2 * pad}" height="${h - 2 * pad}" rx="16"/></clipPath>` +
+    `<g clip-path="url(#tankclip)">${s}</g>` +
+    `<rect class="outline" x="${pad}" y="${pad}" width="${w - 2 * pad}" height="${h - 2 * pad}" rx="16"/></svg>`;
+}
+
 UHA.start(U => {
   const r = name => U.row(U.vshort(name), name);
+  const m = (name, o) => U.row(U.vmeasure(name), name, o);
+  const heaterW = U.calc(['EL_HEATER_CURRENT_A', 'STRG1_VOLTAGE_V'], (a, v) => a * v);
   return U.pageHead(U.t('mon.heat.title'), U.t('mon.heat.sub'), [['uha-heat-scheme.html', U.t('mon.scheme.link')], [U.ctrlHref('heating'), U.t('mon.ctrl.link')]]) +
     `<div class="grid wide">` +
-    U.card(U.t('mon.heat.tank'), U.tankSvg(220, 330) +
-      U.row(U.t('mon.home.heatenergy'), 'HEAT_TOTAL_WH'), { cls: 'heat' }) +
+    U.card(U.t('mon.heat.tank'), `<div class="tankrow">${compactTank(U)}<div class="tankrows">` +
+      U.row(U.t('mon.home.heatenergy'), 'HEAT_TOTAL_WH') +
+      `<h3>${U.t('mon.heat.elheater')}</h3>` +
+      m('EL_HEATER_STATUS') +
+      U.rowText(U.vmeasure('EL_HEATER_CURRENT_A'), `${U.show('EL_HEATER_CURRENT_A')} · ${U.format(heaterW, 'W')}`, U.ageClass('EL_HEATER_CURRENT_A')) +
+      m('EL_HEATER_LOAD_A') + m('ST_EL_HEATER_COILS', { d: 0 }) + m('EL_HEATER_CONS_WH') +
+      `</div></div>`, { cls: 'heat' }) +
     U.card(U.t('mon.heat.boiler'),
-      `<div class="tiles">${U.tile(U.vmeasure('BOILER_POWER_W'), 'BOILER_POWER_W')}${U.tile(U.t('mon.scheme.temp'), 'TEMP_BOILER_C')}` +
+      `<div class="tiles">${U.tile(U.vmeasure('BOILER_HEAT'), 'BOILER_HEAT')}${U.tile(U.vmeasure('BOILER_POWER_W'), 'BOILER_POWER_W')}` +
       `${U.tile(U.vmeasure('ST_BOILER_STATE'), 'ST_BOILER_STATE')}</div>` +
-      r('TEMP_BOILER_IN_C') + r('TEMP_BOILER_OUT_C') + r('TEMP_BOILER_EXHAUST_C') + r('ST_EXHAUST_SET_C') +
-      r('TECHM_AIR_VALVE_SIGNAL_PCT') + U.row(U.vmeasure('BOILER_HEAT'), 'BOILER_HEAT'), { cls: 'heat' }) +
-    U.card(U.t('mon.heat.elheater'),
-      `<div class="tiles">${U.tile(U.vmeasure('EL_HEATER_STATUS'), 'EL_HEATER_STATUS')}${U.tile(U.vmeasure('EL_HEATER_CURRENT_A'), 'EL_HEATER_CURRENT_A')}</div>` +
-      U.mrow('EL_HEATER_LOAD_A') + U.mrow('EL_HEATER_CONS_WH') + U.row(U.vmeasure('ST_EL_HEATER_COILS'), 'ST_EL_HEATER_COILS', { d: 0 }), { cls: 'heat' }) +
+      U.row(U.t('mon.scheme.temp'), 'TEMP_BOILER_C') + m('TEMP_BOILER_IN_C') + m('TEMP_BOILER_OUT_C') + m('TEMP_BOILER_EXHAUST_C') +
+      m('TECHM_AIR_VALVE_SIGNAL_PCT'), { cls: 'heat' }) +
     U.card(U.t('mon.heat.heatenergy'),
       `<div class="tiles">${U.tile(U.vmeasure('HEAT_TOTAL_WH'), 'HEAT_TOTAL_WH')}${U.tile(U.vmeasure('HEAT_HEATING_WH'), 'HEAT_HEATING_WH')}</div>` +
       `<h3>${U.t('mon.heat.floor')}</h3>` + r('TEMP_WALL_IN_C') + r('TEMP_WALL_OUT_C') + r('TEMP_RAD_H_C') + r('TEMP_RAD_C_C'), { cls: 'heat' }) +
