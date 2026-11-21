@@ -185,6 +185,8 @@ table.t tr.old td.n { color: var(--warn); } table.t tr.bad td { color: var(--mut
 .scheme .fan { fill: var(--card); stroke: var(--text); stroke-width: 2.5; } .scheme .fanblade { fill: var(--text); }
 .scheme .big { font-size: 26px; font-weight: 700; }
 .scheme .blink:hover .blk { stroke: var(--muted); }
+.scheme .blk.dim { fill: none; stroke-dasharray: 8 6; } .scheme .rv.dim { fill: var(--muted); font-weight: 400; }
+.scheme .lnk.bus { stroke: #8a96a3; stroke-width: 7; } .scheme .lnk.dim { stroke-dasharray: 8 8; opacity: .5; }
 .modesw { display: flex; gap: 6px; justify-content: center; margin: 0 0 10px; }
 .modesw button { background: var(--card); color: var(--muted); border: 1px solid var(--line); border-radius: 8px; padding: 6px 14px; font-size: 14px; cursor: pointer; }
 .modesw button.on { background: var(--card2); color: var(--text); border-color: var(--muted); font-weight: 600; }

@@ -4,75 +4,121 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UHA</title>
-  <link rel="stylesheet" href="css/uha.css?v=20261121c">
+  <link rel="stylesheet" href="css/uha.css?v=20261122a">
 </head>
 <body>
-<script src="js/uha-common.js?v=20261121c"></script>
-<script src="js/uha-scheme.js?v=20261121c"></script>
+<script src="js/uha-common.js?v=20261122a"></script>
+<script src="js/uha-scheme.js?v=20261122a"></script>
 <script>
-// Energy schematic - FIRST PROPOSAL of the topology, to be reviewed by Martin. Everything is in the arrays below:
-// blocks (x, y, w in a 600 wide drawing; height follows the rows), links (from -> to, variable for the flow
-// direction; pts = explicit path). Assumptions: see the report / README.
-const sumW = names => U => U.sum(names);
-const HOUSE_INV = ['POW_AC300_W', 'POW_AC3KW_W', 'POW_AC5KW_W'];
+// Energy schematic after UHA_FW UHA_COMMON/VarDefs/ENERGY_TOPOLOGY.md (reviewed with Martin 2026-11-21). Everything is
+// in the arrays below: blocks (x, y, w in a 600 wide drawing; height = 38 + 27 per row + 10), links (from -> to or
+// explicit pts, variable / function for the flow direction). Columns x = 10 / 198 / 386 (w 178, centres 99 / 287 / 475),
+// lane x = 580 for the LVDC cable. Dashed (dim) = not measured.
+const C1 = 10, C2 = 198, C3 = 386, W = 178;
+const calc = (names, fn) => U => U.calc(names, fn);
+const heaterW = calc(['EL_HEATER_CURRENT_A', 'STRG1_VOLTAGE_V'], (a, v) => a * v);
+const victronDcW = calc(['POW_WS_HEATING_W'], p => p / 0.9);
+// LVDC link house -> workshop (estimate, + = house -> workshop): workshop bus balance, Victron DC input = AC / 0.9;
+// workshop DC lights and the pack heater neglected (same formula as the Grafana panel "Storages power")
+const LVDC_NAMES = ['BMS1_CURRENT_A', 'AXPERT_BAT_CURRENT_A', 'POW_WS_HEATING_W', 'STRG2_VOLTAGE_V'];
+const lvdcA = calc(LVDC_NAMES, (p, a, h, v) => p - a + h / 0.9 / v);
+const lvdcW = calc(LVDC_NAMES, (p, a, h, v) => (p - a) * v + h / 0.9);
+const fnRow = (label, f, unit, wh) => ({
+  fn: U => { let x = f(U); if (wh && x !== null) x /= 1000; return [U.t(label), U.format(x, unit), x === null ? 'bad' : '']; }
+});
+const approx = (label, f, unit) => ({ fn: U => { const x = f(U); return [U.t(label), x === null ? '–' : '≈ ' + U.format(x, unit), x === null ? 'bad' : '']; } });
+const unmeasured = label => ({ fn: U => [U.t(label), '–', 'dim'] });
 
 UHA.scheme({
   title: 'mon.scheme.energy_t', sub: 'mon.scheme.energy_sub', head: [['uha-energy.html', 'mon.scheme.back_energy'], [UHA.ctrlHref('inverter'), 'mon.ctrl.link']],
-  width: 600, height: 1410, modes: true,
+  width: 600, height: 1610, modes: true,
   areas: [
-    { x: 5, y: 125, w: 590, h: 610, label: 'mon.scheme.area_house' },
-    { x: 5, y: 750, w: 590, h: 650, label: 'mon.scheme.area_workshop' }
+    { x: 5, y: 125, w: 590, h: 670, label: 'mon.scheme.area_house' },
+    { x: 5, y: 925, w: 590, h: 675, label: 'mon.scheme.area_workshop' }
   ],
   blocks: [
     // totals (global)
-    { id: 'tsol', x: 10, y: 10, w: 186, label: 'SOLAR_POWER_W', cls: 'solar', rows: [{ v: 'SOLAR_POWER_W', i: 'CHARGING_A' }, { v: 'SOLAR_ENERGY_TODAY_WH' }] },
-    { id: 'tload', x: 207, y: 10, w: 186, label: 'LOAD_W', cls: 'load', rows: [{ v: 'LOAD_W', i: 'LOAD_A' }, { v: 'CONS_TODAY_WH' }] },
-    { id: 'tbat', x: 404, y: 10, w: 186, label: 'BAT_POWER_W', cls: 'bat', rows: [{ v: 'BAT_POWER_W', i: 'BAT_CURRENT_A' }, { v: 'BAT_SOC' }] },
-    // house: PV -> MPPT -> storage 1 (packs 220 Ah + 80 Ah) -> inverters -> circuits
-    { id: 'pv', x: 20, y: 170, w: 170, label: 'mon.scheme.pv', cls: 'solar', rows: [{ v: 'MPPT_SOLAR_POWER_W', i: 'MPPT_SOLAR_CURRENT_A' }, { v: 'MPPT_SOLAR_VOLTAGE_V' }] },
-    { id: 'mppt', x: 215, y: 170, w: 170, label: 'mon.scheme.mppt', cls: 'solar', rows: [{ v: 'MPPT_BAT_CURRENT_A' }, { v: 'MPPT_YIELD_TODAY_WH' }] },
-    { id: 'strg1', x: 410, y: 170, w: 170, label: 'STRG1_SOC', cls: 'bat',
+    { id: 'tsol', x: C1, y: 10, w: W, label: 'SOLAR_POWER_W', cls: 'solar', rows: [{ v: 'SOLAR_POWER_W', i: 'CHARGING_A' }, { v: 'SOLAR_ENERGY_TODAY_WH' }] },
+    { id: 'tload', x: C2, y: 10, w: W, label: 'LOAD_W', cls: 'load', rows: [{ v: 'LOAD_W', i: 'LOAD_A' }, { v: 'CONS_TODAY_WH' }] },
+    { id: 'tbat', x: C3, y: 10, w: W, label: 'BAT_POWER_W', cls: 'bat', rows: [{ v: 'BAT_POWER_W', i: 'BAT_CURRENT_A' }, { v: 'BAT_SOC' }] },
+
+    // HOUSE: above the DC bus PV + MPPT, storage 1 (shunt, packs 220 + 80 Ah), DC loads; below it the inverters
+    { id: 'hpv', x: C1, y: 170, w: W, label: 'mon.scheme.pv_mppt', cls: 'solar',
+      rows: [{ v: 'MPPT_SOLAR_POWER_W', i: 'MPPT_SOLAR_CURRENT_A', l: 'mon.scheme.pv_short' }, { v: 'MPPT_SOLAR_VOLTAGE_V' }, { v: 'MPPT_BAT_CURRENT_A' }, { v: 'MPPT_YIELD_TODAY_WH' }] },
+    { id: 'strg1', x: C2, y: 170, w: W, label: 'STRG1_SOC', cls: 'bat',
       rows: [{ v: 'STRG1_POWER_W', i: 'STRG1_CURRENT_A' }, { v: 'STRG1_SOC' }, { v: 'BMS2_SOC', l: 'mon.scheme.p220' }, { v: 'BMS3_SOC', l: 'mon.scheme.p80' }] },
-    { id: 'ac300', x: 20, y: 375, w: 170, label: 'ST_AC_300W', state: 'ST_AC_300W', cls: 'load', rows: [{ v: 'POW_AC300_W', i: null }] },
-    { id: 'ac3k', href: UHA.ctrlHref('inverter'), x: 215, y: 375, w: 170, label: 'ST_AC_3KW', state: 'ST_AC_3KW', cls: 'load', rows: [{ v: 'POW_AC3KW_W', i: null }] },
-    { id: 'ac5k', href: UHA.ctrlHref('inverter'), x: 410, y: 375, w: 170, label: 'ST_AC_5KW', state: 'ST_AC_5KW', cls: 'load', rows: [{ v: 'POW_AC5KW_W', i: null }] },
-    { id: 'circ', x: 20, y: 535, w: 365, label: 'mon.loads.circuits', cls: 'load',
-      rows: ['FRIDGE', 'KITCHEN', 'WASCHMACHINE', 'TECHM', 'OTHER'].map(c => ({ v: `POW_${c}_W`, l: `POW_${c}_W`, i: null })) },
-    { id: 'htot', x: 410, y: 535, w: 170, label: 'mon.scheme.house_total', cls: 'home',
+    { id: 'hdc', x: C3, y: 170, w: W, label: 'mon.scheme.dcloads', cls: 'load',
+      rows: [fnRow('mon.scheme.waterheater', heaterW, 'W'), unmeasured('mon.scheme.dc12'), unmeasured('mon.scheme.desk'), unmeasured('mon.scheme.fans')] },
+    { id: 'ac300', x: C1, y: 385, w: W, label: 'ST_AC_300W', state: 'ST_AC_300W', cls: 'load', rows: [{ v: 'POW_AC300_W', i: null }] },
+    { id: 'ac3k', href: UHA.ctrlHref('inverter'), x: C2, y: 385, w: W, label: 'ST_AC_3KW', state: 'ST_AC_3KW', cls: 'load', rows: [{ v: 'POW_AC3KW_W', i: null }] },
+    { id: 'ac5k', href: UHA.ctrlHref('inverter'), x: C3, y: 385, w: W, label: 'ST_AC_5KW', state: 'ST_AC_5KW', cls: 'load', rows: [{ v: 'POW_AC5KW_W', i: null }] },
+    // each inverter's own circuits (meters in the "AC rozvaděč FVE")
+    { id: 'c300', x: C1, y: 525, w: W, label: 'mon.scheme.circ', cls: 'load',
+      rows: [{ v: 'POW_FRIDGE_W', l: 'POW_FRIDGE_W', i: null }, { v: 'POW_TECHM_W', l: 'POW_TECHM_W', i: null }] },
+    { id: 'c3k', x: C2, y: 525, w: W, label: 'mon.scheme.circ', cls: 'load',
+      rows: [{ v: 'POW_KITCHEN_B_W', l: 'POW_KITCHEN_B_W', i: null }, { v: 'POW_WASCHMACHINE_W', l: 'POW_WASCHMACHINE_W', i: null }] },
+    { id: 'c5k', x: C3, y: 525, w: W, label: 'mon.scheme.circ', cls: 'load',
+      rows: [{ v: 'POW_OTHER_W', l: 'POW_OTHER_W', i: null }, { v: 'POW_KITCHEN_A_W', l: 'POW_KITCHEN_A_W', i: null }, unmeasured('mon.scheme.kids_office')] },
+    { id: 'htot', x: C1, y: 680, w: 554, label: 'mon.scheme.house_total', cls: 'home',
       rows: [{ v: 'LPV1_POWER_W', l: 'mon.scheme.pv_short', i: null }, { v: 'LLOAD1_POWER_W', l: 'mon.scheme.load_short', i: null }] },
-    // workshop: PV1 / PV2 -> Axpert <-> storage 2 (pack 251 Ah); Axpert AC -> meter -> EV charger; storage 2 -> Victron -> heating
-    { id: 'pv1', x: 20, y: 800, w: 170, label: 'AXPERT_PVS1_W', cls: 'solar', rows: [{ v: 'AXPERT_PVS1_W', i: 'AXPERT_PVS1_A' }, { v: 'AXPERT_PVS1_V' }] },
-    { id: 'pv2', x: 215, y: 800, w: 170, label: 'AXPERT_PVS2_W', cls: 'solar', rows: [{ v: 'AXPERT_PVS2_W', i: 'AXPERT_PVS2_A' }, { v: 'AXPERT_PVS2_V' }] },
-    { id: 'strg2', x: 410, y: 800, w: 170, label: 'STRG2_SOC', cls: 'bat',
-      rows: [{ v: 'STRG2_POWER_W', i: 'STRG2_CURRENT_A' }, { v: 'STRG2_SOC' }, { v: 'BMS1_SOC', l: 'mon.scheme.p251' }] },
-    { id: 'axpert', href: UHA.ctrlHref('inverter'), x: 20, y: 960, w: 270, label: 'ST_AC_AXPERT', state: 'ST_AC_AXPERT', cls: 'solar',
-      rows: [{ v: 'AXPERT_AC_POWER_W', i: null }, { v: 'AXPERT_SOLAR_W', i: null }, { v: 'AXPERT_BAT_POWER_W', i: 'AXPERT_BAT_CURRENT_A' }] },
-    { id: 'victron', href: UHA.ctrlHref('inverter'), x: 410, y: 960, w: 170, label: 'ST_AC_VICTRON', state: 'ST_AC_VICTRON', cls: 'load',
+
+    // LVDC link (20 m cable, current not measured): estimate
+    { id: 'lvdc', x: C3, y: 810, w: W, label: 'mon.scheme.lvdc', cls: 'bat',
+      rows: [approx('mon.scheme.lvdc_p', lvdcW, 'W'), approx('mon.scheme.lvdc_i', lvdcA, 'A')] },
+
+    // WORKSHOP: above the DC bus storage 2 (251 Ah, current from the BMS) and unmeasured DC loads; below it the
+    // Victron (air conditioner) and the Axpert (2 PV strings, AC out -> EV charger + workshop)
+    { id: 'strg2', x: C1, y: 970, w: W, label: 'STRG2_SOC', cls: 'bat',
+      rows: [{ v: 'STRG2_POWER_W', i: 'BMS1_CURRENT_A' }, { v: 'STRG2_SOC' }, { v: 'STRG2_VOLTAGE_V' }] },
+    { id: 'wdc', x: C2, y: 970, w: W, label: 'mon.scheme.dcloads', cls: 'load', dim: true,
+      rows: [unmeasured('mon.scheme.ws_lights'), unmeasured('mon.scheme.pack_heater')] },
+    { id: 'victron', href: UHA.ctrlHref('inverter'), x: C1, y: 1155, w: W, label: 'ST_AC_VICTRON', state: 'ST_AC_VICTRON', cls: 'load',
       rows: [{ v: 'POW_WS_HEATING_W', l: 'mon.loads.power', i: null }] },
-    { id: 'meter', x: 20, y: 1150, w: 170, label: 'POW_AXPERT_W', cls: 'load', rows: [{ v: 'POW_AXPERT_W', l: 'mon.loads.power', i: null }, { v: 'CONS_AXPERT_WH', l: 'mon.home.today' }] },
-    { id: 'evse', x: 215, y: 1150, w: 170, label: 'POW_EVSE_W', cls: 'load', rows: [{ v: 'POW_EVSE_W', l: 'mon.loads.power', i: null }, { v: 'CONS_EVSE_WH', l: 'mon.home.today' }] },
-    { id: 'wsheat', x: 410, y: 1150, w: 170, label: 'POW_WS_HEATING_W', cls: 'load', rows: [{ v: 'POW_WS_HEATING_W', l: 'mon.loads.power', i: null }, { v: 'CONS_WS_HEATING_WH', l: 'mon.home.today' }] },
-    { id: 'wtot', x: 20, y: 1280, w: 560, label: 'mon.scheme.ws_total', cls: 'home',
-      rows: [{ v: 'LPV2_POWER_W', l: 'mon.scheme.pv_short', i: null }, { v: 'LLOAD2_POWER_W', l: 'mon.scheme.load_short', i: null }] }
+    { id: 'axpert', href: UHA.ctrlHref('inverter'), x: C2, y: 1155, w: 366, label: 'ST_AC_AXPERT', state: 'ST_AC_AXPERT', cls: 'solar',
+      rows: [{ v: 'AXPERT_AC_POWER_W', i: null }, { v: 'AXPERT_SOLAR_W', i: null }, { v: 'AXPERT_BAT_POWER_W', i: 'AXPERT_BAT_CURRENT_A' }] },
+    { id: 'aircon', x: C1, y: 1345, w: W, label: 'mon.scheme.aircon', cls: 'load',
+      rows: [{ v: 'POW_WS_HEATING_W', l: 'mon.loads.power', i: null }, { v: 'CONS_WS_HEATING_WH', l: 'mon.home.today' }] },
+    { id: 'axac', x: C2, y: 1345, w: W, label: 'mon.scheme.axac', cls: 'load',
+      rows: [{ v: 'POW_AXPERT_W', l: 'mon.loads.power', i: null }, { v: 'CONS_AXPERT_WH', l: 'mon.home.today' }] },
+    { id: 'pvws', x: C3, y: 1345, w: W, label: 'mon.scheme.pvws', cls: 'solar',
+      rows: [{ v: 'AXPERT_PVS1_W', l: 'AXPERT_PVS1_W', i: 'AXPERT_PVS1_A' }, { v: 'AXPERT_PVS2_W', l: 'AXPERT_PVS2_W', i: 'AXPERT_PVS2_A' }] },
+    { id: 'wtot', x: C1, y: 1480, w: W, label: 'mon.scheme.ws_total', cls: 'home',
+      rows: [{ v: 'LPV2_POWER_W', l: 'mon.scheme.pv_short', i: null }, { v: 'LLOAD2_POWER_W', l: 'mon.scheme.load_short', i: null }] },
+    { id: 'evse', x: C2, y: 1480, w: W, label: 'POW_EVSE_W', cls: 'load', rows: [{ v: 'POW_EVSE_W', l: 'mon.loads.power', i: null }, { v: 'CONS_EVSE_WH', l: 'mon.home.today' }] },
+    { id: 'wshop', x: C3, y: 1480, w: W, label: 'mon.loads.workshop', cls: 'load',
+      rows: [fnRow('mon.loads.power', calc(['POW_AXPERT_W', 'POW_EVSE_W'], (a, e) => a - e), 'W'),
+             fnRow('mon.home.today', calc(['CONS_AXPERT_WH', 'CONS_EVSE_WH'], (a, e) => a - e), 'kWh', true)] }
   ],
   links: [
-    { from: 'pv', to: 'mppt', v: 'MPPT_SOLAR_POWER_W', i: 'MPPT_SOLAR_CURRENT_A', cls: 'solar' },
-    { from: 'mppt', to: 'strg1', v: 'MPPT_SOLAR_POWER_W', i: 'MPPT_BAT_CURRENT_A', cls: 'solar' },
-    // storage 1 -> DC bus -> the three inverters (flow = sum of the inverter meters)
-    { pts: [[495, 326], [495, 350], [105, 350]], v: sumW(HOUSE_INV), cls: 'bat' },
-    { pts: [[105, 350], [105, 375]], cls: 'bat' }, { pts: [[300, 350], [300, 375]], cls: 'bat' }, { pts: [[495, 350], [495, 375]], cls: 'bat' },
-    // inverters -> AC side -> circuits (assumption: one AC distribution for all house circuits)
-    { pts: [[105, 477], [105, 505]], cls: 'load' }, { pts: [[300, 477], [300, 505]], cls: 'load' }, { pts: [[495, 477], [495, 505]], cls: 'load' },
-    { pts: [[105, 505], [495, 505]], cls: 'load' },
-    { pts: [[200, 505], [200, 535]], v: sumW(HOUSE_INV), cls: 'load' },
-    // workshop
-    { from: 'pv1', to: 'axpert', v: 'AXPERT_PVS1_W', i: 'AXPERT_PVS1_A', cls: 'solar' },
-    { from: 'pv2', to: 'axpert', v: 'AXPERT_PVS2_W', i: 'AXPERT_PVS2_A', cls: 'solar' },
-    { pts: [[290, 1010], [350, 1010], [350, 865], [410, 865]], v: 'AXPERT_BAT_POWER_W', i: 'AXPERT_BAT_CURRENT_A', cls: 'bat' },
-    { from: 'strg2', to: 'victron', v: 'POW_WS_HEATING_W', cls: 'bat' },
-    { from: 'victron', to: 'wsheat', v: 'POW_WS_HEATING_W', cls: 'load' },
-    { from: 'axpert', to: 'meter', v: 'POW_AXPERT_W', cls: 'load' },
-    { from: 'meter', to: 'evse', v: 'POW_EVSE_W', cls: 'load' }
+    // house DC bus (y 352) + the lane to the LVDC link
+    { pts: [[40, 352], [580, 352]], cls: 'bus' },
+    { pts: [[60, 326], [60, 352]], v: 'MPPT_SOLAR_POWER_W', i: 'MPPT_BAT_CURRENT_A', cls: 'solar' },
+    { pts: [[250, 352], [250, 326]], v: 'STRG1_POWER_W', i: 'STRG1_CURRENT_A', cls: 'bat' },
+    { pts: [[520, 352], [520, 326]], v: heaterW, i: 'EL_HEATER_CURRENT_A', cls: 'load' },
+    { pts: [[99, 352], [99, 385]], v: 'POW_AC300_W', cls: 'load' },
+    { pts: [[287, 352], [287, 385]], v: 'POW_AC3KW_W', cls: 'load' },
+    { pts: [[475, 352], [475, 385]], v: 'POW_AC5KW_W', cls: 'load' },
+    { from: 'ac300', to: 'c300', v: 'POW_AC300_W', cls: 'load' },
+    { from: 'ac3k', to: 'c3k', v: 'POW_AC3KW_W', cls: 'load' },
+    { from: 'ac5k', to: 'c5k', v: 'POW_AC5KW_W', cls: 'load' },
+    // LVDC cable: house bus -> lane -> link block -> workshop bus
+    { pts: [[580, 352], [580, 861], [564, 861]], v: lvdcW, i: lvdcA, cls: 'bat' },
+    { pts: [[475, 912], [475, 1125]], v: lvdcW, i: lvdcA, cls: 'bat' },
+    // workshop DC bus (y 1125)
+    { pts: [[40, 1125], [560, 1125]], cls: 'bus' },
+    { pts: [[70, 1125], [70, 1099]], v: 'STRG2_POWER_W', i: 'BMS1_CURRENT_A', cls: 'bat' },
+    { pts: [[287, 1125], [287, 1072]], cls: 'dim' },
+    { pts: [[130, 1125], [130, 1155]], v: victronDcW, cls: 'load' },
+    { pts: [[250, 1155], [250, 1125]], v: 'AXPERT_BAT_POWER_W', i: 'AXPERT_BAT_CURRENT_A', cls: 'bat' },
+    { from: 'victron', to: 'aircon', v: 'POW_WS_HEATING_W', cls: 'load' },
+    { pts: [[475, 1345], [475, 1311]], v: 'AXPERT_SOLAR_W', cls: 'solar' },
+    { pts: [[250, 1311], [250, 1345]], v: 'POW_AXPERT_W', cls: 'load' },
+    { pts: [[250, 1447], [250, 1480]], v: 'POW_EVSE_W', cls: 'load' },
+    { pts: [[340, 1447], [340, 1463], [475, 1463], [475, 1480]], v: calc(['POW_AXPERT_W', 'POW_EVSE_W'], (a, e) => a - e), cls: 'load' }
+  ],
+  texts: [
+    { x: 150, y: 345, l: 'mon.scheme.dcbus', anchor: 'middle', cls: 'lv' },
+    { x: 193, y: 1118, l: 'mon.scheme.dcbus', anchor: 'middle', cls: 'lv' }
   ],
   note: 'mon.scheme.energy_note'
 });

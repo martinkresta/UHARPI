@@ -162,12 +162,12 @@
    "en": "Energy schematic"
   },
   "mon.scheme.energy_sub": {
-   "cz": "Toky výkonu – návrh, topologii zkontroluje Martin",
-   "en": "Power flows – proposal, topology to be reviewed"
+   "cz": "Toky výkonu podle ENERGY_TOPOLOGY.md",
+   "en": "Power flows after ENERGY_TOPOLOGY.md"
   },
   "mon.scheme.energy_note": {
-   "cz": "Šipka ukazuje směr toku, když je výkon aspoň 20 W (proud 0,5 A). Šedé = neplatná nebo stará data.",
-   "en": "The arrow shows the flow direction when the power is at least 20 W (current 0.5 A). Grey = invalid or old data."
+   "cz": "Šipka ukazuje směr toku, když je výkon aspoň 20 W (proud 0,5 A). Šedé = neplatná nebo stará data, čárkovaně = neměřeno. Propoj LVDC je odhad (≈): proud baterie dílny − proud baterie Axpertu + příkon Victronu; kladný = z domu do dílny.",
+   "en": "The arrow shows the flow direction when the power is at least 20 W (current 0.5 A). Grey = invalid or old data, dashed = not measured. The LVDC link is an estimate (≈): workshop pack current − Axpert battery current + Victron input; positive = house to workshop."
   },
   "mon.scheme.area_house": {
    "cz": "Dům",
@@ -384,6 +384,98 @@
   "ctrl.log.err": {
    "cz": "Nelze načíst historii příkazů: {e}",
    "en": "Cannot load the command history: {e}"
+  },
+  "mon.energy.balance": {
+   "cz": "Bilance dnes",
+   "en": "Balance today"
+  },
+  "mon.energy.ax_pv": {
+   "cz": "FV dnes",
+   "en": "PV today"
+  },
+  "mon.energy.ax_dcin": {
+   "cz": "DC vstup dnes",
+   "en": "DC input today"
+  },
+  "mon.energy.ax_acout": {
+   "cz": "AC výstup dnes",
+   "en": "AC output today"
+  },
+  "mon.energy.ax_loss": {
+   "cz": "Ztráty dnes (hrubě)",
+   "en": "Losses today (rough)"
+  },
+  "mon.loads.workshop": {
+   "cz": "Dílna",
+   "en": "Workshop"
+  },
+  "mon.scheme.pv_mppt": {
+   "cz": "FV + MPPT",
+   "en": "PV + MPPT"
+  },
+  "mon.scheme.dcloads": {
+   "cz": "DC spotřebiče",
+   "en": "DC loads"
+  },
+  "mon.scheme.waterheater": {
+   "cz": "Ohřev vody",
+   "en": "Water heater"
+  },
+  "mon.scheme.dc12": {
+   "cz": "DC/DC 12 V",
+   "en": "DC/DC 12 V"
+  },
+  "mon.scheme.desk": {
+   "cz": "Pracovní stůl",
+   "en": "Work desk"
+  },
+  "mon.scheme.fans": {
+   "cz": "Ventilátory REKU",
+   "en": "RECU fans"
+  },
+  "mon.scheme.circ": {
+   "cz": "Okruhy",
+   "en": "Circuits"
+  },
+  "mon.scheme.kids_office": {
+   "cz": "Dětský + pracovna",
+   "en": "Kids room + office"
+  },
+  "mon.scheme.dcbus": {
+   "cz": "DC 48 V",
+   "en": "DC 48 V"
+  },
+  "mon.scheme.lvdc": {
+   "cz": "Propoj LVDC",
+   "en": "LVDC link"
+  },
+  "mon.scheme.lvdc_p": {
+   "cz": "Výkon",
+   "en": "Power"
+  },
+  "mon.scheme.lvdc_i": {
+   "cz": "Proud",
+   "en": "Current"
+  },
+  "mon.scheme.ws_lights": {
+   "cz": "Světla",
+   "en": "Lights"
+  },
+  "mon.scheme.pack_heater": {
+   "cz": "Ohřev baterie",
+   "en": "Pack heater"
+  },
+  "mon.scheme.aircon": {
+   "cz": "Klimatizace",
+   "en": "Air conditioner"
+  },
+  "mon.scheme.axac": {
+   "cz": "AC výstup Axpert",
+   "en": "Axpert AC output"
+  },
+  "mon.scheme.pvws": {
+   "cz": "FV dílna",
+   "en": "PV workshop"
   }
  }
 }

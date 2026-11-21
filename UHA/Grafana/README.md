@@ -40,20 +40,21 @@ WAL readers do not block the writer (checked: long read transactions next to the
 
 ## Dashboards
 
-Folder **UHA**, linked to each other (tag `uha`). Time zone Europe/Prague.
+Folder **UHA**, linked to each other (tag `uha`). Time zone Europe/Prague. Grafana is English; legends use the
+English short names of `WS/i18n/texts.json` (no YAML names). Task `tasks/grafana_energy_views.md`.
 
-1. **UHA Energy** — power (battery, PV, load), SOC, storages / local loads / PV power, energy per hour (bars,
-   consumption LLOAD1+2 and production LPV1+2), energy per day and meters per day (bars, always the last 30 days),
-   meter power.
-2. **UHA Packs** — 16 cell voltages per pack (one panel each), pack voltage / current / SOC.
-3. **UHA Temperatures** — house, outside, tank, boiler + heating circuits, workshop, recuperation, boards, wind.
-4. **UHA States** (0.4.0, table `events`) — state timelines: lights per node (PWM %, 0 = off), one timeline per
-   enum (sunscreens: `BlindCmd`), a table "Lights on now" and bars "Light on-time per day" (hours per local day,
-   last 30 days: intervals with value > 0 between consecutive rows of one light, the last one until now, clipped to
-   the day). Generated from `uha_vars.yaml` (env `UHA_VARS_YAML`, default the UHA_FW checkout): every `agg: event`
-   variable with unit `%` is a light, every `enum` one goes to its enum's timeline, value mappings from the YAML
-   `enums` — new nodes' states (step 2b) appear after `python make_dashboards.py`. Invalid is shown as "invalid"
-   (the query writes it as -1).
+1. **UHA Energy** — power (solar / battery / load), SOC (total thick + packs), energy per day (bar chart:
+   production, consumption, balance hidden by default), loads per day (stacked: the consumption breakdown of
+   `LOAD_CATEGORIES` + "Other" = consumption − categories, adds up to the consumption bar), inverters power
+   (overload view, never summed with the loads), loads power (stacked area, same categories), storages power with
+   the **LVDC link estimate** `(BMS1_CURRENT_A − AXPERT_BAT_CURRENT_A) × STRG2_VOLTAGE_V + POW_WS_HEATING_W / 0.9`
+   (+ = house → workshop; the Victron term is needed, checked on data 2026-11-21).
+2. **UHA Packs** — 16 cell voltages per pack (legend = cell number), pack voltage / current / SOC.
+3. **UHA Temperatures** — indoor & outside, tank layers, boiler, heating circuits, recuperation, CO₂, electronics, wind.
+4. **UHA States** (table `events`) — rows by category (YAML command `category:`, `STATE_CATEGORY` for the rest):
+   lights (+ light on-time per day without the exterior outputs and the stair steps), blinds, inverters, heating
+   (3 pumps, boiler, setpoints, TECHM panels), loads / relays, ventilation. Enum timelines have a colour legend.
+   Invalid is shown as "invalid" (the query writes it as -1).
 
 Which table a panel reads: raw up to 2 days, agg_15min beyond, one value per day beyond 60 days (CET day for
 averages, exact local day for the energy bars). Speed on the Pi 3 with a full-size database (3 days raw + 1 year

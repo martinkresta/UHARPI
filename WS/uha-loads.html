@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UHA</title>
-  <link rel="stylesheet" href="css/uha.css?v=20261121c">
+  <link rel="stylesheet" href="css/uha.css?v=20261122a">
 </head>
 <body>
-<script src="js/uha-common.js?v=20261121c"></script>
+<script src="js/uha-common.js?v=20261122a"></script>
 <script>
 // Inverters: name = state variable (dictionary name), power / today from a meter, rated power W.
 // The Victron has no own meter yet: it shows the workshop heating meter (its only load today). When it gets its
@@ -21,6 +21,10 @@ const INVERTERS = [
 ];
 // Circuit meters: id in POW_<id>_W / CONS_<id>_WH, name from the dictionary (short name of the power variable)
 const CIRCUITS = ['FRIDGE', 'KITCHEN', 'KITCHEN_A', 'KITCHEN_B', 'WASCHMACHINE', 'TECHM', 'EVSE', 'WS_HEATING', 'OTHER'];
+// Computed circuits: the workshop = whole Axpert AC output without the EV charger (ENERGY_TOPOLOGY.md)
+const DERIVED = [
+  { label: 'mon.loads.workshop', pow: ['POW_AXPERT_W', 'POW_EVSE_W'], cons: ['CONS_AXPERT_WH', 'CONS_EVSE_WH'], fn: (a, e) => a - e }
+];
 
 UHA.start(U => {
   const kw = r => (r >= 1000 ? U.fmtNum(r / 1000, 0) + ' kW' : r + ' W');
@@ -35,12 +39,16 @@ UHA.start(U => {
   const present = CIRCUITS.filter(id => U.get(`POW_${id}_W`) && U.get(`POW_${id}_W`).value !== null);
   const rows = present.map(id =>
     `<tr class="${U.ageClass(`POW_${id}_W`)}"><td>${U.vshort(`POW_${id}_W`)}</td><td class="n">${U.show(`POW_${id}_W`)}</td>` +
-    `<td class="n">${U.show(`CONS_${id}_WH`)}</td></tr>`).join('');
+    `<td class="n">${U.show(`CONS_${id}_WH`)}</td></tr>`).join('') +
+    DERIVED.map(x => `<tr class="${U.calcClass(x.pow)}"><td>${U.t(x.label)}</td><td class="n">${U.format(U.calc(x.pow, x.fn), 'W')}</td>` +
+      `<td class="n">${U.format(U.calc(x.cons, (...v) => x.fn(...v) / 1000), 'kWh')}</td></tr>`).join('');
 
   // today's consumption per circuit as bars (relative to the largest)
-  const today = present.map(id => [id, U.num(`CONS_${id}_WH`)]).filter(x => x[1] !== null).sort((a, b) => b[1] - a[1]);
+  const today = present.map(id => [U.vshort(`CONS_${id}_WH`), U.num(`CONS_${id}_WH`)])
+    .concat(DERIVED.map(x => [U.t(x.label), U.calc(x.cons, x.fn)]))
+    .filter(x => x[1] !== null).sort((a, b) => b[1] - a[1]);
   const maxToday = today.length ? Math.max(1, today[0][1]) : 1;
-  const bars = today.map(([id, wh]) => `<div class="meter"><div class="head"><span class="l">${U.vshort(`CONS_${id}_WH`)}</span>` +
+  const bars = today.map(([label, wh]) => `<div class="meter"><div class="head"><span class="l">${label}</span>` +
     `<span class="v">${U.format(wh / 1000, 'kWh')}</span></div>${U.bar(wh / maxToday, 'load')}</div>`).join('');
 
   return U.pageHead(U.t('mon.loads.title'), U.t('mon.loads.sub')) + `<div class="grid wide">` +

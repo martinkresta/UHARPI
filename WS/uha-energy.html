@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UHA</title>
-  <link rel="stylesheet" href="css/uha.css?v=20261121c">
+  <link rel="stylesheet" href="css/uha.css?v=20261122a">
 </head>
 <body>
-<script src="js/uha-common.js?v=20261121c"></script>
+<script src="js/uha-common.js?v=20261122a"></script>
 <script>
 UHA.start(U => {
   const soc = n => { const v = U.num(n); return `<div class="meter"><div class="head"><span class="l">${U.t('mon.energy.soc')}</span><span class="v">${v === null ? '–' : U.format(v, '%', 0)}</span></div>${U.socBar(v)}</div>`; };
@@ -20,7 +20,8 @@ UHA.start(U => {
     U.mrow(`STRG${n}_OPT_CHARGING_A`) + U.mrow(`STRG${n}_BALANCED_TODAY`) +
     `<h3>${U.t('mon.energy.localh')}</h3>` +
     U.row(U.vname(`LLOAD${n}_POWER_W`), `LLOAD${n}_POWER_W`) + U.row(U.vname(`LLOAD${n}_CONS_WH`), `LLOAD${n}_CONS_WH`) +
-    U.row(U.vname(`LPV${n}_POWER_W`), `LPV${n}_POWER_W`) + U.row(U.vname(`LPV${n}_PROD_WH`), `LPV${n}_PROD_WH`), { cls: 'bat' });
+    U.row(U.vname(`LPV${n}_POWER_W`), `LPV${n}_POWER_W`) + U.row(U.vname(`LPV${n}_PROD_WH`), `LPV${n}_PROD_WH`) +
+    U.calcRow(U.t('mon.energy.balance'), [`LPV${n}_PROD_WH`, `LLOAD${n}_CONS_WH`], (p, c) => p - c, 'Wh'), { cls: 'bat' });
 
   return U.pageHead(U.t('mon.energy.title'), U.t('mon.energy.sub'), [['uha-energy-scheme.html', U.t('mon.scheme.link')]]) +
     `<div class="grid wide">` +
@@ -31,7 +32,8 @@ UHA.start(U => {
       U.row(U.vname('BAT_ENERGY_WH'), 'BAT_ENERGY_WH') + U.row(U.vname('BAT_VOLTAGE_V'), 'BAT_VOLTAGE_V') +
       U.row(U.vname('BAT_CURRENT_A'), 'BAT_CURRENT_A') + U.row(U.vname('CHARGING_A'), 'CHARGING_A') + U.row(U.vname('LOAD_A'), 'LOAD_A') +
       `<h3>${U.t('mon.energy.today')}</h3>` + U.row(U.vshort('SOLAR_ENERGY_TODAY_WH'), 'SOLAR_ENERGY_TODAY_WH') +
-      U.row(U.vshort('CONS_TODAY_WH'), 'CONS_TODAY_WH'), { cls: 'solar' }) +
+      U.row(U.vshort('CONS_TODAY_WH'), 'CONS_TODAY_WH') +
+      U.calcRow(U.t('mon.energy.balance'), ['SOLAR_ENERGY_TODAY_WH', 'CONS_TODAY_WH'], (p, c) => p - c, 'Wh'), { cls: 'solar' }) +
     storage(1, U.t('mon.energy.strg1')) +
     storage(2, U.t('mon.energy.strg2')) +
     U.card(U.t('mon.energy.mppt'),
@@ -45,7 +47,13 @@ UHA.start(U => {
       `<h3>${U.t('mon.energy.pvinputs')}</h3>` +
       U.rowText(U.vshort('AXPERT_PVS1_W'), `${U.show('AXPERT_PVS1_W')} · ${U.show('AXPERT_PVS1_V')} · ${U.show('AXPERT_PVS1_A')}`, U.ageClass('AXPERT_PVS1_W')) +
       U.rowText(U.vshort('AXPERT_PVS2_W'), `${U.show('AXPERT_PVS2_W')} · ${U.show('AXPERT_PVS2_V')} · ${U.show('AXPERT_PVS2_A')}`, U.ageClass('AXPERT_PVS2_W')) +
-      U.mrow('AXPERT_ENERGY_TODAY_WH') + U.mrow('AXPERT_TEMP_C'), { cls: 'solar' }) +
+      // AXPERT_ENERGY_TODAY_WH is the net battery energy through the Axpert, not PV (ENERGY_TOPOLOGY.md)
+      `<h3>${U.t('mon.energy.today')}</h3>` +
+      U.calcRow(U.t('mon.energy.ax_pv'), ['LPV2_PROD_WH'], p => p, 'Wh') +
+      U.calcRow(U.t('mon.energy.ax_dcin'), ['LPV2_PROD_WH', 'AXPERT_ENERGY_TODAY_WH'], (p, b) => p - b, 'Wh') +
+      U.calcRow(U.t('mon.energy.ax_acout'), ['CONS_AXPERT_WH'], a => a, 'Wh') +
+      U.calcRow(U.t('mon.energy.ax_loss'), ['LPV2_PROD_WH', 'AXPERT_ENERGY_TODAY_WH', 'CONS_AXPERT_WH'], (p, b, a) => p - b - a, 'Wh') +
+      U.mrow('AXPERT_TEMP_C'), { cls: 'solar' }) +
     `</div><p class="note"><a href="uha-detail.html#energy">${U.t('mon.energy.more')}</a></p>`;
 });
 </script>
