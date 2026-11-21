@@ -1,35 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>UHA Loads</title>
+  <title>UHA</title>
   <link rel="stylesheet" href="css/uha.css">
 </head>
 <body>
 <script src="js/uha-common.js"></script>
 <script>
-// [id in variable names, label, rated power W]
-const INVERTERS = [['AC300', 'Inverter 300 W', 300], ['AC3KW', 'Inverter 3 kW', 3000], ['AC5KW', 'Inverter 5 kW', 5000], ['AXPERT', 'Axpert 8 kW', 8000]];
-const CIRCUITS = [['FRIDGE', 'Fridge'], ['KITCHEN', 'Kitchen'], ['KITCHEN_A', 'Kitchen A'], ['KITCHEN_B', 'Kitchen B'],
-  ['WASCHMACHINE', 'Washing machine'], ['TECHM', 'Technical room'], ['EVSE', 'EV charger'], ['WS_HEATING', 'Workshop heating'], ['OTHER', 'Other']];
+// Inverters: name = state variable (dictionary name), power / today from a meter, rated power W.
+// The Victron has no own meter yet: it shows the workshop heating meter (its only load today). When it gets its
+// own meter, change pow/cons in its line only.
+const INVERTERS = [
+  { name: 'ST_AC_300W', pow: 'POW_AC300_W', cons: 'CONS_AC300_WH', rated: 300 },
+  { name: 'ST_AC_3KW', pow: 'POW_AC3KW_W', cons: 'CONS_AC3KW_WH', rated: 3000 },
+  { name: 'ST_AC_5KW', pow: 'POW_AC5KW_W', cons: 'CONS_AC5KW_WH', rated: 5000 },
+  { name: 'ST_AC_AXPERT', pow: 'POW_AXPERT_W', cons: 'CONS_AXPERT_WH', rated: 8000 },
+  { name: 'ST_AC_VICTRON', pow: 'POW_WS_HEATING_W', cons: 'CONS_WS_HEATING_WH', rated: 2000 }
+];
+// Circuit meters: id in POW_<id>_W / CONS_<id>_WH, name from the dictionary (short name of the power variable)
+const CIRCUITS = ['FRIDGE', 'KITCHEN', 'KITCHEN_A', 'KITCHEN_B', 'WASCHMACHINE', 'TECHM', 'EVSE', 'WS_HEATING', 'OTHER'];
 
 UHA.start(U => {
-  const inv = INVERTERS.map(([id, label, rated]) => {
-    const w = U.num(`POW_${id}_W`);
-    return `<div class="meter"><div class="head"><span class="l">${label}</span><span class="v">${U.show(`POW_${id}_W`)}</span></div>` +
-      U.loadBar(w, rated) +
-      `<div class="foot"><span>${w === null ? '–' : (w / rated * 100).toFixed(0)} % of ${rated >= 1000 ? rated / 1000 + ' kW' : rated + ' W'}</span><span>today ${U.show(`CONS_${id}_WH`)}</span></div></div>`;
+  const kw = r => (r >= 1000 ? U.fmtNum(r / 1000, 0) + ' kW' : r + ' W');
+  const inv = INVERTERS.map(x => {
+    const w = U.num(x.pow), st = U.enumText(x.name);
+    return `<div class="meter ${U.ageClass(x.pow)}"><div class="head"><span class="l">${U.vshort(x.name)}</span>` +
+      `<span class="v">${U.show(x.pow)}</span></div>` + U.loadBar(w, x.rated) +
+      `<div class="foot"><span>${U.t('mon.loads.ofrated', { p: w === null ? '–' : U.fmtNum(w / x.rated * 100, 0), r: kw(x.rated) })}` +
+      `${st ? ' · ' + st : ''}</span><span>${U.t('mon.loads.todayx', { x: U.show(x.cons) })}</span></div></div>`;
   }).join('');
 
-  const rows = CIRCUITS.filter(([id]) => U.get(`POW_${id}_W`) && U.get(`POW_${id}_W`).value !== null).map(([id, label]) =>
-    `<tr class="${U.ageClass(`POW_${id}_W`)}"><td>${label}</td><td class="n">${U.show(`POW_${id}_W`)}</td><td class="n">${U.show(`CONS_${id}_WH`)}</td></tr>`).join('');
+  const present = CIRCUITS.filter(id => U.get(`POW_${id}_W`) && U.get(`POW_${id}_W`).value !== null);
+  const rows = present.map(id =>
+    `<tr class="${U.ageClass(`POW_${id}_W`)}"><td>${U.vshort(`POW_${id}_W`)}</td><td class="n">${U.show(`POW_${id}_W`)}</td>` +
+    `<td class="n">${U.show(`CONS_${id}_WH`)}</td></tr>`).join('');
 
-  return `<h1 class="pagetitle">Loads</h1><p class="pagesub">Inverter load and consumption per circuit</p><div class="grid wide">` +
-    U.card('Total', `<div class="tiles">${U.tile('Consumption now', 'LOAD_W', { big: true })}${U.tile('Today', 'CONS_TODAY_WH', { big: true })}</div>`, { cls: 'load' }) +
-    U.card('Inverters', inv, { cls: 'load' }) +
-    U.card('Circuits', `<table class="t"><tr><th>Circuit</th><th class="n">Power</th><th class="n">Today</th></tr>${rows}</table>`, { cls: 'load' }) +
-    `</div><p class="note">Bars show load against the assumed rated power of each inverter. <a href="uha-detail.html#loads">All meter values →</a></p>`;
+  // today's consumption per circuit as bars (relative to the largest)
+  const today = present.map(id => [id, U.num(`CONS_${id}_WH`)]).filter(x => x[1] !== null).sort((a, b) => b[1] - a[1]);
+  const maxToday = today.length ? Math.max(1, today[0][1]) : 1;
+  const bars = today.map(([id, wh]) => `<div class="meter"><div class="head"><span class="l">${U.vshort(`CONS_${id}_WH`)}</span>` +
+    `<span class="v">${U.format(wh / 1000, 'kWh')}</span></div>${U.bar(wh / maxToday, 'load')}</div>`).join('');
+
+  return U.pageHead(U.t('mon.loads.title'), U.t('mon.loads.sub')) + `<div class="grid wide">` +
+    U.card(U.t('mon.loads.total'), `<div class="tiles">${U.tile(U.t('mon.loads.consnow'), 'LOAD_W', { big: true })}` +
+      `${U.tile(U.t('mon.home.today'), 'CONS_TODAY_WH', { big: true })}</div>`, { cls: 'load' }) +
+    U.card(U.t('mon.loads.inverters'), inv, { cls: 'load' }) +
+    U.card(U.t('mon.loads.circuits'), `<table class="t"><tr><th>${U.t('mon.loads.circuit')}</th><th class="n">${U.t('mon.loads.power')}</th>` +
+      `<th class="n">${U.t('mon.home.today')}</th></tr>${rows}</table>` +
+      (bars ? `<div class="hbars"><h3>${U.t('mon.loads.todaybars')}</h3>${bars}</div>` : ''), { cls: 'load' }) +
+    `</div><p class="note">${U.t('mon.loads.note')} ${U.t('mon.loads.victronnote')} <a href="uha-detail.html#loads">${U.t('mon.loads.more')}</a></p>`;
 });
 </script>
 </body>

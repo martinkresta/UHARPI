@@ -1,54 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>UHA Status</title>
+  <title>UHA</title>
   <link rel="stylesheet" href="css/uha.css">
 </head>
 <body>
 <script src="js/uha-common.js"></script>
 <script>
+const ERRORS = ['UnknownIds', 'WrongProducer', 'ChecksumErrors', 'LengthErrors', 'DiscardedBytes', 'TxErrors', 'WriteErrors', 'EventLogErrors'];
+
 UHA.start(U => {
   const s = U.status();
-  if (!s) return '<div class="card"><h2>No data</h2><p>uha_status.json not available.</p></div>';
-  const n = x => (x === null || x === undefined) ? '–' : x.toLocaleString('en');
+  if (!s) return `<div class="card"><h2>${U.t('mon.err.nodata')}</h2><p>${U.t('mon.status.nofile')}</p></div>`;
+  const n = x => (x === null || x === undefined) ? '–' : x.toLocaleString(U.locale());
   const link = s.Link || {}, c = s.Counters || {}, y = s.Yaml || {}, v2 = s.Vars2 || {};
   const up = link.State === 'up';
+  const nodesAll = Object.entries(s.Nodes || {});
+  // Uptime / FW version per node: shown only once the gateway sends them (Nodes.<X>.UptimeS / FwVersion)
+  const hasUptime = nodesAll.some(([, v]) => v.UptimeS !== undefined && v.UptimeS !== null);
+  const hasFw = nodesAll.some(([, v]) => v.FwVersion !== undefined && v.FwVersion !== null && v.FwVersion !== '');
 
-  const frozenLimit = ((Object.values(s.Nodes || {})[0]) || {}).FrozenLimitS || 120;
-  const nodes = Object.entries(s.Nodes || {}).map(([name, v]) =>
+  const frozenLimit = ((nodesAll[0] || [])[1] || {}).FrozenLimitS || 120;
+  const nodes = nodesAll.map(([name, v]) =>
     `<tr class="${v.AgeS === null || v.Frozen ? 'bad' : ''}"><td>${name}</td><td class="n">${v.Id}</td>` +
-    `<td class="n">${v.AgeS === null ? 'never seen' : v.AgeS + ' s'}</td>` +
+    `<td class="n">${v.AgeS === null ? U.t('mon.status.neverseen') : U.format(v.AgeS, 's', 0)}</td>` +
     // Data: do the node's values still change? A frozen node can keep sending the same old values (ELECON repeats them)
-    `<td>${v.QuietS === null || v.QuietS === undefined ? '–' : v.Frozen ? `<span class="tag bad">frozen ${U.fmtDuration(v.QuietS)}</span>` : '<span class="tag ok">changing</span>'}</td>` +
+    `<td>${v.QuietS === null || v.QuietS === undefined ? '–' : v.Frozen ? `<span class="tag bad">${U.t('mon.status.frozen', { x: U.fmtDuration(v.QuietS) })}</span>` : `<span class="tag ok">${U.t('mon.status.changing')}</span>`}</td>` +
+    (hasUptime ? `<td class="n hide-sm">${U.fmtDuration(v.UptimeS)}</td>` : '') +
+    (hasFw ? `<td class="hide-sm">${v.FwVersion ? U.esc(v.FwVersion) : '–'}</td>` : '') +
     `<td class="n hide-sm">${n(v.TunnelPackets)}</td>` +
     `<td class="n hide-sm">${n(v.LogMessages)}</td><td class="hide-sm">${v.LastLogEvent || '–'}</td></tr>`).join('');
 
-  const errs = ['UnknownIds', 'WrongProducer', 'ChecksumErrors', 'LengthErrors', 'DiscardedBytes', 'TxErrors', 'WriteErrors', 'EventLogErrors']
-    .map(k => `<tr class="${c[k] ? 'old' : ''}"><td>${k}</td><td class="n">${n(c[k])}</td></tr>`).join('');
+  const errs = ERRORS.map(k => `<tr class="${c[k] ? 'old' : ''}"><td>${U.t('mon.status.err.' + k)}</td><td class="n">${n(c[k])}</td></tr>`).join('');
 
   // state of the VARS2 variables: names of the ones that are not fresh (shown on hover)
   const list = (title, names) => U.rowText(title, `<span title="${(names || []).join(', ')}">${n((names || []).length)}</span>`,
     (names || []).length ? 'old' : '');
+  const col = k => U.t('mon.status.col.' + k);
 
-  return `<h1 class="pagetitle">Gateway status</h1><p class="pagesub">UhaGatePy ${s.Version || ''} · uptime ${U.fmtDuration(s.UptimeS)}</p><div class="grid wide">` +
-    U.card('Serial link',
-      U.rowText('State', `<span class="tag ${up ? 'ok' : 'bad'}">${link.State}</span>`) +
-      U.rowText('Last packet age', link.LastPacketAgeS + ' s', link.LastPacketAgeS > 5 ? 'old' : '') +
-      U.rowText('Reconnects', n(link.Reconnects)) + U.rowText('Port', `<span class="raw" style="font:11px monospace">${(link.Port || '').split('/').pop()}</span>`)) +
-    U.card('Traffic',
-      U.rowText('Packets received', n(c.RxPackets)) + U.rowText('Old 0x221 packets (ignored)', n(c.IgnoredOldPackets)) +
-      U.rowText('VARS2 tunnel packets', n(c.TunnelPackets)) + U.rowText('Log packets', n(c.LogPackets)) +
-      U.rowText('Sent (RTC sync)', n(c.TxPackets)) + U.rowText('Gateway memory', n(c.RssKb) + ' kB')) +
-    U.card('Variables',
-      U.rowText('YAML', `v${y.Version} · ${y.Sha} · ${y.Variables} vars`) +
-      U.rowText('Fresh', n(v2.Fresh)) + list('Stale', v2.Stale) + list('Invalid', v2.Invalid) +
-      list('Never received', v2.NeverReceived)) +
-    U.card('Error counters', `<table class="t">${errs}</table>`) +
-    `</div><h3 style="margin-top:20px">Nodes</h3>` +
-    `<table class="t"><tr><th>Node</th><th class="n">ID</th><th class="n">Last seen</th><th>Data</th><th class="n hide-sm">Tunnel packets</th><th class="n hide-sm">Log msgs</th><th class="hide-sm">Last log event</th></tr>${nodes}</table>` +
-    `<p class="note">Last seen = last VARS2 packet or log message of the node. Data = "frozen" when none of its variables changed for ${frozenLimit} s or more: the node has probably stopped sending, even if old values still arrive.</p>`;
+  return U.pageHead(U.t('mon.status.title'), `UhaGatePy ${s.Version || ''} · ${U.t('mon.status.uptime', { x: U.fmtDuration(s.UptimeS) })}`) +
+    `<div class="grid wide">` +
+    U.card(U.t('mon.status.serial'),
+      U.rowText(U.t('mon.status.state'), `<span class="tag ${up ? 'ok' : 'bad'}">${up ? U.t('mon.status.up') : U.t('mon.status.down')}</span>`) +
+      U.rowText(U.t('mon.status.lastpkt'), U.format(link.LastPacketAgeS, 's', 0), link.LastPacketAgeS > 5 ? 'old' : '') +
+      U.rowText(U.t('mon.status.reconnects'), n(link.Reconnects)) +
+      U.rowText(U.t('mon.status.port'), `<span class="raw" style="font:11px monospace">${(link.Port || '').split('/').pop()}</span>`)) +
+    U.card(U.t('mon.status.traffic'),
+      U.rowText(U.t('mon.status.rx'), n(c.RxPackets)) + U.rowText(U.t('mon.status.old221'), n(c.IgnoredOldPackets)) +
+      U.rowText(U.t('mon.status.tunnel'), n(c.TunnelPackets)) + U.rowText(U.t('mon.status.logp'), n(c.LogPackets)) +
+      U.rowText(U.t('mon.status.tx'), n(c.TxPackets)) + U.rowText(U.t('mon.status.mem'), n(c.RssKb) + ' kB')) +
+    U.card(U.t('mon.status.vars'),
+      U.rowText('YAML', `v${y.Version} · ${y.Sha} · ${n(y.Variables)}`) +
+      U.rowText(U.t('mon.status.fresh'), n(v2.Fresh)) + list(U.t('mon.status.stale'), v2.Stale) + list(U.t('mon.status.invalid'), v2.Invalid) +
+      list(U.t('mon.status.never'), v2.NeverReceived)) +
+    U.card(U.t('mon.status.errors'), `<table class="t">${errs}</table>`) +
+    `</div><h3 style="margin-top:20px">${U.t('mon.status.nodes')}</h3>` +
+    `<table class="t"><tr><th>${col('node')}</th><th class="n">ID</th><th class="n">${col('seen')}</th><th>${col('data')}</th>` +
+    (hasUptime ? `<th class="n hide-sm">${col('uptime')}</th>` : '') + (hasFw ? `<th class="hide-sm">${col('fw')}</th>` : '') +
+    `<th class="n hide-sm">${col('tunnel')}</th><th class="n hide-sm">${col('log')}</th><th class="hide-sm">${col('lastlog')}</th></tr>${nodes}</table>` +
+    `<p class="note">${U.t('mon.status.note', { n: frozenLimit })}</p>`;
 }, { status: true });
 </script>
 </body>

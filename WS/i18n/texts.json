@@ -1,0 +1,2879 @@
+{
+ "ui": {
+  "mon.nav.home": {
+   "cz": "Přehled",
+   "en": "Home"
+  },
+  "mon.nav.energy": {
+   "cz": "Energie",
+   "en": "Energy"
+  },
+  "mon.nav.battery": {
+   "cz": "Baterie",
+   "en": "Battery"
+  },
+  "mon.nav.loads": {
+   "cz": "Spotřebiče",
+   "en": "Loads"
+  },
+  "mon.nav.heat": {
+   "cz": "Teplo",
+   "en": "Heat"
+  },
+  "mon.nav.climate": {
+   "cz": "Klima",
+   "en": "Climate"
+  },
+  "mon.nav.detail": {
+   "cz": "Všechna data",
+   "en": "All data"
+  },
+  "mon.nav.status": {
+   "cz": "Stav brány",
+   "en": "Status"
+  },
+  "mon.nav.control": {
+   "cz": "Ovládání",
+   "en": "Control"
+  },
+  "mon.feed.connecting": {
+   "cz": "připojuji…",
+   "en": "connecting…"
+  },
+  "mon.feed.nodata": {
+   "cz": "žádná data",
+   "en": "no data"
+  },
+  "mon.feed.sample": {
+   "cz": "ukázková data",
+   "en": "sample"
+  },
+  "mon.feed.stale": {
+   "cz": "{n} s bez nových dat",
+   "en": "no new data for {n} s"
+  },
+  "mon.sample.banner": {
+   "cz": "Ukázková data – živá data nejsou k dispozici.",
+   "en": "Sample data – live data not available."
+  },
+  "mon.err.nodata": {
+   "cz": "Žádná data",
+   "en": "No data"
+  },
+  "mon.err.load": {
+   "cz": "Nelze načíst data.",
+   "en": "Could not load uha2.json."
+  },
+  "mon.val.yes": {
+   "cz": "ano",
+   "en": "yes"
+  },
+  "mon.val.no": {
+   "cz": "ne",
+   "en": "no"
+  },
+  "mon.home.bat": {
+   "cz": "Baterie",
+   "en": "Battery"
+  },
+  "mon.home.solar": {
+   "cz": "Výroba FV",
+   "en": "Solar production"
+  },
+  "mon.home.cons": {
+   "cz": "Spotřeba",
+   "en": "Consumption"
+  },
+  "mon.home.heat": {
+   "cz": "Teplo",
+   "en": "Heat"
+  },
+  "mon.home.house": {
+   "cz": "Dům",
+   "en": "House"
+  },
+  "mon.home.now": {
+   "cz": "Teď",
+   "en": "Now"
+  },
+  "mon.home.today": {
+   "cz": "Dnes",
+   "en": "Today"
+  },
+  "mon.home.tankmax": {
+   "cz": "Nádrž max.",
+   "en": "Tank max"
+  },
+  "mon.home.heatenergy": {
+   "cz": "Energie v nádrži",
+   "en": "Heat energy"
+  },
+  "mon.home.stored": {
+   "cz": "uloženo",
+   "en": "stored"
+  },
+  "mon.home.charging": {
+   "cz": "Nabíjí {x}",
+   "en": "Charging {x}"
+  },
+  "mon.home.discharging": {
+   "cz": "Vybíjí {x}",
+   "en": "Discharging {x}"
+  },
+  "mon.home.idle": {
+   "cz": "Klid",
+   "en": "Idle"
+  },
+  "mon.energy.title": {
+   "cz": "Energie",
+   "en": "Energy"
+  },
+  "mon.energy.sub": {
+   "cz": "Výroba, úložiště a bilance výkonu",
+   "en": "Solar, storage and power balance"
+  },
+  "mon.energy.global": {
+   "cz": "Celková bilance",
+   "en": "Global balance"
+  },
+  "mon.energy.soc": {
+   "cz": "Nabití",
+   "en": "State of charge"
+  },
+  "mon.energy.batsub": {
+   "cz": "kladné = nabíjení",
+   "en": "positive = charging"
+  },
+  "mon.energy.today": {
+   "cz": "Dnes",
+   "en": "Today"
+  },
+  "mon.energy.strg1": {
+   "cz": "Úložiště 1 – dům",
+   "en": "Storage 1 – house"
+  },
+  "mon.energy.strg2": {
+   "cz": "Úložiště 2 – dílna",
+   "en": "Storage 2 – workshop"
+  },
+  "mon.energy.localh": {
+   "cz": "Místní spotřeba / místní FV",
+   "en": "Local load / local PV"
+  },
+  "mon.energy.mppt": {
+   "cz": "Solární regulátor (MPPT)",
+   "en": "Solar charger (MPPT)"
+  },
+  "mon.energy.axpert": {
+   "cz": "Měnič Axpert 8 kW",
+   "en": "Axpert 8 kW inverter"
+  },
+  "mon.energy.pvinputs": {
+   "cz": "FV vstupy",
+   "en": "PV inputs"
+  },
+  "mon.energy.shunts": {
+   "cz": "Bočníky",
+   "en": "Shunts"
+  },
+  "mon.energy.more": {
+   "cz": "Všechny proměnné energie →",
+   "en": "All energy variables →"
+  },
+  "mon.battery.title": {
+   "cz": "Baterie",
+   "en": "Battery"
+  },
+  "mon.battery.sub": {
+   "cz": "Tři akupacky, každý s vlastním BMS",
+   "en": "Three packs, one BMS each"
+  },
+  "mon.battery.p1": {
+   "cz": "Akupack dílna 251 Ah",
+   "en": "BMS1 – workshop 251 Ah"
+  },
+  "mon.battery.p2": {
+   "cz": "Akupack dům 220 Ah",
+   "en": "BMS2 – house 220 Ah"
+  },
+  "mon.battery.p3": {
+   "cz": "Akupack dům 80 Ah",
+   "en": "BMS3 – house 80 Ah"
+  },
+  "mon.battery.cells": {
+   "cz": "Napětí článků ({lo}–{hi} V)",
+   "en": "Cell voltages ({lo}–{hi} V)"
+  },
+  "mon.battery.cell": {
+   "cz": "Článek {n}",
+   "en": "Cell {n}"
+  },
+  "mon.battery.minmax": {
+   "cz": "Článek min / max",
+   "en": "Min / max cell"
+  },
+  "mon.battery.spread": {
+   "cz": "Rozptyl článků",
+   "en": "Cell spread"
+  },
+  "mon.battery.tminmax": {
+   "cz": "Teplota článků min / max",
+   "en": "Cell temperature min / max"
+  },
+  "mon.battery.todaydiff": {
+   "cz": "Denní bilance",
+   "en": "Energy today (diff)"
+  },
+  "mon.battery.note": {
+   "cz": "Modrá = nejnižší článek, oranžová = nejvyšší. Rozptyl nad 50 mV je zvýrazněn.",
+   "en": "Blue bar = lowest cell, orange = highest. Spread above 50 mV is highlighted."
+  },
+  "mon.battery.more": {
+   "cz": "Všechny hodnoty článků →",
+   "en": "All cell values →"
+  },
+  "mon.loads.title": {
+   "cz": "Spotřebiče",
+   "en": "Loads"
+  },
+  "mon.loads.sub": {
+   "cz": "Zatížení měničů a spotřeba po okruzích",
+   "en": "Inverter load and consumption per circuit"
+  },
+  "mon.loads.total": {
+   "cz": "Celkem",
+   "en": "Total"
+  },
+  "mon.loads.consnow": {
+   "cz": "Spotřeba teď",
+   "en": "Consumption now"
+  },
+  "mon.loads.inverters": {
+   "cz": "Měniče",
+   "en": "Inverters"
+  },
+  "mon.loads.circuits": {
+   "cz": "Okruhy",
+   "en": "Circuits"
+  },
+  "mon.loads.circuit": {
+   "cz": "Okruh",
+   "en": "Circuit"
+  },
+  "mon.loads.power": {
+   "cz": "Výkon",
+   "en": "Power"
+  },
+  "mon.loads.ofrated": {
+   "cz": "{p} % z {r}",
+   "en": "{p} % of {r}"
+  },
+  "mon.loads.todayx": {
+   "cz": "dnes {x}",
+   "en": "today {x}"
+  },
+  "mon.loads.note": {
+   "cz": "Pruhy ukazují zatížení vůči jmenovitému výkonu měniče.",
+   "en": "Bars show load against the assumed rated power of each inverter."
+  },
+  "mon.loads.more": {
+   "cz": "Všechny elektroměry →",
+   "en": "All meter values →"
+  },
+  "mon.heat.title": {
+   "cz": "Teplo a voda",
+   "en": "Heat & water"
+  },
+  "mon.heat.sub": {
+   "cz": "Akumulační nádrž, kotel, topení a voda",
+   "en": "Accumulation tank, boiler, heating and water"
+  },
+  "mon.heat.tank": {
+   "cz": "Akumulační nádrž",
+   "en": "Accumulation tank"
+  },
+  "mon.heat.sensor": {
+   "cz": "Čidlo {n}",
+   "en": "Sensor {n}"
+  },
+  "mon.heat.circuit": {
+   "cz": "Topný okruh",
+   "en": "Heating circuit"
+  },
+  "mon.heat.boiler": {
+   "cz": "Kotel",
+   "en": "Boiler"
+  },
+  "mon.heat.elheater": {
+   "cz": "Elektrický ohřev (nádrž)",
+   "en": "Electric heater (tank)"
+  },
+  "mon.heat.heatenergy": {
+   "cz": "Energie tepla",
+   "en": "Heat energy"
+  },
+  "mon.heat.floor": {
+   "cz": "Stěny / radiátory",
+   "en": "Floor / wall / radiators"
+  },
+  "mon.heat.water": {
+   "cz": "Voda",
+   "en": "Water"
+  },
+  "mon.heat.more": {
+   "cz": "Všechny proměnné tepla →",
+   "en": "All heat variables →"
+  },
+  "mon.climate.title": {
+   "cz": "Klima",
+   "en": "Climate"
+  },
+  "mon.climate.sub": {
+   "cz": "Teploty, větrání a počasí",
+   "en": "Temperatures, ventilation and weather"
+  },
+  "mon.climate.temps": {
+   "cz": "Teploty",
+   "en": "Temperatures"
+  },
+  "mon.climate.vent": {
+   "cz": "Větrání (rekuperace)",
+   "en": "Ventilation (recuperation)"
+  },
+  "mon.climate.fans": {
+   "cz": "Ventilátory a tlak",
+   "en": "Fans & pressure"
+  },
+  "mon.climate.wind": {
+   "cz": "Vítr",
+   "en": "Wind"
+  },
+  "mon.climate.electronics": {
+   "cz": "Teplota elektroniky",
+   "en": "Electronics temperature"
+  },
+  "mon.climate.more": {
+   "cz": "Všechny proměnné klimatu →",
+   "en": "All climate variables →"
+  },
+  "mon.detail.title": {
+   "cz": "Všechna data",
+   "en": "All data"
+  },
+  "mon.detail.sub": {
+   "cz": "Všechny proměnné ve fyzikálních jednotkách ({n})",
+   "en": "Every variable in physical units ({n} total)"
+  },
+  "mon.detail.g.battery": {
+   "cz": "Baterie (BMS)",
+   "en": "Battery (BMS)"
+  },
+  "mon.detail.g.heat": {
+   "cz": "Teplo a voda",
+   "en": "Heat & water"
+  },
+  "mon.detail.g.energy": {
+   "cz": "Energie",
+   "en": "Energy"
+  },
+  "mon.detail.g.loads": {
+   "cz": "Spotřebiče a měniče",
+   "en": "Loads & inverters"
+  },
+  "mon.detail.g.climate": {
+   "cz": "Klima",
+   "en": "Climate"
+  },
+  "mon.detail.g.other": {
+   "cz": "Ostatní",
+   "en": "Other"
+  },
+  "mon.detail.filter": {
+   "cz": "Hledat…",
+   "en": "Filter…"
+  },
+  "mon.detail.hideinvalid": {
+   "cz": "skrýt neplatné",
+   "en": "hide invalid"
+  },
+  "mon.detail.col.var": {
+   "cz": "Proměnná",
+   "en": "Variable"
+  },
+  "mon.detail.col.value": {
+   "cz": "Hodnota",
+   "en": "Value"
+  },
+  "mon.detail.col.age": {
+   "cz": "Stáří",
+   "en": "Age"
+  },
+  "mon.detail.col.producer": {
+   "cz": "Zdroj",
+   "en": "Producer"
+  },
+  "mon.detail.col.state": {
+   "cz": "Stav",
+   "en": "State"
+  },
+  "mon.detail.col.id": {
+   "cz": "ID",
+   "en": "ID"
+  },
+  "mon.detail.fresh": {
+   "cz": "aktuální",
+   "en": "fresh"
+  },
+  "mon.detail.never": {
+   "cz": "nikdy",
+   "en": "never"
+  },
+  "mon.detail.stale": {
+   "cz": "zastaralé",
+   "en": "stale"
+  },
+  "mon.status.title": {
+   "cz": "Stav brány",
+   "en": "Gateway status"
+  },
+  "mon.status.uptime": {
+   "cz": "běží {x}",
+   "en": "uptime {x}"
+  },
+  "mon.status.serial": {
+   "cz": "Sériová linka",
+   "en": "Serial link"
+  },
+  "mon.status.state": {
+   "cz": "Stav",
+   "en": "State"
+  },
+  "mon.status.lastpkt": {
+   "cz": "Poslední paket před",
+   "en": "Last packet age"
+  },
+  "mon.status.reconnects": {
+   "cz": "Znovupřipojení",
+   "en": "Reconnects"
+  },
+  "mon.status.port": {
+   "cz": "Port",
+   "en": "Port"
+  },
+  "mon.status.traffic": {
+   "cz": "Provoz",
+   "en": "Traffic"
+  },
+  "mon.status.rx": {
+   "cz": "Přijaté pakety",
+   "en": "Packets received"
+  },
+  "mon.status.old221": {
+   "cz": "Staré pakety 0x221 (ignorováno)",
+   "en": "Old 0x221 packets (ignored)"
+  },
+  "mon.status.tunnel": {
+   "cz": "Pakety tunelu VARS2",
+   "en": "VARS2 tunnel packets"
+  },
+  "mon.status.logp": {
+   "cz": "Logovací pakety",
+   "en": "Log packets"
+  },
+  "mon.status.tx": {
+   "cz": "Odesláno (čas)",
+   "en": "Sent (RTC sync)"
+  },
+  "mon.status.mem": {
+   "cz": "Paměť brány",
+   "en": "Gateway memory"
+  },
+  "mon.status.vars": {
+   "cz": "Proměnné",
+   "en": "Variables"
+  },
+  "mon.status.fresh": {
+   "cz": "Aktuální",
+   "en": "Fresh"
+  },
+  "mon.status.stale": {
+   "cz": "Zastaralé",
+   "en": "Stale"
+  },
+  "mon.status.invalid": {
+   "cz": "Neplatné",
+   "en": "Invalid"
+  },
+  "mon.status.never": {
+   "cz": "Nikdy nepřijato",
+   "en": "Never received"
+  },
+  "mon.status.errors": {
+   "cz": "Čítače chyb",
+   "en": "Error counters"
+  },
+  "mon.status.nodes": {
+   "cz": "Nody",
+   "en": "Nodes"
+  },
+  "mon.status.col.node": {
+   "cz": "Node",
+   "en": "Node"
+  },
+  "mon.status.col.seen": {
+   "cz": "Naposledy",
+   "en": "Last seen"
+  },
+  "mon.status.col.data": {
+   "cz": "Data",
+   "en": "Data"
+  },
+  "mon.status.col.tunnel": {
+   "cz": "Pakety tunelu",
+   "en": "Tunnel packets"
+  },
+  "mon.status.col.log": {
+   "cz": "Logy",
+   "en": "Log msgs"
+  },
+  "mon.status.col.lastlog": {
+   "cz": "Poslední událost",
+   "en": "Last log event"
+  },
+  "mon.status.neverseen": {
+   "cz": "nikdy",
+   "en": "never seen"
+  },
+  "mon.status.frozen": {
+   "cz": "zamrzlý {x}",
+   "en": "frozen {x}"
+  },
+  "mon.status.changing": {
+   "cz": "mění se",
+   "en": "changing"
+  },
+  "mon.status.note": {
+   "cz": "Naposledy = poslední paket VARS2 nebo log nodu. Data = „zamrzlý“, když se žádná jeho proměnná nezměnila {n} s a déle.",
+   "en": "Last seen = last VARS2 packet or log message of the node. Data = \"frozen\" when none of its variables changed for {n} s or more."
+  },
+  "ctrl.title": {
+   "cz": "Ovládání",
+   "en": "Control"
+  },
+  "ctrl.back": {
+   "cz": "← zpět na přehled",
+   "en": "← back to overview"
+  },
+  "ctrl.loading": {
+   "cz": "Načítám…",
+   "en": "Loading…"
+  },
+  "ctrl.note": {
+   "cz": "Příkaz je žádost: modul ho provede, jen pokud to jeho místní logika dovolí. Stav ukazuje, co modul skutečně nastavil.",
+   "en": "A command is a request: the module carries it out only if its local logic allows it. The state shows what the module really set."
+  },
+  "ctrl.log.title": {
+   "cz": "Poslední příkazy",
+   "en": "Recent commands"
+  },
+  "ctrl.log.time": {
+   "cz": "Čas",
+   "en": "Time"
+  },
+  "ctrl.log.who": {
+   "cz": "Kdo",
+   "en": "Who"
+  },
+  "ctrl.log.func": {
+   "cz": "Funkce",
+   "en": "Function"
+  },
+  "ctrl.log.cmd": {
+   "cz": "Příkaz",
+   "en": "Command"
+  },
+  "ctrl.cat.light": {
+   "cz": "Světla",
+   "en": "Lights"
+  },
+  "ctrl.cat.blind": {
+   "cz": "Žaluzie",
+   "en": "Blinds"
+  },
+  "ctrl.cat.heating": {
+   "cz": "Topení",
+   "en": "Heating"
+  },
+  "ctrl.cat.inverter": {
+   "cz": "Měniče",
+   "en": "Inverters"
+  },
+  "ctrl.cat.ventilation": {
+   "cz": "Rekuperace",
+   "en": "Ventilation"
+  },
+  "ctrl.cat.other": {
+   "cz": "Ostatní",
+   "en": "Other"
+  },
+  "ctrl.col.func": {
+   "cz": "Funkce",
+   "en": "Function"
+  },
+  "ctrl.col.state": {
+   "cz": "Stav",
+   "en": "State"
+  },
+  "ctrl.on": {
+   "cz": "Zapnout",
+   "en": "On"
+  },
+  "ctrl.off": {
+   "cz": "Vypnout",
+   "en": "Off"
+  },
+  "ctrl.set": {
+   "cz": "Nastavit",
+   "en": "Set"
+  },
+  "ctrl.st.on": {
+   "cz": "zapnuto",
+   "en": "on"
+  },
+  "ctrl.st.off": {
+   "cz": "vypnuto",
+   "en": "off"
+  },
+  "ctrl.st.unknown": {
+   "cz": "neznámý",
+   "en": "unknown"
+  },
+  "ctrl.range": {
+   "cz": "rozsah {min} až {max}",
+   "en": "range {min} to {max}"
+  },
+  "ctrl.msg.sending": {
+   "cz": "odesílám…",
+   "en": "sending…"
+  },
+  "ctrl.msg.waiting": {
+   "cz": "čekám na změnu…",
+   "en": "waiting for the change…"
+  },
+  "ctrl.msg.done": {
+   "cz": "hotovo",
+   "en": "done"
+  },
+  "ctrl.msg.nochange": {
+   "cz": "stav se nezměnil",
+   "en": "state did not change"
+  },
+  "ctrl.msg.number": {
+   "cz": "zadejte číslo",
+   "en": "enter a number"
+  },
+  "ctrl.msg.ratelimit": {
+   "cz": "příliš mnoho příkazů, chvíli počkejte",
+   "en": "too many commands, wait a moment"
+  },
+  "ctrl.msg.nolink": {
+   "cz": "brána nemá spojení s ELECONem",
+   "en": "gateway has no link to ELECON"
+  },
+  "ctrl.msg.error": {
+   "cz": "chyba {code}",
+   "en": "error {code}"
+  },
+  "ctrl.msg.cantsend": {
+   "cz": "nelze odeslat: {e}",
+   "en": "cannot send: {e}"
+  },
+  "ctrl.data.old": {
+   "cz": "Pozor: data jsou {n} s stará (brána nezapisuje).",
+   "en": "Warning: data is {n} s old (gateway not writing)."
+  },
+  "ctrl.data.asof": {
+   "cz": "Stav k {time}",
+   "en": "State as of {time}"
+  },
+  "ctrl.data.err": {
+   "cz": "Nelze načíst stav: {e}",
+   "en": "Cannot load state: {e}"
+  },
+  "ctrl.log.on": {
+   "cz": "zapnout",
+   "en": "on"
+  },
+  "ctrl.log.off": {
+   "cz": "vypnout",
+   "en": "off"
+  },
+  "graf.dash.energy": {
+   "cz": "UHA Energie",
+   "en": "UHA Energy"
+  },
+  "graf.dash.packs": {
+   "cz": "UHA Akupacky",
+   "en": "UHA Packs"
+  },
+  "graf.dash.temps": {
+   "cz": "UHA Teploty",
+   "en": "UHA Temperatures"
+  },
+  "graf.dash.states": {
+   "cz": "UHA Stavy",
+   "en": "UHA States"
+  },
+  "graf.energy.power": {
+   "cz": "Výkon",
+   "en": "Power"
+  },
+  "graf.energy.soc": {
+   "cz": "Nabití",
+   "en": "State of charge"
+  },
+  "graf.energy.storages": {
+   "cz": "Výkon úložišť",
+   "en": "Storages power"
+  },
+  "graf.energy.hour": {
+   "cz": "Energie po hodinách",
+   "en": "Energy per hour"
+  },
+  "graf.energy.day": {
+   "cz": "Energie po dnech (30 dní)",
+   "en": "Energy per day (last 30 days)"
+  },
+  "graf.energy.meters_day": {
+   "cz": "Elektroměry po dnech (30 dní)",
+   "en": "Meters per day (last 30 days)"
+  },
+  "graf.energy.meters_power": {
+   "cz": "Výkon elektroměrů",
+   "en": "Meters power"
+  },
+  "graf.energy.total_cons": {
+   "cz": "Spotřeba celkem",
+   "en": "Consumption (LLOAD1+2)"
+  },
+  "graf.energy.total_pv": {
+   "cz": "Výroba FV celkem",
+   "en": "PV production (LPV1+2)"
+  },
+  "graf.packs.p1": {
+   "cz": "Akupack dílna 251 Ah – články",
+   "en": "BMS1 Workshop 251 Ah - cells"
+  },
+  "graf.packs.p2": {
+   "cz": "Akupack dům 220 Ah – články",
+   "en": "BMS2 House 220 Ah - cells"
+  },
+  "graf.packs.p3": {
+   "cz": "Akupack dům 80 Ah – články",
+   "en": "BMS3 House 80 Ah - cells"
+  },
+  "graf.packs.voltage": {
+   "cz": "Napětí akupacků",
+   "en": "Pack voltage"
+  },
+  "graf.packs.current": {
+   "cz": "Proud akupacků",
+   "en": "Pack current"
+  },
+  "graf.packs.soc": {
+   "cz": "Nabití akupacků",
+   "en": "Pack SOC"
+  },
+  "graf.temps.house": {
+   "cz": "Dům",
+   "en": "House"
+  },
+  "graf.temps.outside": {
+   "cz": "Venku",
+   "en": "Outside"
+  },
+  "graf.temps.tank": {
+   "cz": "Nádrž",
+   "en": "Tank"
+  },
+  "graf.temps.boiler": {
+   "cz": "Kotel a topné okruhy",
+   "en": "Boiler and heating circuits"
+  },
+  "graf.temps.workshop": {
+   "cz": "Dílna",
+   "en": "Workshop"
+  },
+  "graf.temps.recu": {
+   "cz": "Rekuperace",
+   "en": "Recuperation"
+  },
+  "graf.temps.boards": {
+   "cz": "Desky a měniče",
+   "en": "Boards and converters"
+  },
+  "graf.temps.wind": {
+   "cz": "Vítr (průměr)",
+   "en": "Wind (mean)"
+  },
+  "graf.states.row": {
+   "cz": "(podle kategorie, ne nodu)",
+   "en": "(by category)"
+  },
+  "graf.states.lights": {
+   "cz": "Světla",
+   "en": "Lights {node}"
+  },
+  "graf.states.relays": {
+   "cz": "Relé",
+   "en": "Relays {node}"
+  },
+  "graf.states.setpoints": {
+   "cz": "Nastavené hodnoty",
+   "en": "Setpoints {node}"
+  },
+  "graf.states.values": {
+   "cz": "Hodnoty",
+   "en": "Values {node}"
+  },
+  "graf.states.rooms": {
+   "cz": "Nastavená vs skutečná teplota místností",
+   "en": "Room request in effect vs room temperature"
+  },
+  "graf.states.exhaust": {
+   "cz": "Nastavené vs skutečné spaliny",
+   "en": "Exhaust setpoint vs exhaust"
+  },
+  "graf.states.valves": {
+   "cz": "Ventily (nastavená poloha)",
+   "en": "Valves (commanded %)"
+  },
+  "graf.states.water": {
+   "cz": "Topná voda – cílová vs skutečná",
+   "en": "Water target vs actual"
+  },
+  "graf.states.lightsnow": {
+   "cz": "Právě svítí",
+   "en": "Lights on now"
+  },
+  "graf.states.ontime": {
+   "cz": "Doba svícení za den (h)",
+   "en": "Light on-time per day (hours)"
+  },
+  "graf.states.off": {
+   "cz": "vyp.",
+   "en": "off"
+  },
+  "graf.states.on": {
+   "cz": "zap.",
+   "en": "on"
+  },
+  "graf.states.invalid": {
+   "cz": "neplatné",
+   "en": "invalid"
+  },
+  "mon.nav.menu": {
+   "cz": "Menu",
+   "en": "Menu"
+  },
+  "mon.nav.lang": {
+   "cz": "Jazyk",
+   "en": "Language"
+  },
+  "mon.nav.grafana": {
+   "cz": "Grafy (Grafana)",
+   "en": "Charts (Grafana)"
+  },
+  "mon.nav.scheme_energy": {
+   "cz": "Schéma energie",
+   "en": "Energy schematic"
+  },
+  "mon.nav.scheme_heat": {
+   "cz": "Schéma topení",
+   "en": "Heating schematic"
+  },
+  "mon.nav.scheme_recu": {
+   "cz": "Schéma rekuperace",
+   "en": "Recuperation schematic"
+  },
+  "mon.home.solar_t": {
+   "cz": "Solár",
+   "en": "Solar"
+  },
+  "mon.home.load_t": {
+   "cz": "Spotřeba",
+   "en": "Load"
+  },
+  "mon.home.peak": {
+   "cz": "Výkon vůči instalovanému maximu {x}",
+   "en": "Power against the installed peak {x}"
+  },
+  "mon.battery.lg_ok": {
+   "cz": "v pořádku",
+   "en": "ok"
+  },
+  "mon.battery.lg_high": {
+   "cz": "≥ {x} V",
+   "en": "≥ {x} V"
+  },
+  "mon.battery.lg_bad": {
+   "cz": "< {lo} V nebo > {hi} V",
+   "en": "< {lo} V or > {hi} V"
+  },
+  "mon.battery.lg_minmax": {
+   "cz": "obrys = nejnižší / nejvyšší článek",
+   "en": "outline = lowest / highest cell"
+  },
+  "mon.battery.spreadnote": {
+   "cz": "Rozptyl nad 50 mV je zvýrazněn.",
+   "en": "Spread above 50 mV is highlighted."
+  },
+  "mon.loads.todaybars": {
+   "cz": "Spotřeba dnes po okruzích",
+   "en": "Today's consumption per circuit"
+  },
+  "mon.loads.victronnote": {
+   "cz": "Victron zatím nemá vlastní elektroměr: ukazuje elektroměr topení dílny (jeho jedinou zátěž).",
+   "en": "The Victron has no own meter yet: it shows the workshop heating meter (its only load)."
+  },
+  "mon.climate.recumore": {
+   "cz": "Teploty, vlhkost a tlak rekuperace ve schématu →",
+   "en": "Recuperation temperatures, humidity and pressure in the schematic →"
+  },
+  "mon.status.nofile": {
+   "cz": "Soubor uha_status.json není k dispozici.",
+   "en": "uha_status.json not available."
+  },
+  "mon.status.up": {
+   "cz": "spojeno",
+   "en": "up"
+  },
+  "mon.status.down": {
+   "cz": "odpojeno",
+   "en": "down"
+  },
+  "mon.status.col.uptime": {
+   "cz": "Běží",
+   "en": "Uptime"
+  },
+  "mon.status.col.fw": {
+   "cz": "Verze FW",
+   "en": "FW version"
+  },
+  "mon.status.err.UnknownIds": {
+   "cz": "Neznámá ID proměnných",
+   "en": "Unknown variable ids"
+  },
+  "mon.status.err.WrongProducer": {
+   "cz": "Špatný zdroj proměnné",
+   "en": "Wrong producer"
+  },
+  "mon.status.err.ChecksumErrors": {
+   "cz": "Chyby kontrolního součtu",
+   "en": "Checksum errors"
+  },
+  "mon.status.err.LengthErrors": {
+   "cz": "Chyby délky paketu",
+   "en": "Length errors"
+  },
+  "mon.status.err.DiscardedBytes": {
+   "cz": "Zahozené bajty",
+   "en": "Discarded bytes"
+  },
+  "mon.status.err.TxErrors": {
+   "cz": "Chyby odesílání",
+   "en": "Send errors"
+  },
+  "mon.status.err.WriteErrors": {
+   "cz": "Chyby zápisu souborů",
+   "en": "File write errors"
+  },
+  "mon.status.err.EventLogErrors": {
+   "cz": "Chyby logu událostí",
+   "en": "Event log errors"
+  },
+  "mon.scheme.link": {
+   "cz": "Schéma ›",
+   "en": "Schematic ›"
+  },
+  "mon.scheme.back_energy": {
+   "cz": "‹ Energie",
+   "en": "‹ Energy"
+  },
+  "mon.scheme.back_heat": {
+   "cz": "‹ Teplo",
+   "en": "‹ Heat"
+  },
+  "mon.scheme.back_climate": {
+   "cz": "‹ Klima",
+   "en": "‹ Climate"
+  },
+  "mon.scheme.mode_power": {
+   "cz": "Výkon",
+   "en": "Power"
+  },
+  "mon.scheme.mode_current": {
+   "cz": "Proud",
+   "en": "Current"
+  },
+  "mon.scheme.mode_both": {
+   "cz": "Obojí",
+   "en": "Both"
+  },
+  "mon.scheme.state": {
+   "cz": "Stav",
+   "en": "State"
+  },
+  "mon.scheme.temp": {
+   "cz": "Teplota",
+   "en": "Temperature"
+  },
+  "mon.scheme.energy_t": {
+   "cz": "Schéma energie",
+   "en": "Energy schematic"
+  },
+  "mon.scheme.energy_sub": {
+   "cz": "Toky výkonu – návrh, topologii zkontroluje Martin",
+   "en": "Power flows – proposal, topology to be reviewed"
+  },
+  "mon.scheme.energy_note": {
+   "cz": "Šipka ukazuje směr toku, když je výkon aspoň 20 W (proud 0,5 A). Šedé = neplatná nebo stará data.",
+   "en": "The arrow shows the flow direction when the power is at least 20 W (current 0.5 A). Grey = invalid or old data."
+  },
+  "mon.scheme.area_house": {
+   "cz": "Dům",
+   "en": "House"
+  },
+  "mon.scheme.area_workshop": {
+   "cz": "Dílna",
+   "en": "Workshop"
+  },
+  "mon.scheme.pv": {
+   "cz": "FV panely",
+   "en": "PV panels"
+  },
+  "mon.scheme.mppt": {
+   "cz": "MPPT",
+   "en": "MPPT"
+  },
+  "mon.scheme.p251": {
+   "cz": "251 Ah",
+   "en": "251 Ah"
+  },
+  "mon.scheme.p220": {
+   "cz": "220 Ah",
+   "en": "220 Ah"
+  },
+  "mon.scheme.p80": {
+   "cz": "80 Ah",
+   "en": "80 Ah"
+  },
+  "mon.scheme.house_total": {
+   "cz": "Dům celkem",
+   "en": "House total"
+  },
+  "mon.scheme.ws_total": {
+   "cz": "Dílna celkem",
+   "en": "Workshop total"
+  },
+  "mon.scheme.pv_short": {
+   "cz": "FV",
+   "en": "PV"
+  },
+  "mon.scheme.load_short": {
+   "cz": "Spotřeba",
+   "en": "Load"
+  },
+  "mon.scheme.heat_t": {
+   "cz": "Schéma topení",
+   "en": "Heating schematic"
+  },
+  "mon.scheme.heat_sub": {
+   "cz": "Kotel, nádrž a topné okruhy – návrh, topologii zkontroluje Martin",
+   "en": "Boiler, tank and heating circuits – proposal, topology to be reviewed"
+  },
+  "mon.scheme.heat_note": {
+   "cz": "Barva potrubí = teplota. Čerpadlo plné = běží. Patro: skutečná teplota z dětského pokoje.",
+   "en": "Pipe colour = temperature. Filled pump = running. Upstairs: actual temperature from the kids room."
+  },
+  "mon.scheme.elheater": {
+   "cz": "El. ohřev v nádrži",
+   "en": "Electric heater (tank)"
+  },
+  "mon.scheme.rad": {
+   "cz": "Radiátory",
+   "en": "Radiators"
+  },
+  "mon.scheme.wall": {
+   "cz": "Stěnové topení",
+   "en": "Wall heating"
+  },
+  "mon.scheme.valve": {
+   "cz": "Směšovací ventil",
+   "en": "Mixing valve"
+  },
+  "mon.scheme.pump": {
+   "cz": "Čerpadlo",
+   "en": "Pump"
+  },
+  "mon.scheme.up": {
+   "cz": "Patro",
+   "en": "Upstairs"
+  },
+  "mon.scheme.down": {
+   "cz": "Přízemí",
+   "en": "Downstairs"
+  },
+  "mon.scheme.req": {
+   "cz": "Nastaveno teď",
+   "en": "Target now"
+  },
+  "mon.scheme.actual": {
+   "cz": "Skutečnost",
+   "en": "Actual"
+  },
+  "mon.scheme.recu_t": {
+   "cz": "Schéma rekuperace",
+   "en": "Recuperation schematic"
+  },
+  "mon.scheme.recu_sub": {
+   "cz": "Výměník tepla, přívod a odtah – návrh",
+   "en": "Heat exchanger, supply and extract – proposal"
+  },
+  "mon.scheme.recu_note": {
+   "cz": "Účinnost = (přívod − venku) / (odtah − venku), jen když se odtah a venkovní vzduch liší o víc než 5 K.",
+   "en": "Efficiency = (supply − outdoor) / (extract − outdoor), only when extract and outdoor air differ by more than 5 K."
+  },
+  "mon.scheme.outdoor": {
+   "cz": "Venkovní vzduch",
+   "en": "Outdoor air"
+  },
+  "mon.scheme.extract": {
+   "cz": "Odtah z domu",
+   "en": "Extract (house)"
+  },
+  "mon.scheme.exhaust": {
+   "cz": "Výfuk ven",
+   "en": "Exhaust (out)"
+  },
+  "mon.scheme.supply": {
+   "cz": "Přívod do domu",
+   "en": "Supply (house)"
+  },
+  "mon.scheme.recu_state": {
+   "cz": "Rekuperace",
+   "en": "Recuperation"
+  },
+  "mon.scheme.outside": {
+   "cz": "Venku",
+   "en": "Outside"
+  },
+  "mon.scheme.inside": {
+   "cz": "Dům",
+   "en": "House"
+  },
+  "mon.scheme.rh": {
+   "cz": "Vlhkost",
+   "en": "Humidity"
+  },
+  "mon.scheme.fan": {
+   "cz": "Ventilátor",
+   "en": "Fan"
+  },
+  "mon.scheme.dp": {
+   "cz": "Tlak",
+   "en": "Pressure"
+  },
+  "mon.scheme.eff": {
+   "cz": "Účinnost",
+   "en": "Efficiency"
+  }
+ },
+ "vars": {
+  "NETWORK_STATUS": {
+   "cz": "Stav sítě (nody v provozu)",
+   "en": "Network status (nodes running)",
+   "cz_short": "Stav sítě (nody v provozu)",
+   "en_short": "Network status (nodes running)"
+  },
+  "BAT_SOC": {
+   "cz": "Baterie – nabití",
+   "en": "Battery – state of charge",
+   "cz_short": "Baterie",
+   "en_short": "Battery"
+  },
+  "BAT_VOLTAGE_V": {
+   "cz": "Baterie – napětí",
+   "en": "Battery – voltage",
+   "cz_short": "Baterie",
+   "en_short": "Battery"
+  },
+  "BAT_CURRENT_A": {
+   "cz": "Baterie – proud",
+   "en": "Battery – current",
+   "cz_short": "Baterie",
+   "en_short": "Battery"
+  },
+  "BAT_ENERGY_WH": {
+   "cz": "Baterie – uložená energie",
+   "en": "Battery – stored energy",
+   "cz_short": "Baterie",
+   "en_short": "Battery"
+  },
+  "BAT_POWER_W": {
+   "cz": "Baterie – výkon",
+   "en": "Battery – power",
+   "cz_short": "Baterie",
+   "en_short": "Battery"
+  },
+  "SOLAR_POWER_W": {
+   "cz": "FV výroba – výkon",
+   "en": "Solar – power",
+   "cz_short": "FV výroba",
+   "en_short": "Solar"
+  },
+  "SOLAR_ENERGY_TODAY_WH": {
+   "cz": "FV výroba – dnes",
+   "en": "Solar – today",
+   "cz_short": "FV výroba",
+   "en_short": "Solar"
+  },
+  "LOAD_A": {
+   "cz": "Spotřeba – proud",
+   "en": "Load – current",
+   "cz_short": "Spotřeba",
+   "en_short": "Load"
+  },
+  "CONS_TODAY_WH": {
+   "cz": "Spotřeba – dnes",
+   "en": "Consumption – today",
+   "cz_short": "Spotřeba",
+   "en_short": "Consumption"
+  },
+  "LOAD_W": {
+   "cz": "Spotřeba – výkon",
+   "en": "Load – power",
+   "cz_short": "Spotřeba",
+   "en_short": "Load"
+  },
+  "BMS1_SOC": {
+   "cz": "Akupack dílna 251 Ah – nabití",
+   "en": "Workshop pack 251 Ah – state of charge",
+   "cz_short": "Akupack dílna 251 Ah",
+   "en_short": "Workshop pack 251 Ah"
+  },
+  "BMS1_CURRENT_A": {
+   "cz": "Akupack dílna 251 Ah – proud",
+   "en": "Workshop pack 251 Ah – current",
+   "cz_short": "Akupack dílna 251 Ah",
+   "en_short": "Workshop pack 251 Ah"
+  },
+  "BMS1_VOLTAGE_V": {
+   "cz": "Akupack dílna 251 Ah – napětí",
+   "en": "Workshop pack 251 Ah – voltage",
+   "cz_short": "Akupack dílna 251 Ah",
+   "en_short": "Workshop pack 251 Ah"
+  },
+  "BMS1_ENERGY_STORED_WH": {
+   "cz": "Akupack dílna 251 Ah – uložená energie",
+   "en": "Workshop pack 251 Ah – stored energy",
+   "cz_short": "Akupack dílna 251 Ah",
+   "en_short": "Workshop pack 251 Ah"
+  },
+  "BMS1_TODAY_ENERGY_WH": {
+   "cz": "Akupack dílna 251 Ah – denní bilance",
+   "en": "Workshop pack 251 Ah – today balance",
+   "cz_short": "Akupack dílna 251 Ah",
+   "en_short": "Workshop pack 251 Ah"
+  },
+  "BMS1_CELL_V_{n}": {
+   "cz": "Akupack dílna 251 Ah – článek {n}",
+   "en": "Workshop pack 251 Ah – cell {n}",
+   "cz_short": "Článek {n}",
+   "en_short": "Cell {n}"
+  },
+  "BMS1_CELL_TEMP_C_{n}": {
+   "cz": "Akupack dílna 251 Ah – teplota článku {n}",
+   "en": "Workshop pack 251 Ah – cell {n} temperature",
+   "cz_short": "Článek {n}",
+   "en_short": "Cell {n}"
+  },
+  "BMS2_SOC": {
+   "cz": "Akupack dům 220 Ah – nabití",
+   "en": "House pack 220 Ah – state of charge",
+   "cz_short": "Akupack dům 220 Ah",
+   "en_short": "House pack 220 Ah"
+  },
+  "BMS2_CURRENT_A": {
+   "cz": "Akupack dům 220 Ah – proud",
+   "en": "House pack 220 Ah – current",
+   "cz_short": "Akupack dům 220 Ah",
+   "en_short": "House pack 220 Ah"
+  },
+  "BMS2_VOLTAGE_V": {
+   "cz": "Akupack dům 220 Ah – napětí",
+   "en": "House pack 220 Ah – voltage",
+   "cz_short": "Akupack dům 220 Ah",
+   "en_short": "House pack 220 Ah"
+  },
+  "BMS2_ENERGY_STORED_WH": {
+   "cz": "Akupack dům 220 Ah – uložená energie",
+   "en": "House pack 220 Ah – stored energy",
+   "cz_short": "Akupack dům 220 Ah",
+   "en_short": "House pack 220 Ah"
+  },
+  "BMS2_TODAY_ENERGY_WH": {
+   "cz": "Akupack dům 220 Ah – denní bilance",
+   "en": "House pack 220 Ah – today balance",
+   "cz_short": "Akupack dům 220 Ah",
+   "en_short": "House pack 220 Ah"
+  },
+  "BMS2_CELL_V_{n}": {
+   "cz": "Akupack dům 220 Ah – článek {n}",
+   "en": "House pack 220 Ah – cell {n}",
+   "cz_short": "Článek {n}",
+   "en_short": "Cell {n}"
+  },
+  "BMS2_CELL_TEMP_C_{n}": {
+   "cz": "Akupack dům 220 Ah – teplota článku {n}",
+   "en": "House pack 220 Ah – cell {n} temperature",
+   "cz_short": "Článek {n}",
+   "en_short": "Cell {n}"
+  },
+  "BMS3_SOC": {
+   "cz": "Akupack dům 80 Ah – nabití",
+   "en": "House pack 80 Ah – state of charge",
+   "cz_short": "Akupack dům 80 Ah",
+   "en_short": "House pack 80 Ah"
+  },
+  "BMS3_CURRENT_A": {
+   "cz": "Akupack dům 80 Ah – proud",
+   "en": "House pack 80 Ah – current",
+   "cz_short": "Akupack dům 80 Ah",
+   "en_short": "House pack 80 Ah"
+  },
+  "BMS3_VOLTAGE_V": {
+   "cz": "Akupack dům 80 Ah – napětí",
+   "en": "House pack 80 Ah – voltage",
+   "cz_short": "Akupack dům 80 Ah",
+   "en_short": "House pack 80 Ah"
+  },
+  "BMS3_ENERGY_STORED_WH": {
+   "cz": "Akupack dům 80 Ah – uložená energie",
+   "en": "House pack 80 Ah – stored energy",
+   "cz_short": "Akupack dům 80 Ah",
+   "en_short": "House pack 80 Ah"
+  },
+  "BMS3_TODAY_ENERGY_WH": {
+   "cz": "Akupack dům 80 Ah – denní bilance",
+   "en": "House pack 80 Ah – today balance",
+   "cz_short": "Akupack dům 80 Ah",
+   "en_short": "House pack 80 Ah"
+  },
+  "BMS3_CELL_V_{n}": {
+   "cz": "Akupack dům 80 Ah – článek {n}",
+   "en": "House pack 80 Ah – cell {n}",
+   "cz_short": "Článek {n}",
+   "en_short": "Cell {n}"
+  },
+  "BMS3_CELL_TEMP_C_{n}": {
+   "cz": "Akupack dům 80 Ah – teplota článku {n}",
+   "en": "House pack 80 Ah – cell {n} temperature",
+   "cz_short": "Článek {n}",
+   "en_short": "Cell {n}"
+  },
+  "MPPT_BAT_CURRENT_A": {
+   "cz": "MPPT – proud do baterie",
+   "en": "MPPT – battery current",
+   "cz_short": "MPPT",
+   "en_short": "MPPT"
+  },
+  "MPPT_BAT_VOLTAGE_V": {
+   "cz": "MPPT – napětí baterie",
+   "en": "MPPT – battery voltage",
+   "cz_short": "MPPT",
+   "en_short": "MPPT"
+  },
+  "MPPT_YIELD_TODAY_WH": {
+   "cz": "MPPT – výroba dnes",
+   "en": "MPPT – yield today",
+   "cz_short": "MPPT",
+   "en_short": "MPPT"
+  },
+  "MPPT_MAX_TODAY_W": {
+   "cz": "MPPT – max. výkon dnes",
+   "en": "MPPT – max power today",
+   "cz_short": "MPPT",
+   "en_short": "MPPT"
+  },
+  "MPPT_SOLAR_POWER_W": {
+   "cz": "MPPT – výkon panelů",
+   "en": "MPPT – PV power",
+   "cz_short": "MPPT",
+   "en_short": "MPPT"
+  },
+  "MPPT_SOLAR_VOLTAGE_V": {
+   "cz": "MPPT – napětí panelů",
+   "en": "MPPT – PV voltage",
+   "cz_short": "MPPT",
+   "en_short": "MPPT"
+  },
+  "MPPT_SOLAR_CURRENT_A": {
+   "cz": "MPPT – proud panelů",
+   "en": "MPPT – PV current",
+   "cz_short": "MPPT",
+   "en_short": "MPPT"
+  },
+  "MPPT_SOLAR_MAX_VOLTAGE_V": {
+   "cz": "MPPT – max. napětí panelů",
+   "en": "MPPT – max PV voltage",
+   "cz_short": "MPPT",
+   "en_short": "MPPT"
+  },
+  "MPPT_MAX_BAT_CURRENT_A": {
+   "cz": "MPPT – max. proud do baterie",
+   "en": "MPPT – max battery current",
+   "cz_short": "MPPT",
+   "en_short": "MPPT"
+  },
+  "MPPT_TEMP_C": {
+   "cz": "MPPT – teplota",
+   "en": "MPPT – temperature",
+   "cz_short": "MPPT",
+   "en_short": "MPPT"
+  },
+  "CHARGING_A": {
+   "cz": "Nabíjecí proud",
+   "en": "Charging current",
+   "cz_short": "Nabíjecí proud",
+   "en_short": "Charging current"
+  },
+  "SHUNT_PCK1_CURRENT_A": {
+   "cz": "Bočník dílna – proud",
+   "en": "Workshop shunt – current",
+   "cz_short": "Bočník dílna",
+   "en_short": "Workshop shunt"
+  },
+  "SHUNT_PCK2_CURRENT_A": {
+   "cz": "Bočník dům – proud",
+   "en": "House shunt – current",
+   "cz_short": "Bočník dům",
+   "en_short": "House shunt"
+  },
+  "STRG1_SOC": {
+   "cz": "Úložiště dům – nabití",
+   "en": "House storage – state of charge",
+   "cz_short": "Úložiště dům",
+   "en_short": "House storage"
+  },
+  "STRG1_POWER_W": {
+   "cz": "Úložiště dům – výkon",
+   "en": "House storage – power",
+   "cz_short": "Úložiště dům",
+   "en_short": "House storage"
+  },
+  "STRG1_CURRENT_A": {
+   "cz": "Úložiště dům – proud",
+   "en": "House storage – current",
+   "cz_short": "Úložiště dům",
+   "en_short": "House storage"
+  },
+  "STRG1_ENERGY_WH": {
+   "cz": "Úložiště dům – uložená energie",
+   "en": "House storage – stored energy",
+   "cz_short": "Úložiště dům",
+   "en_short": "House storage"
+  },
+  "STRG1_OPT_CHARGING_A": {
+   "cz": "Úložiště dům – optimální nabíjecí proud",
+   "en": "House storage – optimal charging current",
+   "cz_short": "Úložiště dům",
+   "en_short": "House storage"
+  },
+  "STRG1_CAPACITY_AH": {
+   "cz": "Úložiště dům – kapacita",
+   "en": "House storage – capacity",
+   "cz_short": "Úložiště dům",
+   "en_short": "House storage"
+  },
+  "STRG1_BALANCED_TODAY": {
+   "cz": "Úložiště dům – dnes vybalancováno",
+   "en": "House storage – balanced today",
+   "cz_short": "Úložiště dům",
+   "en_short": "House storage"
+  },
+  "STRG1_VOLTAGE_V": {
+   "cz": "Úložiště dům – napětí",
+   "en": "House storage – voltage",
+   "cz_short": "Úložiště dům",
+   "en_short": "House storage"
+  },
+  "LLOAD1_POWER_W": {
+   "cz": "Spotřeba dům – výkon",
+   "en": "Load house – power",
+   "cz_short": "Spotřeba dům",
+   "en_short": "Load house"
+  },
+  "LLOAD1_CONS_WH": {
+   "cz": "Spotřeba dům – dnes",
+   "en": "Load house – today",
+   "cz_short": "Spotřeba dům",
+   "en_short": "Load house"
+  },
+  "LPV1_POWER_W": {
+   "cz": "FV dům – výkon",
+   "en": "PV house – power",
+   "cz_short": "FV dům",
+   "en_short": "PV house"
+  },
+  "LPV1_PROD_WH": {
+   "cz": "FV dům – výroba dnes",
+   "en": "PV house – today",
+   "cz_short": "FV dům",
+   "en_short": "PV house"
+  },
+  "STRG2_SOC": {
+   "cz": "Úložiště dílna – nabití",
+   "en": "Workshop storage – state of charge",
+   "cz_short": "Úložiště dílna",
+   "en_short": "Workshop storage"
+  },
+  "STRG2_POWER_W": {
+   "cz": "Úložiště dílna – výkon",
+   "en": "Workshop storage – power",
+   "cz_short": "Úložiště dílna",
+   "en_short": "Workshop storage"
+  },
+  "STRG2_CURRENT_A": {
+   "cz": "Úložiště dílna – proud",
+   "en": "Workshop storage – current",
+   "cz_short": "Úložiště dílna",
+   "en_short": "Workshop storage"
+  },
+  "STRG2_ENERGY_WH": {
+   "cz": "Úložiště dílna – uložená energie",
+   "en": "Workshop storage – stored energy",
+   "cz_short": "Úložiště dílna",
+   "en_short": "Workshop storage"
+  },
+  "STRG2_OPT_CHARGING_A": {
+   "cz": "Úložiště dílna – optimální nabíjecí proud",
+   "en": "Workshop storage – optimal charging current",
+   "cz_short": "Úložiště dílna",
+   "en_short": "Workshop storage"
+  },
+  "STRG2_CAPACITY_AH": {
+   "cz": "Úložiště dílna – kapacita",
+   "en": "Workshop storage – capacity",
+   "cz_short": "Úložiště dílna",
+   "en_short": "Workshop storage"
+  },
+  "STRG2_BALANCED_TODAY": {
+   "cz": "Úložiště dílna – dnes vybalancováno",
+   "en": "Workshop storage – balanced today",
+   "cz_short": "Úložiště dílna",
+   "en_short": "Workshop storage"
+  },
+  "STRG2_VOLTAGE_V": {
+   "cz": "Úložiště dílna – napětí",
+   "en": "Workshop storage – voltage",
+   "cz_short": "Úložiště dílna",
+   "en_short": "Workshop storage"
+  },
+  "LLOAD2_POWER_W": {
+   "cz": "Spotřeba dílna – výkon",
+   "en": "Load workshop – power",
+   "cz_short": "Spotřeba dílna",
+   "en_short": "Load workshop"
+  },
+  "LLOAD2_CONS_WH": {
+   "cz": "Spotřeba dílna – dnes",
+   "en": "Load workshop – today",
+   "cz_short": "Spotřeba dílna",
+   "en_short": "Load workshop"
+  },
+  "LPV2_POWER_W": {
+   "cz": "FV dílna – výkon",
+   "en": "PV workshop – power",
+   "cz_short": "FV dílna",
+   "en_short": "PV workshop"
+  },
+  "LPV2_PROD_WH": {
+   "cz": "FV dílna – výroba dnes",
+   "en": "PV workshop – today",
+   "cz_short": "FV dílna",
+   "en_short": "PV workshop"
+  },
+  "AXPERT_TEMP_C": {
+   "cz": "Axpert – teplota",
+   "en": "Axpert – temperature",
+   "cz_short": "Axpert",
+   "en_short": "Axpert"
+  },
+  "AXPERT_AC_POWER_W": {
+   "cz": "Axpert – výkon AC",
+   "en": "Axpert – AC power",
+   "cz_short": "Axpert",
+   "en_short": "Axpert"
+  },
+  "AXPERT_BAT_CHARGING_A": {
+   "cz": "Axpert – nabíjecí proud",
+   "en": "Axpert – charging current",
+   "cz_short": "Axpert",
+   "en_short": "Axpert"
+  },
+  "AXPERT_BAT_DISCHARGING_A": {
+   "cz": "Axpert – vybíjecí proud",
+   "en": "Axpert – discharging current",
+   "cz_short": "Axpert",
+   "en_short": "Axpert"
+  },
+  "AXPERT_BAT_VOLTAGE_V": {
+   "cz": "Axpert – napětí baterie",
+   "en": "Axpert – battery voltage",
+   "cz_short": "Axpert",
+   "en_short": "Axpert"
+  },
+  "AXPERT_PVS1_W": {
+   "cz": "Axpert – FV1 výkon",
+   "en": "Axpert – PV1 power",
+   "cz_short": "Axpert FV1",
+   "en_short": "Axpert PV1"
+  },
+  "AXPERT_PVS1_V": {
+   "cz": "Axpert – FV1 napětí",
+   "en": "Axpert – PV1 voltage",
+   "cz_short": "Axpert FV1",
+   "en_short": "Axpert PV1"
+  },
+  "AXPERT_PVS1_A": {
+   "cz": "Axpert – FV1 proud",
+   "en": "Axpert – PV1 current",
+   "cz_short": "Axpert FV1",
+   "en_short": "Axpert PV1"
+  },
+  "AXPERT_PVS2_W": {
+   "cz": "Axpert – FV2 výkon",
+   "en": "Axpert – PV2 power",
+   "cz_short": "Axpert FV2",
+   "en_short": "Axpert PV2"
+  },
+  "AXPERT_PVS2_V": {
+   "cz": "Axpert – FV2 napětí",
+   "en": "Axpert – PV2 voltage",
+   "cz_short": "Axpert FV2",
+   "en_short": "Axpert PV2"
+  },
+  "AXPERT_PVS2_A": {
+   "cz": "Axpert – FV2 proud",
+   "en": "Axpert – PV2 current",
+   "cz_short": "Axpert FV2",
+   "en_short": "Axpert PV2"
+  },
+  "AXPERT_BAT_POWER_W": {
+   "cz": "Axpert – výkon baterie",
+   "en": "Axpert – battery power",
+   "cz_short": "Axpert",
+   "en_short": "Axpert"
+  },
+  "AXPERT_BAT_CURRENT_A": {
+   "cz": "Axpert – proud baterie",
+   "en": "Axpert – battery current",
+   "cz_short": "Axpert",
+   "en_short": "Axpert"
+  },
+  "AXPERT_SOLAR_W": {
+   "cz": "Axpert – FV výkon celkem",
+   "en": "Axpert – total PV power",
+   "cz_short": "Axpert",
+   "en_short": "Axpert"
+  },
+  "AXPERT_ENERGY_TODAY_WH": {
+   "cz": "Axpert – výroba dnes",
+   "en": "Axpert – energy today",
+   "cz_short": "Axpert",
+   "en_short": "Axpert"
+  },
+  "AXPERT_LOAD_W": {
+   "cz": "Axpert – zátěž",
+   "en": "Axpert – load",
+   "cz_short": "Axpert",
+   "en_short": "Axpert"
+  },
+  "CONS_AC300_WH": {
+   "cz": "Měnič 300 W – spotřeba dnes",
+   "en": "Inverter 300 W – today",
+   "cz_short": "Měnič 300 W",
+   "en_short": "Inverter 300 W"
+  },
+  "CONS_AC3KW_WH": {
+   "cz": "Měnič 3 kW – spotřeba dnes",
+   "en": "Inverter 3 kW – today",
+   "cz_short": "Měnič 3 kW",
+   "en_short": "Inverter 3 kW"
+  },
+  "CONS_AC5KW_WH": {
+   "cz": "Měnič 5 kW – spotřeba dnes",
+   "en": "Inverter 5 kW – today",
+   "cz_short": "Měnič 5 kW",
+   "en_short": "Inverter 5 kW"
+  },
+  "POW_AC300_W": {
+   "cz": "Měnič 300 W – výkon",
+   "en": "Inverter 300 W – power",
+   "cz_short": "Měnič 300 W",
+   "en_short": "Inverter 300 W"
+  },
+  "POW_AC3KW_W": {
+   "cz": "Měnič 3 kW – výkon",
+   "en": "Inverter 3 kW – power",
+   "cz_short": "Měnič 3 kW",
+   "en_short": "Inverter 3 kW"
+  },
+  "POW_AC5KW_W": {
+   "cz": "Měnič 5 kW – výkon",
+   "en": "Inverter 5 kW – power",
+   "cz_short": "Měnič 5 kW",
+   "en_short": "Inverter 5 kW"
+  },
+  "CONS_FRIDGE_WH": {
+   "cz": "Lednice – spotřeba dnes",
+   "en": "Fridge – today",
+   "cz_short": "Lednice",
+   "en_short": "Fridge"
+  },
+  "CONS_KITCHEN_WH": {
+   "cz": "Kuchyň – spotřeba dnes",
+   "en": "Kitchen – today",
+   "cz_short": "Kuchyň",
+   "en_short": "Kitchen"
+  },
+  "CONS_WASCHMACHINE_WH": {
+   "cz": "Pračka – spotřeba dnes",
+   "en": "Washing machine – today",
+   "cz_short": "Pračka",
+   "en_short": "Washing machine"
+  },
+  "CONS_OTHER_WH": {
+   "cz": "Ostatní – spotřeba dnes",
+   "en": "Other – today",
+   "cz_short": "Ostatní",
+   "en_short": "Other"
+  },
+  "CONS_TECHM_WH": {
+   "cz": "Technická místnost – spotřeba dnes",
+   "en": "Technical room – today",
+   "cz_short": "Technická místnost",
+   "en_short": "Technical room"
+  },
+  "CONS_KITCHEN_A_WH": {
+   "cz": "Kuchyň A – spotřeba dnes",
+   "en": "Kitchen A – today",
+   "cz_short": "Kuchyň A",
+   "en_short": "Kitchen A"
+  },
+  "CONS_KITCHEN_B_WH": {
+   "cz": "Kuchyň B – spotřeba dnes",
+   "en": "Kitchen B – today",
+   "cz_short": "Kuchyň B",
+   "en_short": "Kitchen B"
+  },
+  "POW_FRIDGE_W": {
+   "cz": "Lednice – výkon",
+   "en": "Fridge – power",
+   "cz_short": "Lednice",
+   "en_short": "Fridge"
+  },
+  "POW_KITCHEN_W": {
+   "cz": "Kuchyň – výkon",
+   "en": "Kitchen – power",
+   "cz_short": "Kuchyň",
+   "en_short": "Kitchen"
+  },
+  "POW_WASCHMACHINE_W": {
+   "cz": "Pračka – výkon",
+   "en": "Washing machine – power",
+   "cz_short": "Pračka",
+   "en_short": "Washing machine"
+  },
+  "POW_OTHER_W": {
+   "cz": "Ostatní – výkon",
+   "en": "Other – power",
+   "cz_short": "Ostatní",
+   "en_short": "Other"
+  },
+  "POW_TECHM_W": {
+   "cz": "Technická místnost – výkon",
+   "en": "Technical room – power",
+   "cz_short": "Technická místnost",
+   "en_short": "Technical room"
+  },
+  "POW_KITCHEN_A_W": {
+   "cz": "Kuchyň A – výkon",
+   "en": "Kitchen A – power",
+   "cz_short": "Kuchyň A",
+   "en_short": "Kitchen A"
+  },
+  "POW_KITCHEN_B_W": {
+   "cz": "Kuchyň B – výkon",
+   "en": "Kitchen B – power",
+   "cz_short": "Kuchyň B",
+   "en_short": "Kitchen B"
+  },
+  "CONS_AXPERT_WH": {
+   "cz": "Axpert 8 kW – spotřeba dnes",
+   "en": "Axpert 8 kW – today",
+   "cz_short": "Axpert 8 kW",
+   "en_short": "Axpert 8 kW"
+  },
+  "CONS_EVSE_WH": {
+   "cz": "Nabíječka auta – spotřeba dnes",
+   "en": "EV charger – today",
+   "cz_short": "Nabíječka auta",
+   "en_short": "EV charger"
+  },
+  "CONS_WS_HEATING_WH": {
+   "cz": "Topení dílna – spotřeba dnes",
+   "en": "Workshop heating – today",
+   "cz_short": "Topení dílna",
+   "en_short": "Workshop heating"
+  },
+  "POW_AXPERT_W": {
+   "cz": "Axpert 8 kW – výkon",
+   "en": "Axpert 8 kW – power",
+   "cz_short": "Axpert 8 kW",
+   "en_short": "Axpert 8 kW"
+  },
+  "POW_EVSE_W": {
+   "cz": "Nabíječka auta – výkon",
+   "en": "EV charger – power",
+   "cz_short": "Nabíječka auta",
+   "en_short": "EV charger"
+  },
+  "POW_WS_HEATING_W": {
+   "cz": "Topení dílna – výkon",
+   "en": "Workshop heating – power",
+   "cz_short": "Topení dílna",
+   "en_short": "Workshop heating"
+  },
+  "EL_HEATER_STATUS": {
+   "cz": "El. ohřev – stav",
+   "en": "Electric heater – state",
+   "cz_short": "El. ohřev",
+   "en_short": "Electric heater"
+  },
+  "EL_HEATER_LOAD_A": {
+   "cz": "El. ohřev – povolený proud",
+   "en": "Electric heater – allowed current",
+   "cz_short": "El. ohřev",
+   "en_short": "Electric heater"
+  },
+  "EL_HEATER_CURRENT_A": {
+   "cz": "El. ohřev – proud",
+   "en": "Electric heater – current",
+   "cz_short": "El. ohřev",
+   "en_short": "Electric heater"
+  },
+  "EL_HEATER_CONS_WH": {
+   "cz": "El. ohřev – spotřeba dnes",
+   "en": "Electric heater – today",
+   "cz_short": "El. ohřev",
+   "en_short": "Electric heater"
+  },
+  "HEAT_TOTAL_WH": {
+   "cz": "Nádrž – celková energie",
+   "en": "Tank – total energy",
+   "cz_short": "Nádrž",
+   "en_short": "Tank"
+  },
+  "HEAT_HEATING_WH": {
+   "cz": "Nádrž – energie pro topení",
+   "en": "Tank – energy for heating",
+   "cz_short": "Nádrž",
+   "en_short": "Tank"
+  },
+  "BOILER_POWER_W": {
+   "cz": "Kotel – výkon",
+   "en": "Boiler – power",
+   "cz_short": "Kotel",
+   "en_short": "Boiler"
+  },
+  "BOILER_HEAT": {
+   "cz": "Kotel – teplo",
+   "en": "Boiler – heat today",
+   "cz_short": "Kotel",
+   "en_short": "Boiler"
+  },
+  "FLOW_COLD_LPM": {
+   "cz": "Voda celkem – průtok",
+   "en": "Cold water – flow",
+   "cz_short": "Voda celkem",
+   "en_short": "Cold water"
+  },
+  "FLOW_HOT_LPM": {
+   "cz": "Teplá voda – průtok",
+   "en": "Hot water – flow",
+   "cz_short": "Teplá voda",
+   "en_short": "Hot water"
+  },
+  "CONS_COLD_L": {
+   "cz": "Voda celkem – spotřeba",
+   "en": "Cold water – consumed",
+   "cz_short": "Voda celkem",
+   "en_short": "Cold water"
+  },
+  "CONS_HOT_L": {
+   "cz": "Teplá voda – spotřeba",
+   "en": "Hot water – consumed",
+   "cz_short": "Teplá voda",
+   "en_short": "Hot water"
+  },
+  "TEMP_RECU_FC_C": {
+   "cz": "Rekuperace – čerstvý vzduch, studená strana",
+   "en": "Recuperation – fresh air, cold side",
+   "cz_short": "Čerstvý vzduch, studená strana",
+   "en_short": "Fresh air, cold side"
+  },
+  "TEMP_RECU_FH_C": {
+   "cz": "Rekuperace – přívod do domu",
+   "en": "Recuperation – supply air",
+   "cz_short": "Přívod do domu",
+   "en_short": "Supply air"
+  },
+  "TEMP_RECU_WH_C": {
+   "cz": "Rekuperace – odpadní vzduch z domu",
+   "en": "Recuperation – extract air",
+   "cz_short": "Odpadní vzduch z domu",
+   "en_short": "Extract air"
+  },
+  "TEMP_RECU_WC_C": {
+   "cz": "Rekuperace – výfuk ven",
+   "en": "Recuperation – exhaust air",
+   "cz_short": "Výfuk ven",
+   "en_short": "Exhaust air"
+  },
+  "RH_RECU_FH": {
+   "cz": "Rekuperace – vlhkost přívodu",
+   "en": "Recuperation – supply humidity",
+   "cz_short": "Vlhkost přívodu",
+   "en_short": "Supply humidity"
+  },
+  "RH_RECU_WASTE": {
+   "cz": "Rekuperace – vlhkost odpadu",
+   "en": "Recuperation – extract humidity",
+   "cz_short": "Vlhkost odpadu",
+   "en_short": "Extract humidity"
+  },
+  "CO2_RECU": {
+   "cz": "CO₂",
+   "en": "CO₂",
+   "cz_short": "CO₂",
+   "en_short": "CO₂"
+  },
+  "DP_RECU_F": {
+   "cz": "Rekuperace – tlak přívod",
+   "en": "Recuperation – supply pressure",
+   "cz_short": "Tlak přívod",
+   "en_short": "Supply pressure"
+  },
+  "DP_RECU_WASTE": {
+   "cz": "Rekuperace – tlak odpad",
+   "en": "Recuperation – extract pressure",
+   "cz_short": "Tlak odpad",
+   "en_short": "Extract pressure"
+  },
+  "RECU_FAN_F": {
+   "cz": "Rekuperace – ventilátor přívod",
+   "en": "Recuperation – supply fan",
+   "cz_short": "Ventilátor přívod",
+   "en_short": "Supply fan"
+  },
+  "RECU_FAN_WASTE": {
+   "cz": "Rekuperace – ventilátor odpad",
+   "en": "Recuperation – extract fan",
+   "cz_short": "Ventilátor odpad",
+   "en_short": "Extract fan"
+  },
+  "TEMP_BOILER_C": {
+   "cz": "Kotel",
+   "en": "Boiler",
+   "cz_short": "Kotel",
+   "en_short": "Boiler"
+  },
+  "TEMP_BOILER_IN_C": {
+   "cz": "Kotel – vstup",
+   "en": "Boiler – inlet",
+   "cz_short": "Kotel – vstup",
+   "en_short": "Boiler – inlet"
+  },
+  "TEMP_BOILER_OUT_C": {
+   "cz": "Kotel – výstup",
+   "en": "Boiler – outlet",
+   "cz_short": "Kotel – výstup",
+   "en_short": "Boiler – outlet"
+  },
+  "TEMP_TANK_IN_H_C": {
+   "cz": "Nádrž – vstup teplá strana",
+   "en": "Tank – in, hot side",
+   "cz_short": "Nádrž – vstup teplá strana",
+   "en_short": "Tank – in, hot side"
+  },
+  "TEMP_TANK_OUT_H_C": {
+   "cz": "Nádrž – výstup teplá strana",
+   "en": "Tank – out, hot side",
+   "cz_short": "Nádrž – výstup teplá strana",
+   "en_short": "Tank – out, hot side"
+  },
+  "TEMP_TANK_1_C": {
+   "cz": "Nádrž – vrstva 1 (dole)",
+   "en": "Tank – layer 1",
+   "cz_short": "Vrstva 1 (dole)",
+   "en_short": "Layer 1"
+  },
+  "TEMP_TANK_2_C": {
+   "cz": "Nádrž – vrstva 2",
+   "en": "Tank – layer 2",
+   "cz_short": "Vrstva 2",
+   "en_short": "Layer 2"
+  },
+  "TEMP_TANK_3_C": {
+   "cz": "Nádrž – vrstva 3",
+   "en": "Tank – layer 3",
+   "cz_short": "Vrstva 3",
+   "en_short": "Layer 3"
+  },
+  "TEMP_TANK_4_C": {
+   "cz": "Nádrž – vrstva 4",
+   "en": "Tank – layer 4",
+   "cz_short": "Vrstva 4",
+   "en_short": "Layer 4"
+  },
+  "TEMP_TANK_5_C": {
+   "cz": "Nádrž – vrstva 5",
+   "en": "Tank – layer 5",
+   "cz_short": "Vrstva 5",
+   "en_short": "Layer 5"
+  },
+  "TEMP_TANK_6_C": {
+   "cz": "Nádrž – vrstva 6 (nahoře)",
+   "en": "Tank – layer 6",
+   "cz_short": "Vrstva 6 (nahoře)",
+   "en_short": "Layer 6"
+  },
+  "TEMP_WALL_IN_C": {
+   "cz": "Stěnové topení – přívod",
+   "en": "Wall heating – flow",
+   "cz_short": "Stěnové topení – přívod",
+   "en_short": "Wall heating – flow"
+  },
+  "TEMP_WALL_OUT_C": {
+   "cz": "Stěnové topení – zpátečka",
+   "en": "Wall heating – return",
+   "cz_short": "Stěnové topení – zpátečka",
+   "en_short": "Wall heating – return"
+  },
+  "TEMP_BOILER_EXHAUST_C": {
+   "cz": "Kotel – spaliny",
+   "en": "Boiler – exhaust",
+   "cz_short": "Kotel – spaliny",
+   "en_short": "Boiler – exhaust"
+  },
+  "TEMP_RAD_H_C": {
+   "cz": "Radiátory – přívod",
+   "en": "Radiators – flow",
+   "cz_short": "Radiátory – přívod",
+   "en_short": "Radiators – flow"
+  },
+  "TEMP_RAD_C_C": {
+   "cz": "Radiátory – zpátečka",
+   "en": "Radiators – return",
+   "cz_short": "Radiátory – zpátečka",
+   "en_short": "Radiators – return"
+  },
+  "TEMP_TANK_IN_C_C": {
+   "cz": "Nádrž – vstup studená strana",
+   "en": "Tank – in, cold side",
+   "cz_short": "Nádrž – vstup studená strana",
+   "en_short": "Tank – in, cold side"
+  },
+  "TEMP_TANK_OUT_C_C": {
+   "cz": "Nádrž – výstup studená strana",
+   "en": "Tank – out, cold side",
+   "cz_short": "Nádrž – výstup studená strana",
+   "en_short": "Tank – out, cold side"
+  },
+  "TEMP_TECHM_BOARD_C": {
+   "cz": "Deska TECHM",
+   "en": "TECHM board",
+   "cz_short": "Deska TECHM",
+   "en_short": "TECHM board"
+  },
+  "TEMP_IOBOARD_D_C": {
+   "cz": "Deska IOBOARD dole",
+   "en": "IOBOARD down board",
+   "cz_short": "Deska IOBOARD dole",
+   "en_short": "IOBOARD down board"
+  },
+  "TEMP_DOWNSTAIRS_C": {
+   "cz": "Přízemí",
+   "en": "Downstairs",
+   "cz_short": "Přízemí",
+   "en_short": "Downstairs"
+  },
+  "TEMP_IOBOARD_U_C": {
+   "cz": "Deska IOBOARD nahoře",
+   "en": "IOBOARD up board",
+   "cz_short": "Deska IOBOARD nahoře",
+   "en_short": "IOBOARD up board"
+  },
+  "TEMP_ELECON_BOARD_C": {
+   "cz": "Deska ELECON",
+   "en": "ELECON board",
+   "cz_short": "Deska ELECON",
+   "en_short": "ELECON board"
+  },
+  "TEMP_OFFICE_C": {
+   "cz": "Elektrárna",
+   "en": "Electro kabinet",
+   "cz_short": "Elektrárna",
+   "en_short": "Electro kabinet"
+  },
+  "TEMP_KIDROOM_C": {
+   "cz": "Dětský pokoj",
+   "en": "Kids room",
+   "cz_short": "Dětský pokoj",
+   "en_short": "Kids room"
+  },
+  "TEMP_OUTSIDE_C": {
+   "cz": "Venku",
+   "en": "Outside",
+   "cz_short": "Venku",
+   "en_short": "Outside"
+  },
+  "TEMP_DILNA_C": {
+   "cz": "Dílna",
+   "en": "Workshop",
+   "cz_short": "Dílna",
+   "en_short": "Workshop"
+  },
+  "TEMP_AKUPACK1_C": {
+   "cz": "Akupack dílna",
+   "en": "Workshop battery pack",
+   "cz_short": "Akupack dílna",
+   "en_short": "Workshop battery pack"
+  },
+  "TEMP_BOARD_ELECON_D_C": {
+   "cz": "Deska ELECON_D",
+   "en": "ELECON_D board",
+   "cz_short": "Deska ELECON_D",
+   "en_short": "ELECON_D board"
+  },
+  "TEMP_KOLARNA_C": {
+   "cz": "Kolárna",
+   "en": "Bike shed",
+   "cz_short": "Kolárna",
+   "en_short": "Bike shed"
+  },
+  "METEO_WIND_BURST": {
+   "cz": "Vítr – nárazy",
+   "en": "Wind – gusts",
+   "cz_short": "Vítr – nárazy",
+   "en_short": "Wind – gusts"
+  },
+  "METEO_WIND_AVG": {
+   "cz": "Vítr – průměr",
+   "en": "Wind – average",
+   "cz_short": "Vítr – průměr",
+   "en_short": "Wind – average"
+  },
+  "METEO_WIND_POW": {
+   "cz": "Větrná turbína – výkon",
+   "en": "Wind turbine – power",
+   "cz_short": "Větrná turbína",
+   "en_short": "Wind turbine"
+  },
+  "METEO_WIND_ENERGY": {
+   "cz": "Větrná turbína – energie dnes",
+   "en": "Wind turbine – today",
+   "cz_short": "Větrná turbína",
+   "en_short": "Wind turbine"
+  },
+  "ST_LIGHT_LOFT_WEST": {
+   "cz": "Podkroví západ",
+   "en": "Loft west",
+   "cz_short": "Podkroví západ",
+   "en_short": "Loft west"
+  },
+  "ST_LIGHT_LOFT_EAST_1": {
+   "cz": "Podkroví východ 1",
+   "en": "Loft east 1",
+   "cz_short": "Podkroví východ 1",
+   "en_short": "Loft east 1"
+  },
+  "ST_LIGHT_LOFT_EAST_2": {
+   "cz": "Podkroví východ 2",
+   "en": "Loft east 2",
+   "cz_short": "Podkroví východ 2",
+   "en_short": "Loft east 2"
+  },
+  "ST_LIGHT_BEDROOM_SOUTH": {
+   "cz": "Ložnice jih",
+   "en": "Bedroom south",
+   "cz_short": "Ložnice jih",
+   "en_short": "Bedroom south"
+  },
+  "ST_LIGHT_BEDROOM_NORTH": {
+   "cz": "Ložnice sever",
+   "en": "Bedroom north",
+   "cz_short": "Ložnice sever",
+   "en_short": "Bedroom north"
+  },
+  "ST_LIGHT_BATHROOM": {
+   "cz": "Koupelna",
+   "en": "Bathroom",
+   "cz_short": "Koupelna",
+   "en_short": "Bathroom"
+  },
+  "ST_LIGHT_STAIR_STEPS": {
+   "cz": "Podstupně",
+   "en": "Stair steps",
+   "cz_short": "Podstupně",
+   "en_short": "Stair steps"
+  },
+  "ST_LIGHT_STAIRS": {
+   "cz": "Schody",
+   "en": "Stairs",
+   "cz_short": "Schody",
+   "en_short": "Stairs"
+  },
+  "ST_LIGHT_HALLWAY": {
+   "cz": "Chodba a předsíň",
+   "en": "Hallway",
+   "cz_short": "Chodba a předsíň",
+   "en_short": "Hallway"
+  },
+  "ST_LIGHT_LIVING_ROOM": {
+   "cz": "Obývák",
+   "en": "Living room",
+   "cz_short": "Obývák",
+   "en_short": "Living room"
+  },
+  "ST_LIGHT_DINING_ROOM": {
+   "cz": "Jídelna",
+   "en": "Dining room",
+   "cz_short": "Jídelna",
+   "en_short": "Dining room"
+  },
+  "ST_LIGHT_KITCHEN": {
+   "cz": "Kuchyň",
+   "en": "Kitchen",
+   "cz_short": "Kuchyň",
+   "en_short": "Kitchen"
+  },
+  "ST_SCREEN_EAST": {
+   "cz": "Žaluzie východ",
+   "en": "East blind",
+   "cz_short": "Žaluzie východ",
+   "en_short": "East blind"
+  },
+  "ST_SCREEN_WEST": {
+   "cz": "Žaluzie západ",
+   "en": "West blind",
+   "cz_short": "Žaluzie západ",
+   "en_short": "West blind"
+  },
+  "ST_LIGHT_WASHBASIN": {
+   "cz": "Umyvadlo",
+   "en": "Washbasin",
+   "cz_short": "Umyvadlo",
+   "en_short": "Washbasin"
+  },
+  "ST_LIGHT_KITCHEN_COUNTER": {
+   "cz": "Kuchyňská linka",
+   "en": "Kitchen counter",
+   "cz_short": "Kuchyňská linka",
+   "en_short": "Kitchen counter"
+  },
+  "ST_SEWAGE_PUMP": {
+   "cz": "Čerpadlo ČOV",
+   "en": "Sewage pump",
+   "cz_short": "Čerpadlo ČOV",
+   "en_short": "Sewage pump"
+  },
+  "ST_AC_AXPERT": {
+   "cz": "Měnič Axpert 8 kW",
+   "en": "Axpert 8 kW inverter",
+   "cz_short": "Měnič Axpert 8 kW",
+   "en_short": "Axpert 8 kW inverter"
+  },
+  "ST_AC_VICTRON": {
+   "cz": "Měnič Victron 2 kW",
+   "en": "Victron 2 kW inverter",
+   "cz_short": "Měnič Victron 2 kW",
+   "en_short": "Victron 2 kW inverter"
+  },
+  "ST_AKUPACK_HEATER": {
+   "cz": "Ohřev akupacku",
+   "en": "Pack heater",
+   "cz_short": "Ohřev akupacku",
+   "en_short": "Pack heater"
+  },
+  "ST_AKUPACK_SET_DAY_C": {
+   "cz": "Ohřev akupacku – teplota den",
+   "en": "Pack heater – day setpoint",
+   "cz_short": "Ohřev akupacku – den",
+   "en_short": "Pack heater – day"
+  },
+  "ST_AKUPACK_SET_NIGHT_C": {
+   "cz": "Ohřev akupacku – teplota noc",
+   "en": "Pack heater – night setpoint",
+   "cz_short": "Ohřev akupacku – noc",
+   "en_short": "Pack heater – night"
+  },
+  "ST_EVSE_RELAY": {
+   "cz": "Nabíječka auta – relé",
+   "en": "EV charger relay",
+   "cz_short": "Nabíječka auta – relé",
+   "en_short": "EV charger relay"
+  },
+  "ST_WS_HEATING_RELAY": {
+   "cz": "Topení dílna – relé",
+   "en": "Workshop heating relay",
+   "cz_short": "Topení dílna – relé",
+   "en_short": "Workshop heating relay"
+  },
+  "ST_LIGHT_EXTERIOR_WS": {
+   "cz": "Venkovní světlo dílna",
+   "en": "Workshop outdoor light",
+   "cz_short": "Venkovní světlo dílna",
+   "en_short": "Workshop outdoor light"
+  },
+  "ST_LIGHT_KOLARNA": {
+   "cz": "Kolárna",
+   "en": "Bike shed",
+   "cz_short": "Kolárna",
+   "en_short": "Bike shed"
+  },
+  "ST_LIGHT_SKLEP": {
+   "cz": "Sklep",
+   "en": "Cellar",
+   "cz_short": "Sklep",
+   "en_short": "Cellar"
+  },
+  "ST_AC_300W": {
+   "cz": "Měnič 300 W",
+   "en": "Inverter 300 W",
+   "cz_short": "Měnič 300 W",
+   "en_short": "Inverter 300 W"
+  },
+  "ST_AC_3KW": {
+   "cz": "Měnič 3 kW",
+   "en": "Inverter 3 kW",
+   "cz_short": "Měnič 3 kW",
+   "en_short": "Inverter 3 kW"
+  },
+  "ST_AC_5KW": {
+   "cz": "Měnič 5 kW",
+   "en": "Inverter 5 kW",
+   "cz_short": "Měnič 5 kW",
+   "en_short": "Inverter 5 kW"
+  },
+  "ST_LIGHT_EXTERIOR_HOUSE": {
+   "cz": "Venkovní světlo dům",
+   "en": "House outdoor light",
+   "cz_short": "Venkovní světlo dům",
+   "en_short": "House outdoor light"
+  },
+  "ST_RECU_REMOTE_MODE": {
+   "cz": "Rekuperace – režim",
+   "en": "Recuperation – mode",
+   "cz_short": "Rekuperace – režim",
+   "en_short": "Recuperation – mode"
+  },
+  "ST_RECU_LIMIT": {
+   "cz": "Rekuperace – omezení",
+   "en": "Recuperation – limitation",
+   "cz_short": "Rekuperace – omezení",
+   "en_short": "Recuperation – limitation"
+  },
+  "ST_RECU_CO2_SETPOINT": {
+   "cz": "Rekuperace – CO₂ start",
+   "en": "Recuperation – CO₂ setpoint",
+   "cz_short": "Rekuperace – CO₂ start",
+   "en_short": "Recuperation – CO₂ setpoint"
+  },
+  "ST_RECU_ANTIDRY_RH": {
+   "cz": "Rekuperace – mez vysušení",
+   "en": "Recuperation – anti-dry limit",
+   "cz_short": "Rekuperace – mez vysušení",
+   "en_short": "Recuperation – anti-dry limit"
+  },
+  "ST_UP_REQ_DAY_C": {
+   "cz": "Patro – teplota den",
+   "en": "Upstairs – day setpoint",
+   "cz_short": "Patro – den",
+   "en_short": "Upstairs – day"
+  },
+  "ST_UP_REQ_NIGHT_C": {
+   "cz": "Patro – teplota noc",
+   "en": "Upstairs – night setpoint",
+   "cz_short": "Patro – noc",
+   "en_short": "Upstairs – night"
+  },
+  "ST_DOWN_REQ_DAY_C": {
+   "cz": "Přízemí – teplota den",
+   "en": "Downstairs – day setpoint",
+   "cz_short": "Přízemí – den",
+   "en_short": "Downstairs – day"
+  },
+  "ST_DOWN_REQ_NIGHT_C": {
+   "cz": "Přízemí – teplota noc",
+   "en": "Downstairs – night setpoint",
+   "cz_short": "Přízemí – noc",
+   "en_short": "Downstairs – night"
+  },
+  "ST_EXHAUST_SET_C": {
+   "cz": "Kotel – nastavené spaliny",
+   "en": "Boiler – exhaust setpoint",
+   "cz_short": "Kotel – nastavené spaliny",
+   "en_short": "Boiler – exhaust setpoint"
+  },
+  "ST_UP_REQ_C": {
+   "cz": "Patro – nastavená teplota teď",
+   "en": "Upstairs – setpoint now",
+   "cz_short": "Patro – teď",
+   "en_short": "Upstairs – now"
+  },
+  "ST_DOWN_REQ_C": {
+   "cz": "Přízemí – nastavená teplota teď",
+   "en": "Downstairs – setpoint now",
+   "cz_short": "Přízemí – teď",
+   "en_short": "Downstairs – now"
+  },
+  "ST_RAD_ON": {
+   "cz": "Radiátory topí",
+   "en": "Radiators on",
+   "cz_short": "Radiátory topí",
+   "en_short": "Radiators on"
+  },
+  "ST_WALL_ON": {
+   "cz": "Stěnové topení topí",
+   "en": "Wall heating on",
+   "cz_short": "Stěnové topení topí",
+   "en_short": "Wall heating on"
+  },
+  "ST_PUMP_BOILER": {
+   "cz": "Čerpadlo kotle",
+   "en": "Boiler pump",
+   "cz_short": "Čerpadlo kotle",
+   "en_short": "Boiler pump"
+  },
+  "ST_PUMP_WALL": {
+   "cz": "Čerpadlo stěnového topení",
+   "en": "Wall heating pump",
+   "cz_short": "Čerpadlo stěnového topení",
+   "en_short": "Wall heating pump"
+  },
+  "ST_PUMP_RAD": {
+   "cz": "Čerpadlo radiátorů",
+   "en": "Radiator pump",
+   "cz_short": "Čerpadlo radiátorů",
+   "en_short": "Radiator pump"
+  },
+  "ST_EL_HEATER_COILS": {
+   "cz": "El. ohřev – sepnuté spirály",
+   "en": "Electric heater – coils on",
+   "cz_short": "El. ohřev – sepnuté spirály",
+   "en_short": "Electric heater – coils on"
+  },
+  "ST_BOILER_STATE": {
+   "cz": "Kotel – stav",
+   "en": "Boiler – state",
+   "cz_short": "Kotel",
+   "en_short": "Boiler"
+  },
+  "TECHM_VALVE_WALL_PCT": {
+   "cz": "Ventil stěnového topení",
+   "en": "Wall heating valve",
+   "cz_short": "Ventil stěnového topení",
+   "en_short": "Wall heating valve"
+  },
+  "TECHM_VALVE_RAD_PCT": {
+   "cz": "Ventil radiátorů",
+   "en": "Radiator valve",
+   "cz_short": "Ventil radiátorů",
+   "en_short": "Radiator valve"
+  },
+  "TECHM_AIR_VALVE_SIGNAL_PCT": {
+   "cz": "Kotel – klapka vzduchu",
+   "en": "Boiler – air valve",
+   "cz_short": "Kotel – klapka vzduchu",
+   "en_short": "Boiler – air valve"
+  },
+  "TECHM_REQ_WATER_RAD_C": {
+   "cz": "Radiátory – cílová teplota vody",
+   "en": "Radiators – target water temperature",
+   "cz_short": "Radiátory – cílová voda",
+   "en_short": "Radiators – target water"
+  },
+  "TECHM_REQ_WATER_WALL_C": {
+   "cz": "Stěnové topení – cílová teplota vody",
+   "en": "Wall heating – target water temperature",
+   "cz_short": "Stěnové topení – cílová voda",
+   "en_short": "Wall heating – target water"
+  }
+ },
+ "cmds": {
+  "CMD_LIGHT_LOFT_WEST": {
+   "cz": "Pracovna",
+   "en": "Loft west"
+  },
+  "CMD_LIGHT_LOFT_EAST_1": {
+   "cz": "Pokoj 1",
+   "en": "Loft east 1"
+  },
+  "CMD_LIGHT_LOFT_EAST_2": {
+   "cz": "Pokoj 2",
+   "en": "Loft east 2"
+  },
+  "CMD_LIGHT_BEDROOM_SOUTH": {
+   "cz": "Ložnice jih",
+   "en": "Bedroom south"
+  },
+  "CMD_LIGHT_BEDROOM_NORTH": {
+   "cz": "Ložnice sever",
+   "en": "Bedroom north"
+  },
+  "CMD_LIGHT_BATHROOM": {
+   "cz": "Koupelna",
+   "en": "Bathroom"
+  },
+  "CMD_LIGHT_STAIR_STEPS": {
+   "cz": "Podstupně",
+   "en": "Stair steps"
+  },
+  "CMD_LIGHT_STAIRS": {
+   "cz": "Schody",
+   "en": "Stairs"
+  },
+  "CMD_LIGHT_HALLWAY": {
+   "cz": "Chodba",
+   "en": "Hallway"
+  },
+  "CMD_LIGHT_LIVING_ROOM": {
+   "cz": "Obývák",
+   "en": "Living room"
+  },
+  "CMD_LIGHT_DINING_ROOM": {
+   "cz": "Jídelna",
+   "en": "Dining room"
+  },
+  "CMD_LIGHT_KITCHEN": {
+   "cz": "Kuchyň",
+   "en": "Kitchen"
+  },
+  "CMD_LIGHT_WASHBASIN": {
+   "cz": "Umyvadlo",
+   "en": "Washbasin"
+  },
+  "CMD_LIGHT_KITCHEN_COUNTER": {
+   "cz": "Linka",
+   "en": "Kitchen counter"
+  },
+  "CMD_SCREEN_EAST": {
+   "cz": "Roleta pokoj",
+   "en": "East blind"
+  },
+  "CMD_SCREEN_WEST": {
+   "cz": "Roleta pracovna",
+   "en": "West blind"
+  },
+  "CMD_UP_REQ_DAY": {
+   "cz": "Patro – teplota den",
+   "en": "Upstairs – day"
+  },
+  "CMD_UP_REQ_NIGHT": {
+   "cz": "Patro – teplota noc",
+   "en": "Upstairs – night"
+  },
+  "CMD_DOWN_REQ_DAY": {
+   "cz": "Přízemí – teplota den",
+   "en": "Downstairs – day"
+  },
+  "CMD_DOWN_REQ_NIGHT": {
+   "cz": "Přízemí – teplota noc",
+   "en": "Downstairs – night"
+  },
+  "CMD_EXHAUST_SET": {
+   "cz": "Kotel – teplota spalin",
+   "en": "Boiler – exhaust temperature"
+  },
+  "CMD_LIGHT_KOLARNA": {
+   "cz": "Kolárna",
+   "en": "Bike shed"
+  },
+  "CMD_LIGHT_SKLEP": {
+   "cz": "Sklep",
+   "en": "Cellar"
+  },
+  "CMD_AKUPACK_SET_DAY": {
+   "cz": "Ohřev akupacku – den",
+   "en": "Pack heater – day"
+  },
+  "CMD_AKUPACK_SET_NIGHT": {
+   "cz": "Ohřev akupacku – noc",
+   "en": "Pack heater – night"
+  },
+  "CMD_AC_3KW": {
+   "cz": "Měnič 3 kW",
+   "en": "Inverter 3 kW"
+  },
+  "CMD_AC_5KW": {
+   "cz": "Měnič 5kW",
+   "en": "Inverter 5 kW"
+  },
+  "CMD_AC_AXPERT": {
+   "cz": "Měnič Axpert 8 kW",
+   "en": "Axpert 8 kW"
+  },
+  "CMD_AC_VICTRON": {
+   "cz": "Měnič Victron 2 kW",
+   "en": "Victron 2 kW"
+  },
+  "CMD_RECU_CO2_SETPOINT": {
+   "cz": "Rekuperace – CO₂ start",
+   "en": "Recuperation – CO₂ start"
+  },
+  "CMD_RECU_ANTIDRY_RH": {
+   "cz": "Rekuperace – limit vlhkosti",
+   "en": "Recuperation – anti-dry limit"
+  }
+ },
+ "enums": {
+  "ElHeaterState": {
+   "0": {
+    "name": "Heating",
+    "cz": "Ohřívá",
+    "en": "Heating"
+   },
+   "1": {
+    "name": "TempReached",
+    "cz": "Teplota dosažena",
+    "en": "Temperature reached"
+   },
+   "2": {
+    "name": "NoFreePower",
+    "cz": "Žádný přebytek energie",
+    "en": "No spare power"
+   },
+   "3": {
+    "name": "LowSOC",
+    "cz": "Nízké nabití baterie",
+    "en": "Low battery"
+   },
+   "4": {
+    "name": "48VFail",
+    "cz": "Chyba napájení 48 V",
+    "en": "48 V fault"
+   },
+   "5": {
+    "name": "TankOvertemperature",
+    "cz": "Přehřátá nádrž",
+    "en": "Tank overheated"
+   },
+   "6": {
+    "name": "BoardOvertemperature",
+    "cz": "Přehřátá elektronika",
+    "en": "Board overheated"
+   },
+   "7": {
+    "name": "InvalidInputs",
+    "cz": "Neplatná data",
+    "en": "Invalid inputs"
+   },
+   "8": {
+    "name": "EleconComError",
+    "cz": "Chyba komunikace s ELECON",
+    "en": "ELECON link error"
+   },
+   "9": {
+    "name": "SwitchError",
+    "cz": "Chyba spínače",
+    "en": "Switch fault"
+   },
+   "10": {
+    "name": "BalanceSupport",
+    "cz": "Podpora balancování",
+    "en": "Balancing support"
+   },
+   "11": {
+    "name": "ComfortHeat",
+    "cz": "Komfortní ohřev",
+    "en": "Comfort heating"
+   }
+  },
+  "BlindCmd": {
+   "0": {
+    "name": "None",
+    "cz": "–",
+    "en": "–"
+   },
+   "1": {
+    "name": "Up",
+    "cz": "Nahoru",
+    "en": "Up"
+   },
+   "2": {
+    "name": "Down",
+    "cz": "Dolů",
+    "en": "Down"
+   },
+   "3": {
+    "name": "Stop",
+    "cz": "Stop",
+    "en": "Stop"
+   }
+  },
+  "BoilerStatus": {
+   "0": {
+    "name": "Idle",
+    "cz": "Nehoří",
+    "en": "Idle"
+   },
+   "1": {
+    "name": "HeatUp",
+    "cz": "Roztápění",
+    "en": "Heating up"
+   },
+   "2": {
+    "name": "Heating",
+    "cz": "Hoří",
+    "en": "Heating"
+   },
+   "3": {
+    "name": "CoolDown",
+    "cz": "Dohořívá",
+    "en": "Cooling down"
+   },
+   "4": {
+    "name": "Overheat",
+    "cz": "Přehřátí",
+    "en": "Overheated"
+   },
+   "5": {
+    "name": "Error",
+    "cz": "Chyba",
+    "en": "Error"
+   },
+   "6": {
+    "name": "InvalidInputs",
+    "cz": "Neplatná data",
+    "en": "Invalid inputs"
+   }
+  },
+  "RecuRemoteMode": {
+   "0": {
+    "name": "Auto",
+    "cz": "Automaticky",
+    "en": "Auto"
+   },
+   "1": {
+    "name": "SlightOverpressure",
+    "cz": "Mírný přetlak",
+    "en": "Slight overpressure"
+   },
+   "2": {
+    "name": "MaxOverpressure",
+    "cz": "Max. přetlak",
+    "en": "Max overpressure"
+   },
+   "3": {
+    "name": "SlightUnderpressure",
+    "cz": "Mírný podtlak",
+    "en": "Slight underpressure"
+   },
+   "4": {
+    "name": "MaxUnderpressure",
+    "cz": "Max. podtlak",
+    "en": "Max underpressure"
+   }
+  },
+  "RecuLimit": {
+   "0": {
+    "name": "None",
+    "cz": "Bez omezení",
+    "en": "None"
+   },
+   "1": {
+    "name": "Eco",
+    "cz": "Úsporný režim",
+    "en": "Eco"
+   },
+   "2": {
+    "name": "AntiDry",
+    "cz": "Ochrana proti presušení vzduchu",
+    "en": "Anti-dry"
+   },
+   "3": {
+    "name": "AntifreezeReduced",
+    "cz": "Ochrana proti mrazu – sníženo",
+    "en": "Antifreeze – reduced"
+   },
+   "4": {
+    "name": "AntifreezeStop",
+    "cz": "Ochrana proti mrazu – stop",
+    "en": "Antifreeze – stopped"
+   },
+   "5": {
+    "name": "BatteryOff",
+    "cz": "Vypnuto – vybitá baterie",
+    "en": "Off – low battery"
+   },
+   "6": {
+    "name": "InvalidInputs",
+    "cz": "Neplatná data",
+    "en": "Invalid inputs"
+   }
+  },
+  "InverterState": {
+   "0": {
+    "name": "Off",
+    "cz": "Off",
+    "en": "Off"
+   },
+   "1": {
+    "name": "On",
+    "cz": "On",
+    "en": "On"
+   },
+   "2": {
+    "name": "OnKeepSetting",
+    "cz": "Nastavení zapnutí",
+    "en": "On (keeps setting)"
+   },
+   "3": {
+    "name": "KeepOn",
+    "cz": "Drženo zapnuté",
+    "en": "Kept on"
+   },
+   "4": {
+    "name": "AutoOff",
+    "cz": "Auto",
+    "en": "Auto off"
+   }
+  }
+ },
+ "var_enums": {
+  "EL_HEATER_STATUS": "ElHeaterState",
+  "ST_SCREEN_EAST": "BlindCmd",
+  "ST_SCREEN_WEST": "BlindCmd",
+  "ST_AC_AXPERT": "InverterState",
+  "ST_AC_VICTRON": "InverterState",
+  "ST_AC_300W": "InverterState",
+  "ST_AC_3KW": "InverterState",
+  "ST_AC_5KW": "InverterState",
+  "ST_RECU_REMOTE_MODE": "RecuRemoteMode",
+  "ST_RECU_LIMIT": "RecuLimit",
+  "ST_BOILER_STATE": "BoilerStatus"
+ }
+}
