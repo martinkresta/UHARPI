@@ -15,7 +15,11 @@
   const STALE_AGE_S = 10;      // variable older than this is shown as "old"
   const STALE_FEED_S = 15;     // uha2.json UnixTime did not change for this long
 
-  U.SOLAR_PEAK_W = 5000;       // installed PV peak for the Home bargraph (assumed, to be confirmed by Martin)
+  // PV peak for the Home bargraph (SOLAR_POWER_W = house + workshop): house panels 5600 Wp but the MPPT gives at
+  // most 4600 W; workshop 16 x 365 Wp = 5840 W (Martin, 2026-11-21)
+  U.PV_HOUSE_MAX_W = 4600;
+  U.PV_WORKSHOP_PEAK_W = 16 * 365;
+  U.SOLAR_PEAK_W = U.PV_HOUSE_MAX_W + U.PV_WORKSHOP_PEAK_W;
   U.TEMP_COLD_C = 20;          // temperature colour scale (tank, pipes): blue at or below ...
   U.TEMP_HOT_C = 70;           // ... red at or above
 
