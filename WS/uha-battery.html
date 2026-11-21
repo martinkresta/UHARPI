@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UHA</title>
-  <link rel="stylesheet" href="css/uha.css?v=20261121b">
+  <link rel="stylesheet" href="css/uha.css?v=20261121c">
 </head>
 <body>
-<script src="js/uha-common.js?v=20261121b"></script>
+<script src="js/uha-common.js?v=20261121c"></script>
 <script>
 // Cell voltage chart: fixed scale and colour thresholds (as index.html), all in one place.
 const CELL = {
@@ -19,7 +19,7 @@ const cellClass = v => (v === null ? 'bad' : v < CELL.BAD_LO || v > CELL.BAD_HI 
 
 UHA.start(U => {
   const v3 = x => U.fmtNum(x, 3);
-  const pack = (n, title) => {
+  const pack = (n, title, ctrl) => {
     const cells = [], temps = [];
     for (let i = 1; i <= 16; i++) { cells.push(U.num(`BMS${n}_CELL_V_${i}`)); temps.push(U.num(`BMS${n}_CELL_TEMP_C_${i}`)); }
     const ok = cells.filter(x => x !== null), tk = temps.filter(x => x !== null);
@@ -41,14 +41,14 @@ UHA.start(U => {
       U.rowText(U.t('mon.battery.minmax'), ok.length ? `${v3(lo)} V / ${v3(hi)} V` : '–') +
       `<div class="row ${delta !== null && delta > 50 ? 'old' : ''}"><span class="l">${U.t('mon.battery.spread')}</span><span class="v">${delta === null ? '–' : U.format(delta, 'mV', 0)}</span></div>` +
       U.rowText(U.t('mon.battery.tminmax'), tk.length ? `${U.fmtNum(Math.min(...tk), 0)} / ${U.fmtNum(Math.max(...tk), 0)} °C` : '–'),
-      { cls: 'bat' });
+      { cls: 'bat', ctrl });
   };
   const legend = `<div class="legend"><span><i style="background:var(--ok)"></i>${U.t('mon.battery.lg_ok')}</span>` +
     `<span><i style="background:var(--bat)"></i>${U.t('mon.battery.lg_high', { x: v3(CELL.WARN_HI) })}</span>` +
     `<span><i style="background:var(--bad)"></i>${U.t('mon.battery.lg_bad', { lo: v3(CELL.BAD_LO), hi: v3(CELL.BAD_HI) })}</span>` +
     `<span><i style="outline:2px solid var(--text);outline-offset:-2px;background:var(--card2)"></i>${U.t('mon.battery.lg_minmax')}</span></div>`;
   return U.pageHead(U.t('mon.battery.title'), U.t('mon.battery.sub')) + `<div class="grid wide">` +
-    pack(1, U.t('mon.battery.p1')) + pack(2, U.t('mon.battery.p2')) + pack(3, U.t('mon.battery.p3')) +
+    pack(1, U.t('mon.battery.p1'), 'heating') + pack(2, U.t('mon.battery.p2')) + pack(3, U.t('mon.battery.p3')) +
     `</div>${legend}<p class="note">${U.t('mon.battery.spreadnote')} <a href="uha-detail.html#battery">${U.t('mon.battery.more')}</a></p>`;
 });
 </script>

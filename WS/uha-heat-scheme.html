@@ -4,18 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UHA</title>
-  <link rel="stylesheet" href="css/uha.css?v=20261121b">
+  <link rel="stylesheet" href="css/uha.css?v=20261121c">
 </head>
 <body>
-<script src="js/uha-common.js?v=20261121b"></script>
-<script src="js/uha-scheme.js?v=20261121b"></script>
+<script src="js/uha-common.js?v=20261121c"></script>
+<script src="js/uha-scheme.js?v=20261121c"></script>
 <script>
 // Heat schematic (TECHM) - FIRST PROPOSAL of the topology, to be reviewed by Martin. Pipes are coloured by the
 // temperature variable on them; pumps filled when on; valves with their %. All positions in the arrays below.
 const TANK = { x: 360, y: 30, w: 110, h: 330 };
 
 UHA.scheme({
-  title: 'mon.scheme.heat_t', sub: 'mon.scheme.heat_sub', head: [['uha-heat.html', 'mon.scheme.back_heat']],
+  title: 'mon.scheme.heat_t', sub: 'mon.scheme.heat_sub', head: [['uha-heat.html', 'mon.scheme.back_heat'], [UHA.ctrlHref('heating'), 'mon.ctrl.link']],
   width: 600, height: 895,
   pipes: [
     // boiler <-> tank, hot side: boiler outlet -> tank top, tank bottom -> boiler inlet (boiler pump)

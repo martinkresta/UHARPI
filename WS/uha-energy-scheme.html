@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UHA</title>
-  <link rel="stylesheet" href="css/uha.css?v=20261121b">
+  <link rel="stylesheet" href="css/uha.css?v=20261121c">
 </head>
 <body>
-<script src="js/uha-common.js?v=20261121b"></script>
-<script src="js/uha-scheme.js?v=20261121b"></script>
+<script src="js/uha-common.js?v=20261121c"></script>
+<script src="js/uha-scheme.js?v=20261121c"></script>
 <script>
 // Energy schematic - FIRST PROPOSAL of the topology, to be reviewed by Martin. Everything is in the arrays below:
 // blocks (x, y, w in a 600 wide drawing; height follows the rows), links (from -> to, variable for the flow
@@ -17,7 +17,7 @@ const sumW = names => U => U.sum(names);
 const HOUSE_INV = ['POW_AC300_W', 'POW_AC3KW_W', 'POW_AC5KW_W'];
 
 UHA.scheme({
-  title: 'mon.scheme.energy_t', sub: 'mon.scheme.energy_sub', head: [['uha-energy.html', 'mon.scheme.back_energy']],
+  title: 'mon.scheme.energy_t', sub: 'mon.scheme.energy_sub', head: [['uha-energy.html', 'mon.scheme.back_energy'], [UHA.ctrlHref('inverter'), 'mon.ctrl.link']],
   width: 600, height: 1410, modes: true,
   areas: [
     { x: 5, y: 125, w: 590, h: 610, label: 'mon.scheme.area_house' },
@@ -34,8 +34,8 @@ UHA.scheme({
     { id: 'strg1', x: 410, y: 170, w: 170, label: 'STRG1_SOC', cls: 'bat',
       rows: [{ v: 'STRG1_POWER_W', i: 'STRG1_CURRENT_A' }, { v: 'STRG1_SOC' }, { v: 'BMS2_SOC', l: 'mon.scheme.p220' }, { v: 'BMS3_SOC', l: 'mon.scheme.p80' }] },
     { id: 'ac300', x: 20, y: 375, w: 170, label: 'ST_AC_300W', state: 'ST_AC_300W', cls: 'load', rows: [{ v: 'POW_AC300_W', i: null }] },
-    { id: 'ac3k', x: 215, y: 375, w: 170, label: 'ST_AC_3KW', state: 'ST_AC_3KW', cls: 'load', rows: [{ v: 'POW_AC3KW_W', i: null }] },
-    { id: 'ac5k', x: 410, y: 375, w: 170, label: 'ST_AC_5KW', state: 'ST_AC_5KW', cls: 'load', rows: [{ v: 'POW_AC5KW_W', i: null }] },
+    { id: 'ac3k', href: UHA.ctrlHref('inverter'), x: 215, y: 375, w: 170, label: 'ST_AC_3KW', state: 'ST_AC_3KW', cls: 'load', rows: [{ v: 'POW_AC3KW_W', i: null }] },
+    { id: 'ac5k', href: UHA.ctrlHref('inverter'), x: 410, y: 375, w: 170, label: 'ST_AC_5KW', state: 'ST_AC_5KW', cls: 'load', rows: [{ v: 'POW_AC5KW_W', i: null }] },
     { id: 'circ', x: 20, y: 535, w: 365, label: 'mon.loads.circuits', cls: 'load',
       rows: ['FRIDGE', 'KITCHEN', 'WASCHMACHINE', 'TECHM', 'OTHER'].map(c => ({ v: `POW_${c}_W`, l: `POW_${c}_W`, i: null })) },
     { id: 'htot', x: 410, y: 535, w: 170, label: 'mon.scheme.house_total', cls: 'home',
@@ -45,9 +45,9 @@ UHA.scheme({
     { id: 'pv2', x: 215, y: 800, w: 170, label: 'AXPERT_PVS2_W', cls: 'solar', rows: [{ v: 'AXPERT_PVS2_W', i: 'AXPERT_PVS2_A' }, { v: 'AXPERT_PVS2_V' }] },
     { id: 'strg2', x: 410, y: 800, w: 170, label: 'STRG2_SOC', cls: 'bat',
       rows: [{ v: 'STRG2_POWER_W', i: 'STRG2_CURRENT_A' }, { v: 'STRG2_SOC' }, { v: 'BMS1_SOC', l: 'mon.scheme.p251' }] },
-    { id: 'axpert', x: 20, y: 960, w: 270, label: 'ST_AC_AXPERT', state: 'ST_AC_AXPERT', cls: 'solar',
+    { id: 'axpert', href: UHA.ctrlHref('inverter'), x: 20, y: 960, w: 270, label: 'ST_AC_AXPERT', state: 'ST_AC_AXPERT', cls: 'solar',
       rows: [{ v: 'AXPERT_AC_POWER_W', i: null }, { v: 'AXPERT_SOLAR_W', i: null }, { v: 'AXPERT_BAT_POWER_W', i: 'AXPERT_BAT_CURRENT_A' }] },
-    { id: 'victron', x: 410, y: 960, w: 170, label: 'ST_AC_VICTRON', state: 'ST_AC_VICTRON', cls: 'load',
+    { id: 'victron', href: UHA.ctrlHref('inverter'), x: 410, y: 960, w: 170, label: 'ST_AC_VICTRON', state: 'ST_AC_VICTRON', cls: 'load',
       rows: [{ v: 'POW_WS_HEATING_W', l: 'mon.loads.power', i: null }] },
     { id: 'meter', x: 20, y: 1150, w: 170, label: 'POW_AXPERT_W', cls: 'load', rows: [{ v: 'POW_AXPERT_W', l: 'mon.loads.power', i: null }, { v: 'CONS_AXPERT_WH', l: 'mon.home.today' }] },
     { id: 'evse', x: 215, y: 1150, w: 170, label: 'POW_EVSE_W', cls: 'load', rows: [{ v: 'POW_EVSE_W', l: 'mon.loads.power', i: null }, { v: 'CONS_EVSE_WH', l: 'mon.home.today' }] },

@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UHA</title>
-  <link rel="stylesheet" href="css/uha.css?v=20261121b">
+  <link rel="stylesheet" href="css/uha.css?v=20261121c">
 </head>
 <body>
-<script src="js/uha-common.js?v=20261121b"></script>
+<script src="js/uha-common.js?v=20261121c"></script>
 <script>
 UHA.start(U => {
   const r = name => U.row(U.vshort(name), name);
-  return U.pageHead(U.t('mon.heat.title'), U.t('mon.heat.sub'), [['uha-heat-scheme.html', U.t('mon.scheme.link')]]) +
+  return U.pageHead(U.t('mon.heat.title'), U.t('mon.heat.sub'), [['uha-heat-scheme.html', U.t('mon.scheme.link')], [U.ctrlHref('heating'), U.t('mon.ctrl.link')]]) +
     `<div class="grid wide">` +
     U.card(U.t('mon.heat.tank'), U.tankSvg(220, 330) +
       U.row(U.t('mon.home.heatenergy'), 'HEAT_TOTAL_WH'), { cls: 'heat' }) +

@@ -13,6 +13,7 @@
  *                    variable name, default: the measure part of v's name), o = U.parts options
  *                    or {fn: U => [label, value text, cls]} for a computed row
  *            state: state variable (enum / bool) shown as the first row
+ *            href:  the block is a link (e.g. to its control section), " ›" after the title
  *   links:  [{from, to, v, i?, cls, pts?, min?, imin?, invert?}]  power line between blocks; arrow in the flow
  *            direction when |value| >= min (default 20 W / 0.5 A); v / i may also be functions U => number;
  *            without v: a static line (bus); pts instead of from / to: explicit path
@@ -74,7 +75,7 @@
       const rows = (b.state ? [{ fn: () => [U.t('mon.scheme.state'), U.show(b.state), U.ageClass(b.state)] }] : []).concat(b.rows || []);
       let s = `<g><rect class="blk" x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="10"/>` +
         `<rect class="stripe ${b.cls || ''}" x="${b.x}" y="${b.y}" width="${b.w}" height="5" rx="2"/>` +
-        `<text class="title" x="${b.x + PAD}" y="${b.y + 29}"${fitAttr(label(b.label), 11.8, b.w - 2 * PAD)}>${U.esc(label(b.label))}</text>`;
+        `<text class="title" x="${b.x + PAD}" y="${b.y + 29}"${fitAttr(label(b.label) + (b.href ? ' ›' : ''), 11.8, b.w - 2 * PAD)}>${U.esc(label(b.label))}${b.href ? ' ›' : ''}</text>`;
       rows.forEach((r, k) => {
         const [l, v, cls] = rowText(r), y = b.y + HEAD_H + 19 + k * ROW_H;
         const room = b.w - 2 * PAD - plain(v).length * 11.2 - 8;
@@ -82,7 +83,8 @@
         s +=
           `<text class="rv ${cls || ''}" x="${b.x + b.w - PAD}" y="${y}" text-anchor="end">${v}</text>`;
       });
-      return s + '</g>';
+      s += '</g>';
+      return b.href ? `<a class="blink" href="${b.href}">${s}</a>` : s;
     }
 
     // ---------- links (power lines) ----------
