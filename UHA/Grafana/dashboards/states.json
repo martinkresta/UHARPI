@@ -25,7 +25,7 @@
   "panels": [
     {
       "type": "row",
-      "title": "IOBOARD_D",
+      "title": "Lights",
       "collapsed": false,
       "gridPos": {
         "x": 0,
@@ -38,7 +38,7 @@
     },
     {
       "type": "state-timeline",
-      "title": "Lights IOBOARD_D",
+      "title": "Lights",
       "description": "Output really set: PWM %, relay lights 0 / 100",
       "datasource": {
         "type": "frser-sqlite-datasource",
@@ -48,7 +48,7 @@
         "x": 0,
         "y": 1,
         "w": 24,
-        "h": 4
+        "h": 20
       },
       "fieldConfig": {
         "defaults": {
@@ -118,8 +118,8 @@
             "uid": "uhalog"
           },
           "queryType": "time series",
-          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_LIGHT_LOFT_WEST' THEN 'Loft west' WHEN 'ST_LIGHT_LOFT_EAST_1' THEN 'Loft east 1' WHEN 'ST_LIGHT_LOFT_EAST_2' THEN 'Loft east 2' WHEN 'ST_LIGHT_BEDROOM_SOUTH' THEN 'Bedroom south' WHEN 'ST_LIGHT_BEDROOM_NORTH' THEN 'Bedroom north' WHEN 'ST_LIGHT_BATHROOM' THEN 'Bathroom' WHEN 'ST_LIGHT_STAIR_STEPS' THEN 'Stair steps' WHEN 'ST_LIGHT_STAIRS' THEN 'Stairs' WHEN 'ST_LIGHT_HALLWAY' THEN 'Hallway' WHEN 'ST_LIGHT_LIVING_ROOM' THEN 'Living room' WHEN 'ST_LIGHT_DINING_ROOM' THEN 'Dining room' WHEN 'ST_LIGHT_KITCHEN' THEN 'Kitchen' WHEN 'ST_LIGHT_WASHBASIN' THEN 'Washbasin' WHEN 'ST_LIGHT_KITCHEN_COUNTER' THEN 'Kitchen counter' WHEN 'ST_LIGHT_EXTERIOR_HOUSE' THEN 'House outdoor light' WHEN 'ST_LIGHT_EXTERIOR_WS' THEN 'Workshop outdoor light' WHEN 'ST_LIGHT_KOLARNA' THEN 'Bike shed' WHEN 'ST_LIGHT_SKLEP' THEN 'Cellar' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN', 'ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER', 'ST_LIGHT_EXTERIOR_HOUSE', 'ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_LIGHT_LOFT_WEST' THEN 'Loft west' WHEN 'ST_LIGHT_LOFT_EAST_1' THEN 'Loft east 1' WHEN 'ST_LIGHT_LOFT_EAST_2' THEN 'Loft east 2' WHEN 'ST_LIGHT_BEDROOM_SOUTH' THEN 'Bedroom south' WHEN 'ST_LIGHT_BEDROOM_NORTH' THEN 'Bedroom north' WHEN 'ST_LIGHT_BATHROOM' THEN 'Bathroom' WHEN 'ST_LIGHT_STAIR_STEPS' THEN 'Stair steps' WHEN 'ST_LIGHT_STAIRS' THEN 'Stairs' WHEN 'ST_LIGHT_HALLWAY' THEN 'Hallway' WHEN 'ST_LIGHT_LIVING_ROOM' THEN 'Living room' WHEN 'ST_LIGHT_DINING_ROOM' THEN 'Dining room' WHEN 'ST_LIGHT_KITCHEN' THEN 'Kitchen' WHEN 'ST_LIGHT_WASHBASIN' THEN 'Washbasin' WHEN 'ST_LIGHT_KITCHEN_COUNTER' THEN 'Kitchen counter' WHEN 'ST_LIGHT_EXTERIOR_HOUSE' THEN 'House outdoor light' WHEN 'ST_LIGHT_EXTERIOR_WS' THEN 'Workshop outdoor light' WHEN 'ST_LIGHT_KOLARNA' THEN 'Bike shed' WHEN 'ST_LIGHT_SKLEP' THEN 'Cellar' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN', 'ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER', 'ST_LIGHT_EXTERIOR_HOUSE', 'ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_LIGHT_LOFT_WEST' THEN 'Loft west' WHEN 'ST_LIGHT_LOFT_EAST_1' THEN 'Loft east 1' WHEN 'ST_LIGHT_LOFT_EAST_2' THEN 'Loft east 2' WHEN 'ST_LIGHT_BEDROOM_SOUTH' THEN 'Bedroom south' WHEN 'ST_LIGHT_BEDROOM_NORTH' THEN 'Bedroom north' WHEN 'ST_LIGHT_BATHROOM' THEN 'Bathroom' WHEN 'ST_LIGHT_STAIR_STEPS' THEN 'Stair steps' WHEN 'ST_LIGHT_STAIRS' THEN 'Stairs' WHEN 'ST_LIGHT_HALLWAY' THEN 'Hallway' WHEN 'ST_LIGHT_LIVING_ROOM' THEN 'Living room' WHEN 'ST_LIGHT_DINING_ROOM' THEN 'Dining room' WHEN 'ST_LIGHT_KITCHEN' THEN 'Kitchen' WHEN 'ST_LIGHT_WASHBASIN' THEN 'Washbasin' WHEN 'ST_LIGHT_KITCHEN_COUNTER' THEN 'Kitchen counter' WHEN 'ST_LIGHT_EXTERIOR_HOUSE' THEN 'House outdoor light' WHEN 'ST_LIGHT_EXTERIOR_WS' THEN 'Workshop outdoor light' WHEN 'ST_LIGHT_KOLARNA' THEN 'Bike shed' WHEN 'ST_LIGHT_SKLEP' THEN 'Cellar' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN', 'ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER', 'ST_LIGHT_EXTERIOR_HOUSE', 'ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_LIGHT_LOFT_WEST' THEN 'Loft west' WHEN 'ST_LIGHT_LOFT_EAST_1' THEN 'Loft east 1' WHEN 'ST_LIGHT_LOFT_EAST_2' THEN 'Loft east 2' WHEN 'ST_LIGHT_BEDROOM_SOUTH' THEN 'Bedroom south' WHEN 'ST_LIGHT_BEDROOM_NORTH' THEN 'Bedroom north' WHEN 'ST_LIGHT_BATHROOM' THEN 'Bathroom' WHEN 'ST_LIGHT_STAIR_STEPS' THEN 'Stair steps' WHEN 'ST_LIGHT_STAIRS' THEN 'Stairs' WHEN 'ST_LIGHT_HALLWAY' THEN 'Hallway' WHEN 'ST_LIGHT_LIVING_ROOM' THEN 'Living room' WHEN 'ST_LIGHT_DINING_ROOM' THEN 'Dining room' WHEN 'ST_LIGHT_KITCHEN' THEN 'Kitchen' WHEN 'ST_LIGHT_WASHBASIN' THEN 'Washbasin' WHEN 'ST_LIGHT_KITCHEN_COUNTER' THEN 'Kitchen counter' WHEN 'ST_LIGHT_EXTERIOR_HOUSE' THEN 'House outdoor light' WHEN 'ST_LIGHT_EXTERIOR_WS' THEN 'Workshop outdoor light' WHEN 'ST_LIGHT_KOLARNA' THEN 'Bike shed' WHEN 'ST_LIGHT_SKLEP' THEN 'Cellar' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN', 'ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER', 'ST_LIGHT_EXTERIOR_HOUSE', 'ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_LIGHT_LOFT_WEST' THEN 'Loft west' WHEN 'ST_LIGHT_LOFT_EAST_1' THEN 'Loft east 1' WHEN 'ST_LIGHT_LOFT_EAST_2' THEN 'Loft east 2' WHEN 'ST_LIGHT_BEDROOM_SOUTH' THEN 'Bedroom south' WHEN 'ST_LIGHT_BEDROOM_NORTH' THEN 'Bedroom north' WHEN 'ST_LIGHT_BATHROOM' THEN 'Bathroom' WHEN 'ST_LIGHT_STAIR_STEPS' THEN 'Stair steps' WHEN 'ST_LIGHT_STAIRS' THEN 'Stairs' WHEN 'ST_LIGHT_HALLWAY' THEN 'Hallway' WHEN 'ST_LIGHT_LIVING_ROOM' THEN 'Living room' WHEN 'ST_LIGHT_DINING_ROOM' THEN 'Dining room' WHEN 'ST_LIGHT_KITCHEN' THEN 'Kitchen' WHEN 'ST_LIGHT_WASHBASIN' THEN 'Washbasin' WHEN 'ST_LIGHT_KITCHEN_COUNTER' THEN 'Kitchen counter' WHEN 'ST_LIGHT_EXTERIOR_HOUSE' THEN 'House outdoor light' WHEN 'ST_LIGHT_EXTERIOR_WS' THEN 'Workshop outdoor light' WHEN 'ST_LIGHT_KOLARNA' THEN 'Bike shed' WHEN 'ST_LIGHT_SKLEP' THEN 'Cellar' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN', 'ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER', 'ST_LIGHT_EXTERIOR_HOUSE', 'ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_LIGHT_LOFT_WEST' THEN 'Loft west' WHEN 'ST_LIGHT_LOFT_EAST_1' THEN 'Loft east 1' WHEN 'ST_LIGHT_LOFT_EAST_2' THEN 'Loft east 2' WHEN 'ST_LIGHT_BEDROOM_SOUTH' THEN 'Bedroom south' WHEN 'ST_LIGHT_BEDROOM_NORTH' THEN 'Bedroom north' WHEN 'ST_LIGHT_BATHROOM' THEN 'Bathroom' WHEN 'ST_LIGHT_STAIR_STEPS' THEN 'Stair steps' WHEN 'ST_LIGHT_STAIRS' THEN 'Stairs' WHEN 'ST_LIGHT_HALLWAY' THEN 'Hallway' WHEN 'ST_LIGHT_LIVING_ROOM' THEN 'Living room' WHEN 'ST_LIGHT_DINING_ROOM' THEN 'Dining room' WHEN 'ST_LIGHT_KITCHEN' THEN 'Kitchen' WHEN 'ST_LIGHT_WASHBASIN' THEN 'Washbasin' WHEN 'ST_LIGHT_KITCHEN_COUNTER' THEN 'Kitchen counter' WHEN 'ST_LIGHT_EXTERIOR_HOUSE' THEN 'House outdoor light' WHEN 'ST_LIGHT_EXTERIOR_WS' THEN 'Workshop outdoor light' WHEN 'ST_LIGHT_KOLARNA' THEN 'Bike shed' WHEN 'ST_LIGHT_SKLEP' THEN 'Cellar' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN', 'ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER', 'ST_LIGHT_EXTERIOR_HOUSE', 'ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
           "timeColumns": [
             "time"
           ]
@@ -128,85 +128,48 @@
       "id": 2
     },
     {
-      "type": "state-timeline",
-      "title": "Relays IOBOARD_D",
-      "description": "On / off outputs as really set",
+      "type": "timeseries",
+      "title": "Light on-time per day (hours)",
+      "description": "Intervals with value > 0 between consecutive event rows, per local day. Without the exterior outputs and the stair steps.",
       "datasource": {
         "type": "frser-sqlite-datasource",
         "uid": "uhalog"
       },
       "gridPos": {
         "x": 0,
-        "y": 5,
+        "y": 21,
         "w": 24,
-        "h": 3
+        "h": 9
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "none",
-          "displayName": "${__field.labels.name}",
-          "mappings": [
-            {
-              "type": "value",
-              "options": {
-                "0": {
-                  "text": "off",
-                  "color": "#555555",
-                  "index": 0
-                },
-                "1": {
-                  "text": "on",
-                  "color": "green",
-                  "index": 1
-                },
-                "-1": {
-                  "text": "invalid",
-                  "color": "#3a3a3a",
-                  "index": 99
-                }
-              }
-            }
-          ],
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#3a3a3a",
-                "value": null
-              },
-              {
-                "color": "#555555",
-                "value": 0
-              },
-              {
-                "color": "green",
-                "value": 1
-              }
-            ]
-          },
+          "unit": "h",
           "custom": {
+            "drawStyle": "bars",
+            "lineWidth": 1,
             "fillOpacity": 80,
-            "lineWidth": 0,
-            "spanNulls": true
-          }
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null,
+            "barAlignment": 1,
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            }
+          },
+          "displayName": "${__field.labels.name}",
+          "decimals": 1
         },
         "overrides": []
       },
       "options": {
-        "mergeValues": true,
-        "showValue": "auto",
-        "alignValue": "left",
-        "rowHeight": 0.85,
         "legend": {
-          "showLegend": false,
           "displayMode": "list",
-          "placement": "bottom"
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
-          "mode": "single",
+          "mode": "multi",
           "sort": "none"
         }
       },
@@ -218,22 +181,23 @@
             "uid": "uhalog"
           },
           "queryType": "time series",
-          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_SEWAGE_PUMP')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_SEWAGE_PUMP')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_SEWAGE_PUMP') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_SEWAGE_PUMP')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_SEWAGE_PUMP')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_SEWAGE_PUMP') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "rawQueryText": "-- hours on per local day, from events\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ndays(d0, d1) AS (\n  SELECT s, CAST(strftime('%s', date(s, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) FROM (SELECT CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS s FROM q)\n  UNION ALL\n  SELECT d1, CAST(strftime('%s', date(d1, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) FROM days, q WHERE d1 < q.t\n),\nev AS (\n  SELECT CASE v.name WHEN 'ST_LIGHT_LOFT_WEST' THEN 'Loft west' WHEN 'ST_LIGHT_LOFT_EAST_1' THEN 'Loft east 1' WHEN 'ST_LIGHT_LOFT_EAST_2' THEN 'Loft east 2' WHEN 'ST_LIGHT_BEDROOM_SOUTH' THEN 'Bedroom south' WHEN 'ST_LIGHT_BEDROOM_NORTH' THEN 'Bedroom north' WHEN 'ST_LIGHT_BATHROOM' THEN 'Bathroom' WHEN 'ST_LIGHT_STAIRS' THEN 'Stairs' WHEN 'ST_LIGHT_HALLWAY' THEN 'Hallway' WHEN 'ST_LIGHT_LIVING_ROOM' THEN 'Living room' WHEN 'ST_LIGHT_DINING_ROOM' THEN 'Dining room' WHEN 'ST_LIGHT_KITCHEN' THEN 'Kitchen' WHEN 'ST_LIGHT_WASHBASIN' THEN 'Washbasin' WHEN 'ST_LIGHT_KITCHEN_COUNTER' THEN 'Kitchen counter' WHEN 'ST_LIGHT_KOLARNA' THEN 'Bike shed' WHEN 'ST_LIGHT_SKLEP' THEN 'Cellar' ELSE v.name END AS name, x.ts, x.value, LEAD(x.ts) OVER (PARTITION BY x.var_id ORDER BY x.ts) AS te\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts < q.t\n       AND x.ts >= COALESCE((SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id\n                              AND e.ts <= (SELECT MIN(d0) FROM days)), 0)\n  WHERE v.name IN ('ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN', 'ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP')\n),\niv AS (\n  SELECT name, ts, COALESCE(te, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER))) AS te FROM ev, q WHERE value > 0\n)\nSELECT d.d0 AS time, iv.name, SUM(MIN(iv.te, d.d1) - MAX(iv.ts, d.d0)) / 3600.0 AS value\nFROM days d JOIN iv ON iv.ts < d.d1 AND iv.te > d.d0\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- hours on per local day, from events\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ndays(d0, d1) AS (\n  SELECT s, CAST(strftime('%s', date(s, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) FROM (SELECT CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS s FROM q)\n  UNION ALL\n  SELECT d1, CAST(strftime('%s', date(d1, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) FROM days, q WHERE d1 < q.t\n),\nev AS (\n  SELECT CASE v.name WHEN 'ST_LIGHT_LOFT_WEST' THEN 'Loft west' WHEN 'ST_LIGHT_LOFT_EAST_1' THEN 'Loft east 1' WHEN 'ST_LIGHT_LOFT_EAST_2' THEN 'Loft east 2' WHEN 'ST_LIGHT_BEDROOM_SOUTH' THEN 'Bedroom south' WHEN 'ST_LIGHT_BEDROOM_NORTH' THEN 'Bedroom north' WHEN 'ST_LIGHT_BATHROOM' THEN 'Bathroom' WHEN 'ST_LIGHT_STAIRS' THEN 'Stairs' WHEN 'ST_LIGHT_HALLWAY' THEN 'Hallway' WHEN 'ST_LIGHT_LIVING_ROOM' THEN 'Living room' WHEN 'ST_LIGHT_DINING_ROOM' THEN 'Dining room' WHEN 'ST_LIGHT_KITCHEN' THEN 'Kitchen' WHEN 'ST_LIGHT_WASHBASIN' THEN 'Washbasin' WHEN 'ST_LIGHT_KITCHEN_COUNTER' THEN 'Kitchen counter' WHEN 'ST_LIGHT_KOLARNA' THEN 'Bike shed' WHEN 'ST_LIGHT_SKLEP' THEN 'Cellar' ELSE v.name END AS name, x.ts, x.value, LEAD(x.ts) OVER (PARTITION BY x.var_id ORDER BY x.ts) AS te\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts < q.t\n       AND x.ts >= COALESCE((SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id\n                              AND e.ts <= (SELECT MIN(d0) FROM days)), 0)\n  WHERE v.name IN ('ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN', 'ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP')\n),\niv AS (\n  SELECT name, ts, COALESCE(te, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER))) AS te FROM ev, q WHERE value > 0\n)\nSELECT d.d0 AS time, iv.name, SUM(MIN(iv.te, d.d1) - MAX(iv.ts, d.d0)) / 3600.0 AS value\nFROM days d JOIN iv ON iv.ts < d.d1 AND iv.te > d.d0\nGROUP BY 1, 2\nORDER BY 1",
           "timeColumns": [
             "time"
           ]
         }
       ],
+      "timeFrom": "30d",
       "id": 3
     },
     {
       "type": "row",
-      "title": "IOBOARD_U",
+      "title": "Blinds",
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 8,
+        "y": 30,
         "w": 24,
         "h": 1
       },
@@ -242,108 +206,17 @@
     },
     {
       "type": "state-timeline",
-      "title": "Lights IOBOARD_U",
-      "description": "Output really set: PWM %, relay lights 0 / 100",
+      "title": "Blinds",
+      "description": "Colours: see the legend below the chart",
       "datasource": {
         "type": "frser-sqlite-datasource",
         "uid": "uhalog"
       },
       "gridPos": {
         "x": 0,
-        "y": 9,
+        "y": 31,
         "w": 24,
-        "h": 14
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percent",
-          "displayName": "${__field.labels.name}",
-          "mappings": [
-            {
-              "type": "value",
-              "options": {
-                "0": {
-                  "text": "off",
-                  "color": "#555555",
-                  "index": 0
-                },
-                "-1": {
-                  "text": "invalid",
-                  "color": "#3a3a3a",
-                  "index": 99
-                }
-              }
-            }
-          ],
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#555555",
-                "value": null
-              },
-              {
-                "color": "#e0b400",
-                "value": 1
-              }
-            ]
-          },
-          "custom": {
-            "fillOpacity": 80,
-            "lineWidth": 0,
-            "spanNulls": true
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "mergeValues": true,
-        "showValue": "auto",
-        "alignValue": "left",
-        "rowHeight": 0.85,
-        "legend": {
-          "showLegend": false,
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "datasource": {
-            "type": "frser-sqlite-datasource",
-            "uid": "uhalog"
-          },
-          "queryType": "time series",
-          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "timeColumns": [
-            "time"
-          ]
-        }
-      ],
-      "id": 5
-    },
-    {
-      "type": "state-timeline",
-      "title": "BlindCmd IOBOARD_U",
-      "description": "enum BlindCmd from uha_vars.yaml",
-      "datasource": {
-        "type": "frser-sqlite-datasource",
-        "uid": "uhalog"
-      },
-      "gridPos": {
-        "x": 0,
-        "y": 23,
-        "w": 24,
-        "h": 6
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -354,7 +227,7 @@
               "type": "value",
               "options": {
                 "0": {
-                  "text": "None",
+                  "text": "–",
                   "color": "#8e8e8e",
                   "index": 0
                 },
@@ -423,7 +296,7 @@
         "alignValue": "left",
         "rowHeight": 0.85,
         "legend": {
-          "showLegend": false,
+          "showLegend": true,
           "displayMode": "list",
           "placement": "bottom"
         },
@@ -440,31 +313,171 @@
             "uid": "uhalog"
           },
           "queryType": "time series",
-          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_SCREEN_EAST', 'ST_SCREEN_WEST')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_SCREEN_EAST', 'ST_SCREEN_WEST')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_SCREEN_EAST', 'ST_SCREEN_WEST') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_SCREEN_EAST', 'ST_SCREEN_WEST')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_SCREEN_EAST', 'ST_SCREEN_WEST')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_SCREEN_EAST', 'ST_SCREEN_WEST') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_SCREEN_EAST' THEN 'East blind' WHEN 'ST_SCREEN_WEST' THEN 'West blind' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_SCREEN_EAST', 'ST_SCREEN_WEST')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_SCREEN_EAST' THEN 'East blind' WHEN 'ST_SCREEN_WEST' THEN 'West blind' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_SCREEN_EAST', 'ST_SCREEN_WEST')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_SCREEN_EAST' THEN 'East blind' WHEN 'ST_SCREEN_WEST' THEN 'West blind' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_SCREEN_EAST', 'ST_SCREEN_WEST') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_SCREEN_EAST' THEN 'East blind' WHEN 'ST_SCREEN_WEST' THEN 'West blind' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_SCREEN_EAST', 'ST_SCREEN_WEST')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_SCREEN_EAST' THEN 'East blind' WHEN 'ST_SCREEN_WEST' THEN 'West blind' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_SCREEN_EAST', 'ST_SCREEN_WEST')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_SCREEN_EAST' THEN 'East blind' WHEN 'ST_SCREEN_WEST' THEN 'West blind' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_SCREEN_EAST', 'ST_SCREEN_WEST') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
           "timeColumns": [
             "time"
           ]
         }
       ],
-      "id": 6
+      "id": 5
     },
     {
       "type": "row",
-      "title": "TECHM",
+      "title": "Inverters",
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 29,
+        "y": 39,
         "w": 24,
         "h": 1
       },
       "panels": [],
-      "id": 7
+      "id": 6
     },
     {
       "type": "state-timeline",
-      "title": "Relays TECHM",
+      "title": "Inverters",
+      "description": "Colours: see the legend below the chart",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 40,
+        "w": 24,
+        "h": 14
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "displayName": "${__field.labels.name}",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Off",
+                  "color": "#8e8e8e",
+                  "index": 0
+                },
+                "1": {
+                  "text": "On",
+                  "color": "green",
+                  "index": 1
+                },
+                "2": {
+                  "text": "On (keeps setting)",
+                  "color": "blue",
+                  "index": 2
+                },
+                "3": {
+                  "text": "Kept on",
+                  "color": "orange",
+                  "index": 3
+                },
+                "4": {
+                  "text": "Auto off",
+                  "color": "purple",
+                  "index": 4
+                },
+                "-1": {
+                  "text": "invalid",
+                  "color": "#3a3a3a",
+                  "index": 99
+                }
+              }
+            }
+          ],
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#3a3a3a",
+                "value": null
+              },
+              {
+                "color": "#8e8e8e",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              },
+              {
+                "color": "blue",
+                "value": 2
+              },
+              {
+                "color": "orange",
+                "value": 3
+              },
+              {
+                "color": "purple",
+                "value": 4
+              }
+            ]
+          },
+          "custom": {
+            "fillOpacity": 80,
+            "lineWidth": 0,
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "mergeValues": true,
+        "showValue": "auto",
+        "alignValue": "left",
+        "rowHeight": 0.85,
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_AC_300W' THEN 'Inverter 300 W' WHEN 'ST_AC_3KW' THEN 'Inverter 3 kW' WHEN 'ST_AC_5KW' THEN 'Inverter 5 kW' WHEN 'ST_AC_AXPERT' THEN 'Axpert 8 kW inverter' WHEN 'ST_AC_VICTRON' THEN 'Victron 2 kW inverter' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_AC_300W', 'ST_AC_3KW', 'ST_AC_5KW', 'ST_AC_AXPERT', 'ST_AC_VICTRON')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_AC_300W' THEN 'Inverter 300 W' WHEN 'ST_AC_3KW' THEN 'Inverter 3 kW' WHEN 'ST_AC_5KW' THEN 'Inverter 5 kW' WHEN 'ST_AC_AXPERT' THEN 'Axpert 8 kW inverter' WHEN 'ST_AC_VICTRON' THEN 'Victron 2 kW inverter' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_AC_300W', 'ST_AC_3KW', 'ST_AC_5KW', 'ST_AC_AXPERT', 'ST_AC_VICTRON')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_AC_300W' THEN 'Inverter 300 W' WHEN 'ST_AC_3KW' THEN 'Inverter 3 kW' WHEN 'ST_AC_5KW' THEN 'Inverter 5 kW' WHEN 'ST_AC_AXPERT' THEN 'Axpert 8 kW inverter' WHEN 'ST_AC_VICTRON' THEN 'Victron 2 kW inverter' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_AC_300W', 'ST_AC_3KW', 'ST_AC_5KW', 'ST_AC_AXPERT', 'ST_AC_VICTRON') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_AC_300W' THEN 'Inverter 300 W' WHEN 'ST_AC_3KW' THEN 'Inverter 3 kW' WHEN 'ST_AC_5KW' THEN 'Inverter 5 kW' WHEN 'ST_AC_AXPERT' THEN 'Axpert 8 kW inverter' WHEN 'ST_AC_VICTRON' THEN 'Victron 2 kW inverter' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_AC_300W', 'ST_AC_3KW', 'ST_AC_5KW', 'ST_AC_AXPERT', 'ST_AC_VICTRON')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_AC_300W' THEN 'Inverter 300 W' WHEN 'ST_AC_3KW' THEN 'Inverter 3 kW' WHEN 'ST_AC_5KW' THEN 'Inverter 5 kW' WHEN 'ST_AC_AXPERT' THEN 'Axpert 8 kW inverter' WHEN 'ST_AC_VICTRON' THEN 'Victron 2 kW inverter' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_AC_300W', 'ST_AC_3KW', 'ST_AC_5KW', 'ST_AC_AXPERT', 'ST_AC_VICTRON')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_AC_300W' THEN 'Inverter 300 W' WHEN 'ST_AC_3KW' THEN 'Inverter 3 kW' WHEN 'ST_AC_5KW' THEN 'Inverter 5 kW' WHEN 'ST_AC_AXPERT' THEN 'Axpert 8 kW inverter' WHEN 'ST_AC_VICTRON' THEN 'Victron 2 kW inverter' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_AC_300W', 'ST_AC_3KW', 'ST_AC_5KW', 'ST_AC_AXPERT', 'ST_AC_VICTRON') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 7
+    },
+    {
+      "type": "row",
+      "title": "Heating",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 54,
+        "w": 24,
+        "h": 1
+      },
+      "panels": [],
+      "id": 8
+    },
+    {
+      "type": "state-timeline",
+      "title": "On / off",
       "description": "On / off outputs as really set",
       "datasource": {
         "type": "frser-sqlite-datasource",
@@ -472,9 +485,9 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 30,
+        "y": 55,
         "w": 24,
-        "h": 7
+        "h": 6
       },
       "fieldConfig": {
         "defaults": {
@@ -553,28 +566,603 @@
             "uid": "uhalog"
           },
           "queryType": "time series",
-          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_RAD_ON', 'ST_WALL_ON', 'ST_PUMP_BOILER', 'ST_PUMP_WALL', 'ST_PUMP_RAD')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_RAD_ON', 'ST_WALL_ON', 'ST_PUMP_BOILER', 'ST_PUMP_WALL', 'ST_PUMP_RAD')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_RAD_ON', 'ST_WALL_ON', 'ST_PUMP_BOILER', 'ST_PUMP_WALL', 'ST_PUMP_RAD') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_RAD_ON', 'ST_WALL_ON', 'ST_PUMP_BOILER', 'ST_PUMP_WALL', 'ST_PUMP_RAD')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_RAD_ON', 'ST_WALL_ON', 'ST_PUMP_BOILER', 'ST_PUMP_WALL', 'ST_PUMP_RAD')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_RAD_ON', 'ST_WALL_ON', 'ST_PUMP_BOILER', 'ST_PUMP_WALL', 'ST_PUMP_RAD') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_PUMP_BOILER' THEN 'Boiler pump' WHEN 'ST_PUMP_WALL' THEN 'Wall heating pump' WHEN 'ST_PUMP_RAD' THEN 'Radiator pump' WHEN 'ST_AKUPACK_HEATER' THEN 'Pack heater' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_PUMP_BOILER', 'ST_PUMP_WALL', 'ST_PUMP_RAD', 'ST_AKUPACK_HEATER')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_PUMP_BOILER' THEN 'Boiler pump' WHEN 'ST_PUMP_WALL' THEN 'Wall heating pump' WHEN 'ST_PUMP_RAD' THEN 'Radiator pump' WHEN 'ST_AKUPACK_HEATER' THEN 'Pack heater' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_PUMP_BOILER', 'ST_PUMP_WALL', 'ST_PUMP_RAD', 'ST_AKUPACK_HEATER')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_PUMP_BOILER' THEN 'Boiler pump' WHEN 'ST_PUMP_WALL' THEN 'Wall heating pump' WHEN 'ST_PUMP_RAD' THEN 'Radiator pump' WHEN 'ST_AKUPACK_HEATER' THEN 'Pack heater' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_PUMP_BOILER', 'ST_PUMP_WALL', 'ST_PUMP_RAD', 'ST_AKUPACK_HEATER') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_PUMP_BOILER' THEN 'Boiler pump' WHEN 'ST_PUMP_WALL' THEN 'Wall heating pump' WHEN 'ST_PUMP_RAD' THEN 'Radiator pump' WHEN 'ST_AKUPACK_HEATER' THEN 'Pack heater' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_PUMP_BOILER', 'ST_PUMP_WALL', 'ST_PUMP_RAD', 'ST_AKUPACK_HEATER')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_PUMP_BOILER' THEN 'Boiler pump' WHEN 'ST_PUMP_WALL' THEN 'Wall heating pump' WHEN 'ST_PUMP_RAD' THEN 'Radiator pump' WHEN 'ST_AKUPACK_HEATER' THEN 'Pack heater' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_PUMP_BOILER', 'ST_PUMP_WALL', 'ST_PUMP_RAD', 'ST_AKUPACK_HEATER')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_PUMP_BOILER' THEN 'Boiler pump' WHEN 'ST_PUMP_WALL' THEN 'Wall heating pump' WHEN 'ST_PUMP_RAD' THEN 'Radiator pump' WHEN 'ST_AKUPACK_HEATER' THEN 'Pack heater' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_PUMP_BOILER', 'ST_PUMP_WALL', 'ST_PUMP_RAD', 'ST_AKUPACK_HEATER') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
           "timeColumns": [
             "time"
           ]
         }
       ],
-      "id": 8
+      "id": 9
     },
     {
       "type": "state-timeline",
-      "title": "ElHeaterState TECHM",
-      "description": "enum ElHeaterState from uha_vars.yaml",
+      "title": "Boiler",
+      "description": "Colours: see the legend below the chart",
       "datasource": {
         "type": "frser-sqlite-datasource",
         "uid": "uhalog"
       },
       "gridPos": {
         "x": 0,
-        "y": 37,
+        "y": 61,
         "w": 24,
-        "h": 4
+        "h": 6
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "displayName": "${__field.labels.name}",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Idle",
+                  "color": "#8e8e8e",
+                  "index": 0
+                },
+                "1": {
+                  "text": "Heating up",
+                  "color": "green",
+                  "index": 1
+                },
+                "2": {
+                  "text": "Heating",
+                  "color": "blue",
+                  "index": 2
+                },
+                "3": {
+                  "text": "Cooling down",
+                  "color": "orange",
+                  "index": 3
+                },
+                "4": {
+                  "text": "Overheated",
+                  "color": "purple",
+                  "index": 4
+                },
+                "5": {
+                  "text": "Error",
+                  "color": "red",
+                  "index": 5
+                },
+                "6": {
+                  "text": "Invalid inputs",
+                  "color": "yellow",
+                  "index": 6
+                },
+                "-1": {
+                  "text": "invalid",
+                  "color": "#3a3a3a",
+                  "index": 99
+                }
+              }
+            }
+          ],
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#3a3a3a",
+                "value": null
+              },
+              {
+                "color": "#8e8e8e",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              },
+              {
+                "color": "blue",
+                "value": 2
+              },
+              {
+                "color": "orange",
+                "value": 3
+              },
+              {
+                "color": "purple",
+                "value": 4
+              },
+              {
+                "color": "red",
+                "value": 5
+              },
+              {
+                "color": "yellow",
+                "value": 6
+              }
+            ]
+          },
+          "custom": {
+            "fillOpacity": 80,
+            "lineWidth": 0,
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "mergeValues": true,
+        "showValue": "auto",
+        "alignValue": "left",
+        "rowHeight": 0.85,
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_BOILER_STATE' THEN 'Boiler' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_BOILER_STATE')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_BOILER_STATE' THEN 'Boiler' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_BOILER_STATE')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_BOILER_STATE' THEN 'Boiler' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_BOILER_STATE') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_BOILER_STATE' THEN 'Boiler' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_BOILER_STATE')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_BOILER_STATE' THEN 'Boiler' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_BOILER_STATE')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_BOILER_STATE' THEN 'Boiler' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_BOILER_STATE') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 10
+    },
+    {
+      "type": "timeseries",
+      "title": "Setpoints (°C)",
+      "description": "Numeric states, one point per change",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 67,
+        "w": 24,
+        "h": 7
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "always",
+            "spanNulls": true,
+            "axisSoftMin": null,
+            "lineInterpolation": "stepAfter",
+            "pointSize": 4
+          },
+          "displayName": "${__field.labels.name}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_UP_REQ_DAY_C' THEN 'Upstairs – day' WHEN 'ST_UP_REQ_NIGHT_C' THEN 'Upstairs – night' WHEN 'ST_DOWN_REQ_DAY_C' THEN 'Downstairs – day' WHEN 'ST_DOWN_REQ_NIGHT_C' THEN 'Downstairs – night' WHEN 'ST_AKUPACK_SET_DAY_C' THEN 'Pack heater – day' WHEN 'ST_AKUPACK_SET_NIGHT_C' THEN 'Pack heater – night' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_UP_REQ_DAY_C', 'ST_UP_REQ_NIGHT_C', 'ST_DOWN_REQ_DAY_C', 'ST_DOWN_REQ_NIGHT_C', 'ST_AKUPACK_SET_DAY_C', 'ST_AKUPACK_SET_NIGHT_C')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_UP_REQ_DAY_C' THEN 'Upstairs – day' WHEN 'ST_UP_REQ_NIGHT_C' THEN 'Upstairs – night' WHEN 'ST_DOWN_REQ_DAY_C' THEN 'Downstairs – day' WHEN 'ST_DOWN_REQ_NIGHT_C' THEN 'Downstairs – night' WHEN 'ST_AKUPACK_SET_DAY_C' THEN 'Pack heater – day' WHEN 'ST_AKUPACK_SET_NIGHT_C' THEN 'Pack heater – night' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_UP_REQ_DAY_C', 'ST_UP_REQ_NIGHT_C', 'ST_DOWN_REQ_DAY_C', 'ST_DOWN_REQ_NIGHT_C', 'ST_AKUPACK_SET_DAY_C', 'ST_AKUPACK_SET_NIGHT_C')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_UP_REQ_DAY_C' THEN 'Upstairs – day' WHEN 'ST_UP_REQ_NIGHT_C' THEN 'Upstairs – night' WHEN 'ST_DOWN_REQ_DAY_C' THEN 'Downstairs – day' WHEN 'ST_DOWN_REQ_NIGHT_C' THEN 'Downstairs – night' WHEN 'ST_AKUPACK_SET_DAY_C' THEN 'Pack heater – day' WHEN 'ST_AKUPACK_SET_NIGHT_C' THEN 'Pack heater – night' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_UP_REQ_DAY_C', 'ST_UP_REQ_NIGHT_C', 'ST_DOWN_REQ_DAY_C', 'ST_DOWN_REQ_NIGHT_C', 'ST_AKUPACK_SET_DAY_C', 'ST_AKUPACK_SET_NIGHT_C') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_UP_REQ_DAY_C' THEN 'Upstairs – day' WHEN 'ST_UP_REQ_NIGHT_C' THEN 'Upstairs – night' WHEN 'ST_DOWN_REQ_DAY_C' THEN 'Downstairs – day' WHEN 'ST_DOWN_REQ_NIGHT_C' THEN 'Downstairs – night' WHEN 'ST_AKUPACK_SET_DAY_C' THEN 'Pack heater – day' WHEN 'ST_AKUPACK_SET_NIGHT_C' THEN 'Pack heater – night' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_UP_REQ_DAY_C', 'ST_UP_REQ_NIGHT_C', 'ST_DOWN_REQ_DAY_C', 'ST_DOWN_REQ_NIGHT_C', 'ST_AKUPACK_SET_DAY_C', 'ST_AKUPACK_SET_NIGHT_C')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_UP_REQ_DAY_C' THEN 'Upstairs – day' WHEN 'ST_UP_REQ_NIGHT_C' THEN 'Upstairs – night' WHEN 'ST_DOWN_REQ_DAY_C' THEN 'Downstairs – day' WHEN 'ST_DOWN_REQ_NIGHT_C' THEN 'Downstairs – night' WHEN 'ST_AKUPACK_SET_DAY_C' THEN 'Pack heater – day' WHEN 'ST_AKUPACK_SET_NIGHT_C' THEN 'Pack heater – night' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_UP_REQ_DAY_C', 'ST_UP_REQ_NIGHT_C', 'ST_DOWN_REQ_DAY_C', 'ST_DOWN_REQ_NIGHT_C', 'ST_AKUPACK_SET_DAY_C', 'ST_AKUPACK_SET_NIGHT_C')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_UP_REQ_DAY_C' THEN 'Upstairs – day' WHEN 'ST_UP_REQ_NIGHT_C' THEN 'Upstairs – night' WHEN 'ST_DOWN_REQ_DAY_C' THEN 'Downstairs – day' WHEN 'ST_DOWN_REQ_NIGHT_C' THEN 'Downstairs – night' WHEN 'ST_AKUPACK_SET_DAY_C' THEN 'Pack heater – day' WHEN 'ST_AKUPACK_SET_NIGHT_C' THEN 'Pack heater – night' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_UP_REQ_DAY_C', 'ST_UP_REQ_NIGHT_C', 'ST_DOWN_REQ_DAY_C', 'ST_DOWN_REQ_NIGHT_C', 'ST_AKUPACK_SET_DAY_C', 'ST_AKUPACK_SET_NIGHT_C') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 11
+    },
+    {
+      "type": "timeseries",
+      "title": "Room request in effect vs room temperature",
+      "description": "Upstairs = kids room, radiators; downstairs = walls",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 74,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "always",
+            "spanNulls": true,
+            "axisSoftMin": null,
+            "lineInterpolation": "stepAfter",
+            "pointSize": 4
+          },
+          "displayName": "${__field.labels.name}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_UP_REQ_C' THEN 'Upstairs – now' WHEN 'ST_DOWN_REQ_C' THEN 'Downstairs – now' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_UP_REQ_C', 'ST_DOWN_REQ_C')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_UP_REQ_C' THEN 'Upstairs – now' WHEN 'ST_DOWN_REQ_C' THEN 'Downstairs – now' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_UP_REQ_C', 'ST_DOWN_REQ_C')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_UP_REQ_C' THEN 'Upstairs – now' WHEN 'ST_DOWN_REQ_C' THEN 'Downstairs – now' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_UP_REQ_C', 'ST_DOWN_REQ_C') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_UP_REQ_C' THEN 'Upstairs – now' WHEN 'ST_DOWN_REQ_C' THEN 'Downstairs – now' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_UP_REQ_C', 'ST_DOWN_REQ_C')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_UP_REQ_C' THEN 'Upstairs – now' WHEN 'ST_DOWN_REQ_C' THEN 'Downstairs – now' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_UP_REQ_C', 'ST_DOWN_REQ_C')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_UP_REQ_C' THEN 'Upstairs – now' WHEN 'ST_DOWN_REQ_C' THEN 'Downstairs – now' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_UP_REQ_C', 'ST_DOWN_REQ_C') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "timeColumns": [
+            "time"
+          ]
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'TEMP_KIDROOM_C' THEN 'Kids room' WHEN 'TEMP_DOWNSTAIRS_C' THEN 'Downstairs' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_KIDROOM_C', 'TEMP_DOWNSTAIRS_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'TEMP_KIDROOM_C' THEN 'Kids room' WHEN 'TEMP_DOWNSTAIRS_C' THEN 'Downstairs' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_KIDROOM_C', 'TEMP_DOWNSTAIRS_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'TEMP_KIDROOM_C' THEN 'Kids room' WHEN 'TEMP_DOWNSTAIRS_C' THEN 'Downstairs' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_KIDROOM_C', 'TEMP_DOWNSTAIRS_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'TEMP_KIDROOM_C' THEN 'Kids room' WHEN 'TEMP_DOWNSTAIRS_C' THEN 'Downstairs' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_KIDROOM_C', 'TEMP_DOWNSTAIRS_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 12
+    },
+    {
+      "type": "timeseries",
+      "title": "Exhaust setpoint vs exhaust",
+      "description": "Boiler air control setpoint",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 74,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "always",
+            "spanNulls": true,
+            "axisSoftMin": null,
+            "lineInterpolation": "stepAfter",
+            "pointSize": 4
+          },
+          "displayName": "${__field.labels.name}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_EXHAUST_SET_C' THEN 'Boiler – exhaust setpoint' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_EXHAUST_SET_C')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_EXHAUST_SET_C' THEN 'Boiler – exhaust setpoint' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_EXHAUST_SET_C')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_EXHAUST_SET_C' THEN 'Boiler – exhaust setpoint' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_EXHAUST_SET_C') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_EXHAUST_SET_C' THEN 'Boiler – exhaust setpoint' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_EXHAUST_SET_C')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_EXHAUST_SET_C' THEN 'Boiler – exhaust setpoint' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_EXHAUST_SET_C')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_EXHAUST_SET_C' THEN 'Boiler – exhaust setpoint' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_EXHAUST_SET_C') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "timeColumns": [
+            "time"
+          ]
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'TEMP_BOILER_EXHAUST_C' THEN 'Boiler – exhaust' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_BOILER_EXHAUST_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'TEMP_BOILER_EXHAUST_C' THEN 'Boiler – exhaust' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_BOILER_EXHAUST_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'TEMP_BOILER_EXHAUST_C' THEN 'Boiler – exhaust' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_BOILER_EXHAUST_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'TEMP_BOILER_EXHAUST_C' THEN 'Boiler – exhaust' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_BOILER_EXHAUST_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 13
+    },
+    {
+      "type": "timeseries",
+      "title": "Valves (commanded %)",
+      "description": "Mixing valves wall / radiators as commanded; air valve = servo signal (20..100 % = 2..10 V)",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 82,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null
+          },
+          "displayName": "${__field.labels.name}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'TECHM_VALVE_WALL_PCT' THEN 'Wall heating valve' WHEN 'TECHM_VALVE_RAD_PCT' THEN 'Radiator valve' WHEN 'TECHM_AIR_VALVE_SIGNAL_PCT' THEN 'Boiler – air valve' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TECHM_VALVE_WALL_PCT', 'TECHM_VALVE_RAD_PCT', 'TECHM_AIR_VALVE_SIGNAL_PCT') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'TECHM_VALVE_WALL_PCT' THEN 'Wall heating valve' WHEN 'TECHM_VALVE_RAD_PCT' THEN 'Radiator valve' WHEN 'TECHM_AIR_VALVE_SIGNAL_PCT' THEN 'Boiler – air valve' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TECHM_VALVE_WALL_PCT', 'TECHM_VALVE_RAD_PCT', 'TECHM_AIR_VALVE_SIGNAL_PCT') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'TECHM_VALVE_WALL_PCT' THEN 'Wall heating valve' WHEN 'TECHM_VALVE_RAD_PCT' THEN 'Radiator valve' WHEN 'TECHM_AIR_VALVE_SIGNAL_PCT' THEN 'Boiler – air valve' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TECHM_VALVE_WALL_PCT', 'TECHM_VALVE_RAD_PCT', 'TECHM_AIR_VALVE_SIGNAL_PCT') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'TECHM_VALVE_WALL_PCT' THEN 'Wall heating valve' WHEN 'TECHM_VALVE_RAD_PCT' THEN 'Radiator valve' WHEN 'TECHM_AIR_VALVE_SIGNAL_PCT' THEN 'Boiler – air valve' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TECHM_VALVE_WALL_PCT', 'TECHM_VALVE_RAD_PCT', 'TECHM_AIR_VALVE_SIGNAL_PCT') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 14
+    },
+    {
+      "type": "timeseries",
+      "title": "Water required vs actual",
+      "description": "Required water temperatures and the circuit inlets",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 82,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null
+          },
+          "displayName": "${__field.labels.name}"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'TECHM_REQ_WATER_RAD_C' THEN 'Radiators – target water' WHEN 'TEMP_RAD_H_C' THEN 'Radiators – flow' WHEN 'TECHM_REQ_WATER_WALL_C' THEN 'Wall heating – target water' WHEN 'TEMP_WALL_IN_C' THEN 'Wall heating – flow' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TECHM_REQ_WATER_RAD_C', 'TEMP_RAD_H_C', 'TECHM_REQ_WATER_WALL_C', 'TEMP_WALL_IN_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'TECHM_REQ_WATER_RAD_C' THEN 'Radiators – target water' WHEN 'TEMP_RAD_H_C' THEN 'Radiators – flow' WHEN 'TECHM_REQ_WATER_WALL_C' THEN 'Wall heating – target water' WHEN 'TEMP_WALL_IN_C' THEN 'Wall heating – flow' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TECHM_REQ_WATER_RAD_C', 'TEMP_RAD_H_C', 'TECHM_REQ_WATER_WALL_C', 'TEMP_WALL_IN_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'TECHM_REQ_WATER_RAD_C' THEN 'Radiators – target water' WHEN 'TEMP_RAD_H_C' THEN 'Radiators – flow' WHEN 'TECHM_REQ_WATER_WALL_C' THEN 'Wall heating – target water' WHEN 'TEMP_WALL_IN_C' THEN 'Wall heating – flow' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TECHM_REQ_WATER_RAD_C', 'TEMP_RAD_H_C', 'TECHM_REQ_WATER_WALL_C', 'TEMP_WALL_IN_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'TECHM_REQ_WATER_RAD_C' THEN 'Radiators – target water' WHEN 'TEMP_RAD_H_C' THEN 'Radiators – flow' WHEN 'TECHM_REQ_WATER_WALL_C' THEN 'Wall heating – target water' WHEN 'TEMP_WALL_IN_C' THEN 'Wall heating – flow' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TECHM_REQ_WATER_RAD_C', 'TEMP_RAD_H_C', 'TECHM_REQ_WATER_WALL_C', 'TEMP_WALL_IN_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 15
+    },
+    {
+      "type": "row",
+      "title": "Loads / relays",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 90,
+        "w": 24,
+        "h": 1
+      },
+      "panels": [],
+      "id": 16
+    },
+    {
+      "type": "state-timeline",
+      "title": "On / off",
+      "description": "On / off outputs as really set",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 91,
+        "w": 24,
+        "h": 5
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "displayName": "${__field.labels.name}",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "off",
+                  "color": "#555555",
+                  "index": 0
+                },
+                "1": {
+                  "text": "on",
+                  "color": "green",
+                  "index": 1
+                },
+                "-1": {
+                  "text": "invalid",
+                  "color": "#3a3a3a",
+                  "index": 99
+                }
+              }
+            }
+          ],
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#3a3a3a",
+                "value": null
+              },
+              {
+                "color": "#555555",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "custom": {
+            "fillOpacity": 80,
+            "lineWidth": 0,
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "mergeValues": true,
+        "showValue": "auto",
+        "alignValue": "left",
+        "rowHeight": 0.85,
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "time series",
+          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_SEWAGE_PUMP' THEN 'Sewage pump' WHEN 'ST_EVSE_RELAY' THEN 'EV charger relay' WHEN 'ST_WS_HEATING_RELAY' THEN 'Workshop heating relay' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_SEWAGE_PUMP', 'ST_EVSE_RELAY', 'ST_WS_HEATING_RELAY')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_SEWAGE_PUMP' THEN 'Sewage pump' WHEN 'ST_EVSE_RELAY' THEN 'EV charger relay' WHEN 'ST_WS_HEATING_RELAY' THEN 'Workshop heating relay' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_SEWAGE_PUMP', 'ST_EVSE_RELAY', 'ST_WS_HEATING_RELAY')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_SEWAGE_PUMP' THEN 'Sewage pump' WHEN 'ST_EVSE_RELAY' THEN 'EV charger relay' WHEN 'ST_WS_HEATING_RELAY' THEN 'Workshop heating relay' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_SEWAGE_PUMP', 'ST_EVSE_RELAY', 'ST_WS_HEATING_RELAY') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_SEWAGE_PUMP' THEN 'Sewage pump' WHEN 'ST_EVSE_RELAY' THEN 'EV charger relay' WHEN 'ST_WS_HEATING_RELAY' THEN 'Workshop heating relay' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_SEWAGE_PUMP', 'ST_EVSE_RELAY', 'ST_WS_HEATING_RELAY')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_SEWAGE_PUMP' THEN 'Sewage pump' WHEN 'ST_EVSE_RELAY' THEN 'EV charger relay' WHEN 'ST_WS_HEATING_RELAY' THEN 'Workshop heating relay' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_SEWAGE_PUMP', 'ST_EVSE_RELAY', 'ST_WS_HEATING_RELAY')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_SEWAGE_PUMP' THEN 'Sewage pump' WHEN 'ST_EVSE_RELAY' THEN 'EV charger relay' WHEN 'ST_WS_HEATING_RELAY' THEN 'Workshop heating relay' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_SEWAGE_PUMP', 'ST_EVSE_RELAY', 'ST_WS_HEATING_RELAY') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "id": 17
+    },
+    {
+      "type": "state-timeline",
+      "title": "Electric heater",
+      "description": "Colours: see the legend below the chart",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 96,
+        "w": 24,
+        "h": 6
       },
       "fieldConfig": {
         "defaults": {
@@ -590,58 +1178,58 @@
                   "index": 0
                 },
                 "1": {
-                  "text": "TempReached",
+                  "text": "Temperature reached",
                   "color": "green",
                   "index": 1
                 },
                 "2": {
-                  "text": "NoFreePower",
+                  "text": "No spare power",
                   "color": "blue",
                   "index": 2
                 },
                 "3": {
-                  "text": "LowSOC",
+                  "text": "Low battery",
                   "color": "orange",
                   "index": 3
                 },
                 "4": {
-                  "text": "48VFail",
+                  "text": "48 V fault",
                   "color": "purple",
                   "index": 4
                 },
                 "5": {
-                  "text": "TankOvertemperature",
+                  "text": "Tank overheated",
                   "color": "red",
                   "index": 5
                 },
                 "6": {
-                  "text": "BoardOvertemperature",
+                  "text": "Board overheated",
                   "color": "yellow",
                   "index": 6
                 },
                 "7": {
-                  "text": "InvalidInputs",
+                  "text": "Invalid inputs",
                   "color": "dark-green",
                   "index": 7
                 },
                 "8": {
-                  "text": "EleconComError",
+                  "text": "ELECON link error",
                   "color": "dark-blue",
                   "index": 8
                 },
                 "9": {
-                  "text": "SwitchError",
-                  "color": "#8e8e8e",
+                  "text": "Switch fault",
+                  "color": "dark-orange",
                   "index": 9
                 },
                 "10": {
-                  "text": "BalanceSupport",
-                  "color": "green",
+                  "text": "Balancing support",
+                  "color": "dark-purple",
                   "index": 10
                 },
                 "11": {
-                  "text": "ComfortHeat",
-                  "color": "blue",
+                  "text": "Comfort heating",
+                  "color": "dark-red",
                   "index": 11
                 },
                 "-1": {
@@ -699,15 +1287,15 @@
                 "value": 8
               },
               {
-                "color": "#8e8e8e",
+                "color": "dark-orange",
                 "value": 9
               },
               {
-                "color": "green",
+                "color": "dark-purple",
                 "value": 10
               },
               {
-                "color": "blue",
+                "color": "dark-red",
                 "value": 11
               }
             ]
@@ -726,7 +1314,7 @@
         "alignValue": "left",
         "rowHeight": 0.85,
         "legend": {
-          "showLegend": false,
+          "showLegend": true,
           "displayMode": "list",
           "placement": "bottom"
         },
@@ -743,633 +1331,8 @@
             "uid": "uhalog"
           },
           "queryType": "time series",
-          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('EL_HEATER_STATUS')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('EL_HEATER_STATUS')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('EL_HEATER_STATUS') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('EL_HEATER_STATUS')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('EL_HEATER_STATUS')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('EL_HEATER_STATUS') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "timeColumns": [
-            "time"
-          ]
-        }
-      ],
-      "id": 9
-    },
-    {
-      "type": "state-timeline",
-      "title": "BoilerStatus TECHM",
-      "description": "enum BoilerStatus from uha_vars.yaml",
-      "datasource": {
-        "type": "frser-sqlite-datasource",
-        "uid": "uhalog"
-      },
-      "gridPos": {
-        "x": 0,
-        "y": 41,
-        "w": 24,
-        "h": 4
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "none",
-          "displayName": "${__field.labels.name}",
-          "mappings": [
-            {
-              "type": "value",
-              "options": {
-                "0": {
-                  "text": "Idle",
-                  "color": "#8e8e8e",
-                  "index": 0
-                },
-                "1": {
-                  "text": "HeatUp",
-                  "color": "green",
-                  "index": 1
-                },
-                "2": {
-                  "text": "Heating",
-                  "color": "blue",
-                  "index": 2
-                },
-                "3": {
-                  "text": "CoolDown",
-                  "color": "orange",
-                  "index": 3
-                },
-                "4": {
-                  "text": "Overheat",
-                  "color": "purple",
-                  "index": 4
-                },
-                "5": {
-                  "text": "Error",
-                  "color": "red",
-                  "index": 5
-                },
-                "6": {
-                  "text": "InvalidInputs",
-                  "color": "yellow",
-                  "index": 6
-                },
-                "-1": {
-                  "text": "invalid",
-                  "color": "#3a3a3a",
-                  "index": 99
-                }
-              }
-            }
-          ],
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#3a3a3a",
-                "value": null
-              },
-              {
-                "color": "#8e8e8e",
-                "value": 0
-              },
-              {
-                "color": "green",
-                "value": 1
-              },
-              {
-                "color": "blue",
-                "value": 2
-              },
-              {
-                "color": "orange",
-                "value": 3
-              },
-              {
-                "color": "purple",
-                "value": 4
-              },
-              {
-                "color": "red",
-                "value": 5
-              },
-              {
-                "color": "yellow",
-                "value": 6
-              }
-            ]
-          },
-          "custom": {
-            "fillOpacity": 80,
-            "lineWidth": 0,
-            "spanNulls": true
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "mergeValues": true,
-        "showValue": "auto",
-        "alignValue": "left",
-        "rowHeight": 0.85,
-        "legend": {
-          "showLegend": false,
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "datasource": {
-            "type": "frser-sqlite-datasource",
-            "uid": "uhalog"
-          },
-          "queryType": "time series",
-          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_BOILER_STATE')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_BOILER_STATE')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_BOILER_STATE') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_BOILER_STATE')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_BOILER_STATE')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_BOILER_STATE') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "timeColumns": [
-            "time"
-          ]
-        }
-      ],
-      "id": 10
-    },
-    {
-      "type": "timeseries",
-      "title": "Setpoints TECHM",
-      "description": "Numeric states, one point per change",
-      "datasource": {
-        "type": "frser-sqlite-datasource",
-        "uid": "uhalog"
-      },
-      "gridPos": {
-        "x": 0,
-        "y": 45,
-        "w": 24,
-        "h": 7
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "celsius",
-          "custom": {
-            "drawStyle": "line",
-            "lineWidth": 1,
-            "fillOpacity": 0,
-            "showPoints": "always",
-            "spanNulls": true,
-            "axisSoftMin": null,
-            "lineInterpolation": "stepAfter",
-            "pointSize": 4
-          },
-          "displayName": "${__field.labels.name}"
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "datasource": {
-            "type": "frser-sqlite-datasource",
-            "uid": "uhalog"
-          },
-          "queryType": "time series",
-          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_UP_REQ_DAY_C', 'ST_UP_REQ_NIGHT_C', 'ST_DOWN_REQ_DAY_C', 'ST_DOWN_REQ_NIGHT_C')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_UP_REQ_DAY_C', 'ST_UP_REQ_NIGHT_C', 'ST_DOWN_REQ_DAY_C', 'ST_DOWN_REQ_NIGHT_C')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_UP_REQ_DAY_C', 'ST_UP_REQ_NIGHT_C', 'ST_DOWN_REQ_DAY_C', 'ST_DOWN_REQ_NIGHT_C') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_UP_REQ_DAY_C', 'ST_UP_REQ_NIGHT_C', 'ST_DOWN_REQ_DAY_C', 'ST_DOWN_REQ_NIGHT_C')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_UP_REQ_DAY_C', 'ST_UP_REQ_NIGHT_C', 'ST_DOWN_REQ_DAY_C', 'ST_DOWN_REQ_NIGHT_C')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_UP_REQ_DAY_C', 'ST_UP_REQ_NIGHT_C', 'ST_DOWN_REQ_DAY_C', 'ST_DOWN_REQ_NIGHT_C') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "timeColumns": [
-            "time"
-          ]
-        }
-      ],
-      "id": 11
-    },
-    {
-      "type": "timeseries",
-      "title": "Values TECHM",
-      "description": "Numeric states, one point per change",
-      "datasource": {
-        "type": "frser-sqlite-datasource",
-        "uid": "uhalog"
-      },
-      "gridPos": {
-        "x": 0,
-        "y": 52,
-        "w": 24,
-        "h": 7
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "none",
-          "custom": {
-            "drawStyle": "line",
-            "lineWidth": 1,
-            "fillOpacity": 0,
-            "showPoints": "always",
-            "spanNulls": true,
-            "axisSoftMin": null,
-            "lineInterpolation": "stepAfter",
-            "pointSize": 4
-          },
-          "displayName": "${__field.labels.name}"
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "datasource": {
-            "type": "frser-sqlite-datasource",
-            "uid": "uhalog"
-          },
-          "queryType": "time series",
-          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_EL_HEATER_COILS')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_EL_HEATER_COILS')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_EL_HEATER_COILS') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_EL_HEATER_COILS')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_EL_HEATER_COILS')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_EL_HEATER_COILS') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "timeColumns": [
-            "time"
-          ]
-        }
-      ],
-      "id": 12
-    },
-    {
-      "type": "timeseries",
-      "title": "Room request in effect vs room temperature",
-      "description": "UP = upstairs (kidroom, radiators), DOWN = downstairs (walls)",
-      "datasource": {
-        "type": "frser-sqlite-datasource",
-        "uid": "uhalog"
-      },
-      "gridPos": {
-        "x": 0,
-        "y": 59,
-        "w": 12,
-        "h": 8
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "celsius",
-          "custom": {
-            "drawStyle": "line",
-            "lineWidth": 1,
-            "fillOpacity": 0,
-            "showPoints": "always",
-            "spanNulls": true,
-            "axisSoftMin": null,
-            "lineInterpolation": "stepAfter",
-            "pointSize": 4
-          },
-          "displayName": "${__field.labels.name}"
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "datasource": {
-            "type": "frser-sqlite-datasource",
-            "uid": "uhalog"
-          },
-          "queryType": "time series",
-          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_UP_REQ_C', 'ST_DOWN_REQ_C')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_UP_REQ_C', 'ST_DOWN_REQ_C')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_UP_REQ_C', 'ST_DOWN_REQ_C') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_UP_REQ_C', 'ST_DOWN_REQ_C')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_UP_REQ_C', 'ST_DOWN_REQ_C')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_UP_REQ_C', 'ST_DOWN_REQ_C') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "timeColumns": [
-            "time"
-          ]
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "frser-sqlite-datasource",
-            "uid": "uhalog"
-          },
-          "queryType": "time series",
-          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_KIDROOM_C', 'TEMP_DOWNSTAIRS_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_KIDROOM_C', 'TEMP_DOWNSTAIRS_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
-          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_KIDROOM_C', 'TEMP_DOWNSTAIRS_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_KIDROOM_C', 'TEMP_DOWNSTAIRS_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
-          "timeColumns": [
-            "time"
-          ]
-        }
-      ],
-      "id": 13
-    },
-    {
-      "type": "timeseries",
-      "title": "Exhaust setpoint vs exhaust",
-      "description": "BOILER_AIR control setpoint (es_AirControl)",
-      "datasource": {
-        "type": "frser-sqlite-datasource",
-        "uid": "uhalog"
-      },
-      "gridPos": {
-        "x": 12,
-        "y": 59,
-        "w": 12,
-        "h": 8
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "celsius",
-          "custom": {
-            "drawStyle": "line",
-            "lineWidth": 1,
-            "fillOpacity": 0,
-            "showPoints": "always",
-            "spanNulls": true,
-            "axisSoftMin": null,
-            "lineInterpolation": "stepAfter",
-            "pointSize": 4
-          },
-          "displayName": "${__field.labels.name}"
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "datasource": {
-            "type": "frser-sqlite-datasource",
-            "uid": "uhalog"
-          },
-          "queryType": "time series",
-          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_EXHAUST_SET_C')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_EXHAUST_SET_C')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_EXHAUST_SET_C') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_EXHAUST_SET_C')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_EXHAUST_SET_C')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_EXHAUST_SET_C') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "timeColumns": [
-            "time"
-          ]
-        },
-        {
-          "refId": "B",
-          "datasource": {
-            "type": "frser-sqlite-datasource",
-            "uid": "uhalog"
-          },
-          "queryType": "time series",
-          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_BOILER_EXHAUST_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_BOILER_EXHAUST_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
-          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_BOILER_EXHAUST_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_BOILER_EXHAUST_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
-          "timeColumns": [
-            "time"
-          ]
-        }
-      ],
-      "id": 14
-    },
-    {
-      "type": "timeseries",
-      "title": "Valves (commanded %)",
-      "description": "Mixing valves wall / radiators as commanded; air valve = servo signal (20..100 % = 2..10 V)",
-      "datasource": {
-        "type": "frser-sqlite-datasource",
-        "uid": "uhalog"
-      },
-      "gridPos": {
-        "x": 0,
-        "y": 67,
-        "w": 12,
-        "h": 8
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percent",
-          "custom": {
-            "drawStyle": "line",
-            "lineWidth": 1,
-            "fillOpacity": 0,
-            "showPoints": "never",
-            "spanNulls": false,
-            "axisSoftMin": null
-          },
-          "displayName": "${__field.labels.name}"
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "datasource": {
-            "type": "frser-sqlite-datasource",
-            "uid": "uhalog"
-          },
-          "queryType": "time series",
-          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TECHM_VALVE_WALL_PCT', 'TECHM_VALVE_RAD_PCT', 'TECHM_AIR_VALVE_SIGNAL_PCT') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TECHM_VALVE_WALL_PCT', 'TECHM_VALVE_RAD_PCT', 'TECHM_AIR_VALVE_SIGNAL_PCT') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
-          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TECHM_VALVE_WALL_PCT', 'TECHM_VALVE_RAD_PCT', 'TECHM_AIR_VALVE_SIGNAL_PCT') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TECHM_VALVE_WALL_PCT', 'TECHM_VALVE_RAD_PCT', 'TECHM_AIR_VALVE_SIGNAL_PCT') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
-          "timeColumns": [
-            "time"
-          ]
-        }
-      ],
-      "id": 15
-    },
-    {
-      "type": "timeseries",
-      "title": "Water required vs actual",
-      "description": "TEMPCON required water temperatures and the circuit inlets",
-      "datasource": {
-        "type": "frser-sqlite-datasource",
-        "uid": "uhalog"
-      },
-      "gridPos": {
-        "x": 12,
-        "y": 67,
-        "w": 12,
-        "h": 8
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "celsius",
-          "custom": {
-            "drawStyle": "line",
-            "lineWidth": 1,
-            "fillOpacity": 0,
-            "showPoints": "never",
-            "spanNulls": false,
-            "axisSoftMin": null
-          },
-          "displayName": "${__field.labels.name}"
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "datasource": {
-            "type": "frser-sqlite-datasource",
-            "uid": "uhalog"
-          },
-          "queryType": "time series",
-          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TECHM_REQ_WATER_RAD_C', 'TEMP_RAD_H_C', 'TECHM_REQ_WATER_WALL_C', 'TEMP_WALL_IN_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TECHM_REQ_WATER_RAD_C', 'TEMP_RAD_H_C', 'TECHM_REQ_WATER_WALL_C', 'TEMP_WALL_IN_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
-          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TECHM_REQ_WATER_RAD_C', 'TEMP_RAD_H_C', 'TECHM_REQ_WATER_WALL_C', 'TEMP_WALL_IN_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TECHM_REQ_WATER_RAD_C', 'TEMP_RAD_H_C', 'TECHM_REQ_WATER_WALL_C', 'TEMP_WALL_IN_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
-          "timeColumns": [
-            "time"
-          ]
-        }
-      ],
-      "id": 16
-    },
-    {
-      "type": "row",
-      "title": "ELECON",
-      "collapsed": false,
-      "gridPos": {
-        "x": 0,
-        "y": 75,
-        "w": 24,
-        "h": 1
-      },
-      "panels": [],
-      "id": 17
-    },
-    {
-      "type": "state-timeline",
-      "title": "Lights ELECON",
-      "description": "Output really set: PWM %, relay lights 0 / 100",
-      "datasource": {
-        "type": "frser-sqlite-datasource",
-        "uid": "uhalog"
-      },
-      "gridPos": {
-        "x": 0,
-        "y": 76,
-        "w": 24,
-        "h": 3
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percent",
-          "displayName": "${__field.labels.name}",
-          "mappings": [
-            {
-              "type": "value",
-              "options": {
-                "0": {
-                  "text": "off",
-                  "color": "#555555",
-                  "index": 0
-                },
-                "-1": {
-                  "text": "invalid",
-                  "color": "#3a3a3a",
-                  "index": 99
-                }
-              }
-            }
-          ],
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#555555",
-                "value": null
-              },
-              {
-                "color": "#e0b400",
-                "value": 1
-              }
-            ]
-          },
-          "custom": {
-            "fillOpacity": 80,
-            "lineWidth": 0,
-            "spanNulls": true
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "mergeValues": true,
-        "showValue": "auto",
-        "alignValue": "left",
-        "rowHeight": 0.85,
-        "legend": {
-          "showLegend": false,
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "datasource": {
-            "type": "frser-sqlite-datasource",
-            "uid": "uhalog"
-          },
-          "queryType": "time series",
-          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_LIGHT_EXTERIOR_HOUSE')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_LIGHT_EXTERIOR_HOUSE')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_LIGHT_EXTERIOR_HOUSE') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_LIGHT_EXTERIOR_HOUSE')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_LIGHT_EXTERIOR_HOUSE')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_LIGHT_EXTERIOR_HOUSE') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'EL_HEATER_STATUS' THEN 'Electric heater' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('EL_HEATER_STATUS')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'EL_HEATER_STATUS' THEN 'Electric heater' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('EL_HEATER_STATUS')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'EL_HEATER_STATUS' THEN 'Electric heater' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('EL_HEATER_STATUS') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'EL_HEATER_STATUS' THEN 'Electric heater' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('EL_HEATER_STATUS')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'EL_HEATER_STATUS' THEN 'Electric heater' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('EL_HEATER_STATUS')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'EL_HEATER_STATUS' THEN 'Electric heater' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('EL_HEATER_STATUS') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
           "timeColumns": [
             "time"
           ]
@@ -1378,112 +1341,44 @@
       "id": 18
     },
     {
-      "type": "state-timeline",
-      "title": "InverterState ELECON",
-      "description": "enum InverterState from uha_vars.yaml",
+      "type": "timeseries",
+      "title": "Electric heater – coils on",
+      "description": "Numeric states, one point per change",
       "datasource": {
         "type": "frser-sqlite-datasource",
         "uid": "uhalog"
       },
       "gridPos": {
         "x": 0,
-        "y": 79,
+        "y": 102,
         "w": 24,
-        "h": 8
+        "h": 7
       },
       "fieldConfig": {
         "defaults": {
           "unit": "none",
-          "displayName": "${__field.labels.name}",
-          "mappings": [
-            {
-              "type": "value",
-              "options": {
-                "0": {
-                  "text": "Off",
-                  "color": "#8e8e8e",
-                  "index": 0
-                },
-                "1": {
-                  "text": "On",
-                  "color": "green",
-                  "index": 1
-                },
-                "2": {
-                  "text": "OnKeepSetting",
-                  "color": "blue",
-                  "index": 2
-                },
-                "3": {
-                  "text": "KeepOn",
-                  "color": "orange",
-                  "index": 3
-                },
-                "4": {
-                  "text": "AutoOff",
-                  "color": "purple",
-                  "index": 4
-                },
-                "-1": {
-                  "text": "invalid",
-                  "color": "#3a3a3a",
-                  "index": 99
-                }
-              }
-            }
-          ],
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#3a3a3a",
-                "value": null
-              },
-              {
-                "color": "#8e8e8e",
-                "value": 0
-              },
-              {
-                "color": "green",
-                "value": 1
-              },
-              {
-                "color": "blue",
-                "value": 2
-              },
-              {
-                "color": "orange",
-                "value": 3
-              },
-              {
-                "color": "purple",
-                "value": 4
-              }
-            ]
-          },
           "custom": {
-            "fillOpacity": 80,
-            "lineWidth": 0,
-            "spanNulls": true
-          }
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "always",
+            "spanNulls": true,
+            "axisSoftMin": null,
+            "lineInterpolation": "stepAfter",
+            "pointSize": 4
+          },
+          "displayName": "${__field.labels.name}"
         },
         "overrides": []
       },
       "options": {
-        "mergeValues": true,
-        "showValue": "auto",
-        "alignValue": "left",
-        "rowHeight": 0.85,
         "legend": {
-          "showLegend": false,
           "displayMode": "list",
-          "placement": "bottom"
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
-          "mode": "single",
+          "mode": "multi",
           "sort": "none"
         }
       },
@@ -1495,8 +1390,8 @@
             "uid": "uhalog"
           },
           "queryType": "time series",
-          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_AC_300W', 'ST_AC_3KW', 'ST_AC_5KW')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_AC_300W', 'ST_AC_3KW', 'ST_AC_5KW')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_AC_300W', 'ST_AC_3KW', 'ST_AC_5KW') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_AC_300W', 'ST_AC_3KW', 'ST_AC_5KW')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_AC_300W', 'ST_AC_3KW', 'ST_AC_5KW')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_AC_300W', 'ST_AC_3KW', 'ST_AC_5KW') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_EL_HEATER_COILS' THEN 'Electric heater – coils on' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_EL_HEATER_COILS')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_EL_HEATER_COILS' THEN 'Electric heater – coils on' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_EL_HEATER_COILS')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_EL_HEATER_COILS' THEN 'Electric heater – coils on' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_EL_HEATER_COILS') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_EL_HEATER_COILS' THEN 'Electric heater – coils on' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_EL_HEATER_COILS')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_EL_HEATER_COILS' THEN 'Electric heater – coils on' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_EL_HEATER_COILS')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_EL_HEATER_COILS' THEN 'Electric heater – coils on' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_EL_HEATER_COILS') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
           "timeColumns": [
             "time"
           ]
@@ -1506,11 +1401,11 @@
     },
     {
       "type": "row",
-      "title": "RECU",
+      "title": "Ventilation",
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 87,
+        "y": 109,
         "w": 24,
         "h": 1
       },
@@ -1519,17 +1414,17 @@
     },
     {
       "type": "state-timeline",
-      "title": "RecuRemoteMode RECU",
-      "description": "enum RecuRemoteMode from uha_vars.yaml",
+      "title": "Recuperation mode",
+      "description": "Colours: see the legend below the chart",
       "datasource": {
         "type": "frser-sqlite-datasource",
         "uid": "uhalog"
       },
       "gridPos": {
         "x": 0,
-        "y": 88,
+        "y": 110,
         "w": 24,
-        "h": 4
+        "h": 6
       },
       "fieldConfig": {
         "defaults": {
@@ -1545,22 +1440,22 @@
                   "index": 0
                 },
                 "1": {
-                  "text": "SlightOverpressure",
+                  "text": "Slight overpressure",
                   "color": "green",
                   "index": 1
                 },
                 "2": {
-                  "text": "MaxOverpressure",
+                  "text": "Max overpressure",
                   "color": "blue",
                   "index": 2
                 },
                 "3": {
-                  "text": "SlightUnderpressure",
+                  "text": "Slight underpressure",
                   "color": "orange",
                   "index": 3
                 },
                 "4": {
-                  "text": "MaxUnderpressure",
+                  "text": "Max underpressure",
                   "color": "purple",
                   "index": 4
                 },
@@ -1618,7 +1513,7 @@
         "alignValue": "left",
         "rowHeight": 0.85,
         "legend": {
-          "showLegend": false,
+          "showLegend": true,
           "displayMode": "list",
           "placement": "bottom"
         },
@@ -1635,8 +1530,8 @@
             "uid": "uhalog"
           },
           "queryType": "time series",
-          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_RECU_REMOTE_MODE')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_RECU_REMOTE_MODE')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_RECU_REMOTE_MODE') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_RECU_REMOTE_MODE')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_RECU_REMOTE_MODE')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_RECU_REMOTE_MODE') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_RECU_REMOTE_MODE' THEN 'Recuperation – mode' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_RECU_REMOTE_MODE')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_RECU_REMOTE_MODE' THEN 'Recuperation – mode' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_RECU_REMOTE_MODE')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_RECU_REMOTE_MODE' THEN 'Recuperation – mode' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_RECU_REMOTE_MODE') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_RECU_REMOTE_MODE' THEN 'Recuperation – mode' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_RECU_REMOTE_MODE')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_RECU_REMOTE_MODE' THEN 'Recuperation – mode' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_RECU_REMOTE_MODE')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_RECU_REMOTE_MODE' THEN 'Recuperation – mode' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_RECU_REMOTE_MODE') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
           "timeColumns": [
             "time"
           ]
@@ -1646,17 +1541,17 @@
     },
     {
       "type": "state-timeline",
-      "title": "RecuLimit RECU",
-      "description": "enum RecuLimit from uha_vars.yaml",
+      "title": "Recuperation limitation",
+      "description": "Colours: see the legend below the chart",
       "datasource": {
         "type": "frser-sqlite-datasource",
         "uid": "uhalog"
       },
       "gridPos": {
         "x": 0,
-        "y": 92,
+        "y": 116,
         "w": 24,
-        "h": 4
+        "h": 6
       },
       "fieldConfig": {
         "defaults": {
@@ -1677,27 +1572,27 @@
                   "index": 1
                 },
                 "2": {
-                  "text": "AntiDry",
+                  "text": "Anti-dry",
                   "color": "blue",
                   "index": 2
                 },
                 "3": {
-                  "text": "AntifreezeReduced",
+                  "text": "Antifreeze – reduced",
                   "color": "orange",
                   "index": 3
                 },
                 "4": {
-                  "text": "AntifreezeStop",
+                  "text": "Antifreeze – stopped",
                   "color": "purple",
                   "index": 4
                 },
                 "5": {
-                  "text": "BatteryOff",
+                  "text": "Off – low battery",
                   "color": "red",
                   "index": 5
                 },
                 "6": {
-                  "text": "InvalidInputs",
+                  "text": "Invalid inputs",
                   "color": "yellow",
                   "index": 6
                 },
@@ -1763,7 +1658,7 @@
         "alignValue": "left",
         "rowHeight": 0.85,
         "legend": {
-          "showLegend": false,
+          "showLegend": true,
           "displayMode": "list",
           "placement": "bottom"
         },
@@ -1780,8 +1675,8 @@
             "uid": "uhalog"
           },
           "queryType": "time series",
-          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_RECU_LIMIT')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_RECU_LIMIT')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_RECU_LIMIT') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_RECU_LIMIT')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_RECU_LIMIT')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_RECU_LIMIT') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_RECU_LIMIT' THEN 'Recuperation – limitation' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_RECU_LIMIT')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_RECU_LIMIT' THEN 'Recuperation – limitation' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_RECU_LIMIT')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_RECU_LIMIT' THEN 'Recuperation – limitation' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_RECU_LIMIT') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_RECU_LIMIT' THEN 'Recuperation – limitation' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_RECU_LIMIT')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_RECU_LIMIT' THEN 'Recuperation – limitation' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_RECU_LIMIT')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_RECU_LIMIT' THEN 'Recuperation – limitation' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_RECU_LIMIT') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
           "timeColumns": [
             "time"
           ]
@@ -1790,339 +1685,8 @@
       "id": 22
     },
     {
-      "type": "row",
-      "title": "ELECON_D",
-      "collapsed": false,
-      "gridPos": {
-        "x": 0,
-        "y": 96,
-        "w": 24,
-        "h": 1
-      },
-      "panels": [],
-      "id": 23
-    },
-    {
-      "type": "state-timeline",
-      "title": "Lights ELECON_D",
-      "description": "Output really set: PWM %, relay lights 0 / 100",
-      "datasource": {
-        "type": "frser-sqlite-datasource",
-        "uid": "uhalog"
-      },
-      "gridPos": {
-        "x": 0,
-        "y": 97,
-        "w": 24,
-        "h": 5
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percent",
-          "displayName": "${__field.labels.name}",
-          "mappings": [
-            {
-              "type": "value",
-              "options": {
-                "0": {
-                  "text": "off",
-                  "color": "#555555",
-                  "index": 0
-                },
-                "-1": {
-                  "text": "invalid",
-                  "color": "#3a3a3a",
-                  "index": 99
-                }
-              }
-            }
-          ],
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#555555",
-                "value": null
-              },
-              {
-                "color": "#e0b400",
-                "value": 1
-              }
-            ]
-          },
-          "custom": {
-            "fillOpacity": 80,
-            "lineWidth": 0,
-            "spanNulls": true
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "mergeValues": true,
-        "showValue": "auto",
-        "alignValue": "left",
-        "rowHeight": 0.85,
-        "legend": {
-          "showLegend": false,
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "datasource": {
-            "type": "frser-sqlite-datasource",
-            "uid": "uhalog"
-          },
-          "queryType": "time series",
-          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "timeColumns": [
-            "time"
-          ]
-        }
-      ],
-      "id": 24
-    },
-    {
-      "type": "state-timeline",
-      "title": "Relays ELECON_D",
-      "description": "On / off outputs as really set",
-      "datasource": {
-        "type": "frser-sqlite-datasource",
-        "uid": "uhalog"
-      },
-      "gridPos": {
-        "x": 0,
-        "y": 102,
-        "w": 24,
-        "h": 5
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "none",
-          "displayName": "${__field.labels.name}",
-          "mappings": [
-            {
-              "type": "value",
-              "options": {
-                "0": {
-                  "text": "off",
-                  "color": "#555555",
-                  "index": 0
-                },
-                "1": {
-                  "text": "on",
-                  "color": "green",
-                  "index": 1
-                },
-                "-1": {
-                  "text": "invalid",
-                  "color": "#3a3a3a",
-                  "index": 99
-                }
-              }
-            }
-          ],
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#3a3a3a",
-                "value": null
-              },
-              {
-                "color": "#555555",
-                "value": 0
-              },
-              {
-                "color": "green",
-                "value": 1
-              }
-            ]
-          },
-          "custom": {
-            "fillOpacity": 80,
-            "lineWidth": 0,
-            "spanNulls": true
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "mergeValues": true,
-        "showValue": "auto",
-        "alignValue": "left",
-        "rowHeight": 0.85,
-        "legend": {
-          "showLegend": false,
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "datasource": {
-            "type": "frser-sqlite-datasource",
-            "uid": "uhalog"
-          },
-          "queryType": "time series",
-          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_AKUPACK_HEATER', 'ST_EVSE_RELAY', 'ST_WS_HEATING_RELAY')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_AKUPACK_HEATER', 'ST_EVSE_RELAY', 'ST_WS_HEATING_RELAY')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_AKUPACK_HEATER', 'ST_EVSE_RELAY', 'ST_WS_HEATING_RELAY') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_AKUPACK_HEATER', 'ST_EVSE_RELAY', 'ST_WS_HEATING_RELAY')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_AKUPACK_HEATER', 'ST_EVSE_RELAY', 'ST_WS_HEATING_RELAY')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_AKUPACK_HEATER', 'ST_EVSE_RELAY', 'ST_WS_HEATING_RELAY') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "timeColumns": [
-            "time"
-          ]
-        }
-      ],
-      "id": 25
-    },
-    {
-      "type": "state-timeline",
-      "title": "InverterState ELECON_D",
-      "description": "enum InverterState from uha_vars.yaml",
-      "datasource": {
-        "type": "frser-sqlite-datasource",
-        "uid": "uhalog"
-      },
-      "gridPos": {
-        "x": 0,
-        "y": 107,
-        "w": 24,
-        "h": 6
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "none",
-          "displayName": "${__field.labels.name}",
-          "mappings": [
-            {
-              "type": "value",
-              "options": {
-                "0": {
-                  "text": "Off",
-                  "color": "#8e8e8e",
-                  "index": 0
-                },
-                "1": {
-                  "text": "On",
-                  "color": "green",
-                  "index": 1
-                },
-                "2": {
-                  "text": "OnKeepSetting",
-                  "color": "blue",
-                  "index": 2
-                },
-                "3": {
-                  "text": "KeepOn",
-                  "color": "orange",
-                  "index": 3
-                },
-                "4": {
-                  "text": "AutoOff",
-                  "color": "purple",
-                  "index": 4
-                },
-                "-1": {
-                  "text": "invalid",
-                  "color": "#3a3a3a",
-                  "index": 99
-                }
-              }
-            }
-          ],
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#3a3a3a",
-                "value": null
-              },
-              {
-                "color": "#8e8e8e",
-                "value": 0
-              },
-              {
-                "color": "green",
-                "value": 1
-              },
-              {
-                "color": "blue",
-                "value": 2
-              },
-              {
-                "color": "orange",
-                "value": 3
-              },
-              {
-                "color": "purple",
-                "value": 4
-              }
-            ]
-          },
-          "custom": {
-            "fillOpacity": 80,
-            "lineWidth": 0,
-            "spanNulls": true
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "mergeValues": true,
-        "showValue": "auto",
-        "alignValue": "left",
-        "rowHeight": 0.85,
-        "legend": {
-          "showLegend": false,
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "datasource": {
-            "type": "frser-sqlite-datasource",
-            "uid": "uhalog"
-          },
-          "queryType": "time series",
-          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_AC_AXPERT', 'ST_AC_VICTRON')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_AC_AXPERT', 'ST_AC_VICTRON')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_AC_AXPERT', 'ST_AC_VICTRON') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_AC_AXPERT', 'ST_AC_VICTRON')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_AC_AXPERT', 'ST_AC_VICTRON')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_AC_AXPERT', 'ST_AC_VICTRON') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "timeColumns": [
-            "time"
-          ]
-        }
-      ],
-      "id": 26
-    },
-    {
       "type": "timeseries",
-      "title": "Setpoints ELECON_D",
+      "title": "Setpoints (ppm)",
       "description": "Numeric states, one point per change",
       "datasource": {
         "type": "frser-sqlite-datasource",
@@ -2130,13 +1694,13 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 113,
+        "y": 122,
         "w": 24,
         "h": 7
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "celsius",
+          "unit": "ppm",
           "custom": {
             "drawStyle": "line",
             "lineWidth": 1,
@@ -2170,110 +1734,43 @@
             "uid": "uhalog"
           },
           "queryType": "time series",
-          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_AKUPACK_SET_DAY_C', 'ST_AKUPACK_SET_NIGHT_C')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_AKUPACK_SET_DAY_C', 'ST_AKUPACK_SET_NIGHT_C')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_AKUPACK_SET_DAY_C', 'ST_AKUPACK_SET_NIGHT_C') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
-          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_AKUPACK_SET_DAY_C', 'ST_AKUPACK_SET_NIGHT_C')\n  UNION ALL\n  SELECT e.f, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_AKUPACK_SET_DAY_C', 'ST_AKUPACK_SET_NIGHT_C')\n  UNION ALL\n  SELECT e.te, CASE WHEN substr(v.name, 1, 3) = 'ST_' THEN substr(v.name, 4) ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_AKUPACK_SET_DAY_C', 'ST_AKUPACK_SET_NIGHT_C') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_RECU_CO2_SETPOINT' THEN 'Recuperation – CO₂ setpoint' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_RECU_CO2_SETPOINT')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_RECU_CO2_SETPOINT' THEN 'Recuperation – CO₂ setpoint' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_RECU_CO2_SETPOINT')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_RECU_CO2_SETPOINT' THEN 'Recuperation – CO₂ setpoint' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_RECU_CO2_SETPOINT') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_RECU_CO2_SETPOINT' THEN 'Recuperation – CO₂ setpoint' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_RECU_CO2_SETPOINT')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_RECU_CO2_SETPOINT' THEN 'Recuperation – CO₂ setpoint' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_RECU_CO2_SETPOINT')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_RECU_CO2_SETPOINT' THEN 'Recuperation – CO₂ setpoint' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_RECU_CO2_SETPOINT') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
           "timeColumns": [
             "time"
           ]
         }
       ],
-      "id": 27
+      "id": 23
     },
     {
-      "type": "table",
-      "title": "Lights on now",
-      "description": "Newest event row with value > 0",
+      "type": "timeseries",
+      "title": "Setpoints (%)",
+      "description": "Numeric states, one point per change",
       "datasource": {
         "type": "frser-sqlite-datasource",
         "uid": "uhalog"
       },
       "gridPos": {
         "x": 0,
-        "y": 120,
-        "w": 8,
-        "h": 9
-      },
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "pct"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "percent"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "since"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "dateTimeAsLocal"
-              }
-            ]
-          }
-        ]
-      },
-      "options": {
-        "showHeader": true
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "datasource": {
-            "type": "frser-sqlite-datasource",
-            "uid": "uhalog"
-          },
-          "queryType": "table",
-          "rawQueryText": "-- lights with value > 0 in their newest event row\nSELECT CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END AS light, x.value AS pct, x.ts * 1000 AS since\nFROM vars v CROSS JOIN events x ON x.var_id = v.id\n     AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id)\nWHERE v.name IN ('ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER', 'ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN', 'ST_LIGHT_EXTERIOR_HOUSE', 'ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP') AND x.value > 0\nORDER BY 1",
-          "queryText": "-- lights with value > 0 in their newest event row\nSELECT CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END AS light, x.value AS pct, x.ts * 1000 AS since\nFROM vars v CROSS JOIN events x ON x.var_id = v.id\n     AND x.ts = (SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id)\nWHERE v.name IN ('ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER', 'ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN', 'ST_LIGHT_EXTERIOR_HOUSE', 'ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP') AND x.value > 0\nORDER BY 1",
-          "timeColumns": [
-            "since"
-          ]
-        }
-      ],
-      "id": 28
-    },
-    {
-      "type": "timeseries",
-      "title": "Light on-time per day (hours)",
-      "description": "Intervals with value > 0 between consecutive event rows, per local day",
-      "datasource": {
-        "type": "frser-sqlite-datasource",
-        "uid": "uhalog"
-      },
-      "gridPos": {
-        "x": 8,
-        "y": 120,
-        "w": 16,
-        "h": 9
+        "y": 129,
+        "w": 24,
+        "h": 7
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "h",
+          "unit": "percent",
           "custom": {
-            "drawStyle": "bars",
+            "drawStyle": "line",
             "lineWidth": 1,
-            "fillOpacity": 80,
-            "showPoints": "never",
-            "spanNulls": false,
+            "fillOpacity": 0,
+            "showPoints": "always",
+            "spanNulls": true,
             "axisSoftMin": null,
-            "barAlignment": 1,
-            "stacking": {
-              "mode": "normal",
-              "group": "A"
-            }
+            "lineInterpolation": "stepAfter",
+            "pointSize": 4
           },
-          "displayName": "${__field.labels.name}",
-          "decimals": 1
+          "displayName": "${__field.labels.name}"
         },
         "overrides": []
       },
@@ -2296,15 +1793,14 @@
             "uid": "uhalog"
           },
           "queryType": "time series",
-          "rawQueryText": "-- hours on per local day, from events\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ndays(d0, d1) AS (\n  SELECT s, CAST(strftime('%s', date(s, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) FROM (SELECT CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS s FROM q)\n  UNION ALL\n  SELECT d1, CAST(strftime('%s', date(d1, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) FROM days, q WHERE d1 < q.t\n),\nev AS (\n  SELECT CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END AS name, x.ts, x.value, LEAD(x.ts) OVER (PARTITION BY x.var_id ORDER BY x.ts) AS te\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts < q.t\n       AND x.ts >= COALESCE((SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id\n                              AND e.ts <= (SELECT MIN(d0) FROM days)), 0)\n  WHERE v.name IN ('ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER', 'ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN', 'ST_LIGHT_EXTERIOR_HOUSE', 'ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP')\n),\niv AS (\n  SELECT name, ts, COALESCE(te, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER))) AS te FROM ev, q WHERE value > 0\n)\nSELECT d.d0 AS time, iv.name, SUM(MIN(iv.te, d.d1) - MAX(iv.ts, d.d0)) / 3600.0 AS value\nFROM days d JOIN iv ON iv.ts < d.d1 AND iv.te > d.d0\nGROUP BY 1, 2\nORDER BY 1",
-          "queryText": "-- hours on per local day, from events\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ndays(d0, d1) AS (\n  SELECT s, CAST(strftime('%s', date(s, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) FROM (SELECT CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS s FROM q)\n  UNION ALL\n  SELECT d1, CAST(strftime('%s', date(d1, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) FROM days, q WHERE d1 < q.t\n),\nev AS (\n  SELECT CASE WHEN substr(v.name, 1, 9) = 'ST_LIGHT_' THEN substr(v.name, 10) ELSE v.name END AS name, x.ts, x.value, LEAD(x.ts) OVER (PARTITION BY x.var_id ORDER BY x.ts) AS te\n  FROM q, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts < q.t\n       AND x.ts >= COALESCE((SELECT MAX(e.ts) FROM events e WHERE e.var_id = v.id\n                              AND e.ts <= (SELECT MIN(d0) FROM days)), 0)\n  WHERE v.name IN ('ST_LIGHT_WASHBASIN', 'ST_LIGHT_KITCHEN_COUNTER', 'ST_LIGHT_LOFT_WEST', 'ST_LIGHT_LOFT_EAST_1', 'ST_LIGHT_LOFT_EAST_2', 'ST_LIGHT_BEDROOM_SOUTH', 'ST_LIGHT_BEDROOM_NORTH', 'ST_LIGHT_BATHROOM', 'ST_LIGHT_STAIR_STEPS', 'ST_LIGHT_STAIRS', 'ST_LIGHT_HALLWAY', 'ST_LIGHT_LIVING_ROOM', 'ST_LIGHT_DINING_ROOM', 'ST_LIGHT_KITCHEN', 'ST_LIGHT_EXTERIOR_HOUSE', 'ST_LIGHT_EXTERIOR_WS', 'ST_LIGHT_KOLARNA', 'ST_LIGHT_SKLEP')\n),\niv AS (\n  SELECT name, ts, COALESCE(te, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER))) AS te FROM ev, q WHERE value > 0\n)\nSELECT d.d0 AS time, iv.name, SUM(MIN(iv.te, d.d1) - MAX(iv.ts, d.d0)) / 3600.0 AS value\nFROM days d JOIN iv ON iv.ts < d.d1 AND iv.te > d.d0\nGROUP BY 1, 2\nORDER BY 1",
+          "rawQueryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_RECU_ANTIDRY_RH' THEN 'Recuperation – anti-dry limit' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_RECU_ANTIDRY_RH')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_RECU_ANTIDRY_RH' THEN 'Recuperation – anti-dry limit' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_RECU_ANTIDRY_RH')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_RECU_ANTIDRY_RH' THEN 'Recuperation – anti-dry limit' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_RECU_ANTIDRY_RH') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
+          "queryText": "-- events: changes in the range + the state at its start + the state at its end (or now)\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\ne AS (SELECT q.f, q.t, MIN(q.t, CAST(strftime('%s', 'now') AS INTEGER)) AS te FROM q)\nSELECT time, name, value FROM (\n  SELECT x.ts AS time, CASE v.name WHEN 'ST_RECU_ANTIDRY_RH' THEN 'Recuperation – anti-dry limit' ELSE v.name END AS name, COALESCE(x.value, -1) AS value\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id AND x.ts >= e.f AND x.ts < e.t\n  WHERE v.name IN ('ST_RECU_ANTIDRY_RH')\n  UNION ALL\n  SELECT e.f, CASE v.name WHEN 'ST_RECU_ANTIDRY_RH' THEN 'Recuperation – anti-dry limit' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts < e.f)\n  WHERE v.name IN ('ST_RECU_ANTIDRY_RH')\n  UNION ALL\n  SELECT e.te, CASE v.name WHEN 'ST_RECU_ANTIDRY_RH' THEN 'Recuperation – anti-dry limit' ELSE v.name END, COALESCE(x.value, -1)\n  FROM e, vars v CROSS JOIN events x ON x.var_id = v.id\n       AND x.ts = (SELECT MAX(y.ts) FROM events y WHERE y.var_id = v.id AND y.ts <= e.te)\n  WHERE v.name IN ('ST_RECU_ANTIDRY_RH') AND x.ts < e.te     -- no extra point if the last change is exactly at the end\n) ORDER BY time",
           "timeColumns": [
             "time"
           ]
         }
       ],
-      "timeFrom": "30d",
-      "id": 29
+      "id": 24
     }
   ],
   "templating": {

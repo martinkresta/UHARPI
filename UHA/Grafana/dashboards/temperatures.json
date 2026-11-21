@@ -25,7 +25,7 @@
   "panels": [
     {
       "type": "timeseries",
-      "title": "House",
+      "title": "Indoor & outside",
       "description": "",
       "datasource": {
         "type": "frser-sqlite-datasource",
@@ -34,8 +34,8 @@
       "gridPos": {
         "x": 0,
         "y": 0,
-        "w": 12,
-        "h": 8
+        "w": 24,
+        "h": 9
       },
       "fieldConfig": {
         "defaults": {
@@ -71,8 +71,8 @@
             "uid": "uhalog"
           },
           "queryType": "time series",
-          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_OFFICE_C', 'TEMP_KIDROOM_C', 'TEMP_DOWNSTAIRS_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_OFFICE_C', 'TEMP_KIDROOM_C', 'TEMP_DOWNSTAIRS_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
-          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_OFFICE_C', 'TEMP_KIDROOM_C', 'TEMP_DOWNSTAIRS_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_OFFICE_C', 'TEMP_KIDROOM_C', 'TEMP_DOWNSTAIRS_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'TEMP_DOWNSTAIRS_C' THEN 'Downstairs' WHEN 'TEMP_OFFICE_C' THEN 'Office' WHEN 'TEMP_KIDROOM_C' THEN 'Kids room' WHEN 'TEMP_DILNA_C' THEN 'Workshop' WHEN 'TEMP_KOLARNA_C' THEN 'Bike shed' WHEN 'TEMP_OUTSIDE_C' THEN 'Outside' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_DOWNSTAIRS_C', 'TEMP_OFFICE_C', 'TEMP_KIDROOM_C', 'TEMP_DILNA_C', 'TEMP_KOLARNA_C', 'TEMP_OUTSIDE_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'TEMP_DOWNSTAIRS_C' THEN 'Downstairs' WHEN 'TEMP_OFFICE_C' THEN 'Office' WHEN 'TEMP_KIDROOM_C' THEN 'Kids room' WHEN 'TEMP_DILNA_C' THEN 'Workshop' WHEN 'TEMP_KOLARNA_C' THEN 'Bike shed' WHEN 'TEMP_OUTSIDE_C' THEN 'Outside' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_DOWNSTAIRS_C', 'TEMP_OFFICE_C', 'TEMP_KIDROOM_C', 'TEMP_DILNA_C', 'TEMP_KOLARNA_C', 'TEMP_OUTSIDE_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'TEMP_DOWNSTAIRS_C' THEN 'Downstairs' WHEN 'TEMP_OFFICE_C' THEN 'Office' WHEN 'TEMP_KIDROOM_C' THEN 'Kids room' WHEN 'TEMP_DILNA_C' THEN 'Workshop' WHEN 'TEMP_KOLARNA_C' THEN 'Bike shed' WHEN 'TEMP_OUTSIDE_C' THEN 'Outside' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_DOWNSTAIRS_C', 'TEMP_OFFICE_C', 'TEMP_KIDROOM_C', 'TEMP_DILNA_C', 'TEMP_KOLARNA_C', 'TEMP_OUTSIDE_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'TEMP_DOWNSTAIRS_C' THEN 'Downstairs' WHEN 'TEMP_OFFICE_C' THEN 'Office' WHEN 'TEMP_KIDROOM_C' THEN 'Kids room' WHEN 'TEMP_DILNA_C' THEN 'Workshop' WHEN 'TEMP_KOLARNA_C' THEN 'Bike shed' WHEN 'TEMP_OUTSIDE_C' THEN 'Outside' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_DOWNSTAIRS_C', 'TEMP_OFFICE_C', 'TEMP_KIDROOM_C', 'TEMP_DILNA_C', 'TEMP_KOLARNA_C', 'TEMP_OUTSIDE_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
           "timeColumns": [
             "time"
           ]
@@ -82,17 +82,17 @@
     },
     {
       "type": "timeseries",
-      "title": "Outside",
+      "title": "Tank",
       "description": "",
       "datasource": {
         "type": "frser-sqlite-datasource",
         "uid": "uhalog"
       },
       "gridPos": {
-        "x": 12,
-        "y": 0,
+        "x": 0,
+        "y": 9,
         "w": 12,
-        "h": 8
+        "h": 9
       },
       "fieldConfig": {
         "defaults": {
@@ -128,8 +128,8 @@
             "uid": "uhalog"
           },
           "queryType": "time series",
-          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_OUTSIDE_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_OUTSIDE_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
-          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_OUTSIDE_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_OUTSIDE_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'TEMP_TANK_1_C' THEN 'Layer 1 (bottom)' WHEN 'TEMP_TANK_2_C' THEN 'Layer 2' WHEN 'TEMP_TANK_3_C' THEN 'Layer 3' WHEN 'TEMP_TANK_4_C' THEN 'Layer 4' WHEN 'TEMP_TANK_5_C' THEN 'Layer 5' WHEN 'TEMP_TANK_6_C' THEN 'Layer 6 (top)' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TANK_1_C', 'TEMP_TANK_2_C', 'TEMP_TANK_3_C', 'TEMP_TANK_4_C', 'TEMP_TANK_5_C', 'TEMP_TANK_6_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'TEMP_TANK_1_C' THEN 'Layer 1 (bottom)' WHEN 'TEMP_TANK_2_C' THEN 'Layer 2' WHEN 'TEMP_TANK_3_C' THEN 'Layer 3' WHEN 'TEMP_TANK_4_C' THEN 'Layer 4' WHEN 'TEMP_TANK_5_C' THEN 'Layer 5' WHEN 'TEMP_TANK_6_C' THEN 'Layer 6 (top)' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TANK_1_C', 'TEMP_TANK_2_C', 'TEMP_TANK_3_C', 'TEMP_TANK_4_C', 'TEMP_TANK_5_C', 'TEMP_TANK_6_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'TEMP_TANK_1_C' THEN 'Layer 1 (bottom)' WHEN 'TEMP_TANK_2_C' THEN 'Layer 2' WHEN 'TEMP_TANK_3_C' THEN 'Layer 3' WHEN 'TEMP_TANK_4_C' THEN 'Layer 4' WHEN 'TEMP_TANK_5_C' THEN 'Layer 5' WHEN 'TEMP_TANK_6_C' THEN 'Layer 6 (top)' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TANK_1_C', 'TEMP_TANK_2_C', 'TEMP_TANK_3_C', 'TEMP_TANK_4_C', 'TEMP_TANK_5_C', 'TEMP_TANK_6_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'TEMP_TANK_1_C' THEN 'Layer 1 (bottom)' WHEN 'TEMP_TANK_2_C' THEN 'Layer 2' WHEN 'TEMP_TANK_3_C' THEN 'Layer 3' WHEN 'TEMP_TANK_4_C' THEN 'Layer 4' WHEN 'TEMP_TANK_5_C' THEN 'Layer 5' WHEN 'TEMP_TANK_6_C' THEN 'Layer 6 (top)' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TANK_1_C', 'TEMP_TANK_2_C', 'TEMP_TANK_3_C', 'TEMP_TANK_4_C', 'TEMP_TANK_5_C', 'TEMP_TANK_6_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
           "timeColumns": [
             "time"
           ]
@@ -139,15 +139,15 @@
     },
     {
       "type": "timeseries",
-      "title": "Tank",
-      "description": "TANK_1..6 = tank layers",
+      "title": "Boiler",
+      "description": "",
       "datasource": {
         "type": "frser-sqlite-datasource",
         "uid": "uhalog"
       },
       "gridPos": {
-        "x": 0,
-        "y": 8,
+        "x": 12,
+        "y": 9,
         "w": 12,
         "h": 9
       },
@@ -185,8 +185,8 @@
             "uid": "uhalog"
           },
           "queryType": "time series",
-          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TANK_1_C', 'TEMP_TANK_2_C', 'TEMP_TANK_3_C', 'TEMP_TANK_4_C', 'TEMP_TANK_5_C', 'TEMP_TANK_6_C', 'TEMP_TANK_IN_H_C', 'TEMP_TANK_OUT_H_C', 'TEMP_TANK_IN_C_C', 'TEMP_TANK_OUT_C_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TANK_1_C', 'TEMP_TANK_2_C', 'TEMP_TANK_3_C', 'TEMP_TANK_4_C', 'TEMP_TANK_5_C', 'TEMP_TANK_6_C', 'TEMP_TANK_IN_H_C', 'TEMP_TANK_OUT_H_C', 'TEMP_TANK_IN_C_C', 'TEMP_TANK_OUT_C_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
-          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TANK_1_C', 'TEMP_TANK_2_C', 'TEMP_TANK_3_C', 'TEMP_TANK_4_C', 'TEMP_TANK_5_C', 'TEMP_TANK_6_C', 'TEMP_TANK_IN_H_C', 'TEMP_TANK_OUT_H_C', 'TEMP_TANK_IN_C_C', 'TEMP_TANK_OUT_C_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TANK_1_C', 'TEMP_TANK_2_C', 'TEMP_TANK_3_C', 'TEMP_TANK_4_C', 'TEMP_TANK_5_C', 'TEMP_TANK_6_C', 'TEMP_TANK_IN_H_C', 'TEMP_TANK_OUT_H_C', 'TEMP_TANK_IN_C_C', 'TEMP_TANK_OUT_C_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'TEMP_BOILER_C' THEN 'Boiler' WHEN 'TEMP_BOILER_IN_C' THEN 'Boiler – inlet' WHEN 'TEMP_BOILER_OUT_C' THEN 'Boiler – outlet' WHEN 'TEMP_BOILER_EXHAUST_C' THEN 'Boiler – exhaust' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_BOILER_C', 'TEMP_BOILER_IN_C', 'TEMP_BOILER_OUT_C', 'TEMP_BOILER_EXHAUST_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'TEMP_BOILER_C' THEN 'Boiler' WHEN 'TEMP_BOILER_IN_C' THEN 'Boiler – inlet' WHEN 'TEMP_BOILER_OUT_C' THEN 'Boiler – outlet' WHEN 'TEMP_BOILER_EXHAUST_C' THEN 'Boiler – exhaust' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_BOILER_C', 'TEMP_BOILER_IN_C', 'TEMP_BOILER_OUT_C', 'TEMP_BOILER_EXHAUST_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'TEMP_BOILER_C' THEN 'Boiler' WHEN 'TEMP_BOILER_IN_C' THEN 'Boiler – inlet' WHEN 'TEMP_BOILER_OUT_C' THEN 'Boiler – outlet' WHEN 'TEMP_BOILER_EXHAUST_C' THEN 'Boiler – exhaust' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_BOILER_C', 'TEMP_BOILER_IN_C', 'TEMP_BOILER_OUT_C', 'TEMP_BOILER_EXHAUST_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'TEMP_BOILER_C' THEN 'Boiler' WHEN 'TEMP_BOILER_IN_C' THEN 'Boiler – inlet' WHEN 'TEMP_BOILER_OUT_C' THEN 'Boiler – outlet' WHEN 'TEMP_BOILER_EXHAUST_C' THEN 'Boiler – exhaust' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_BOILER_C', 'TEMP_BOILER_IN_C', 'TEMP_BOILER_OUT_C', 'TEMP_BOILER_EXHAUST_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
           "timeColumns": [
             "time"
           ]
@@ -196,17 +196,17 @@
     },
     {
       "type": "timeseries",
-      "title": "Boiler and heating circuits",
+      "title": "Heating circuits",
       "description": "",
       "datasource": {
         "type": "frser-sqlite-datasource",
         "uid": "uhalog"
       },
       "gridPos": {
-        "x": 12,
-        "y": 8,
+        "x": 0,
+        "y": 18,
         "w": 12,
-        "h": 9
+        "h": 8
       },
       "fieldConfig": {
         "defaults": {
@@ -242,8 +242,8 @@
             "uid": "uhalog"
           },
           "queryType": "time series",
-          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_BOILER_C', 'TEMP_BOILER_IN_C', 'TEMP_BOILER_OUT_C', 'TEMP_BOILER_EXHAUST_C', 'TEMP_RAD_H_C', 'TEMP_RAD_C_C', 'TEMP_WALL_IN_C', 'TEMP_WALL_OUT_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_BOILER_C', 'TEMP_BOILER_IN_C', 'TEMP_BOILER_OUT_C', 'TEMP_BOILER_EXHAUST_C', 'TEMP_RAD_H_C', 'TEMP_RAD_C_C', 'TEMP_WALL_IN_C', 'TEMP_WALL_OUT_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
-          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_BOILER_C', 'TEMP_BOILER_IN_C', 'TEMP_BOILER_OUT_C', 'TEMP_BOILER_EXHAUST_C', 'TEMP_RAD_H_C', 'TEMP_RAD_C_C', 'TEMP_WALL_IN_C', 'TEMP_WALL_OUT_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_BOILER_C', 'TEMP_BOILER_IN_C', 'TEMP_BOILER_OUT_C', 'TEMP_BOILER_EXHAUST_C', 'TEMP_RAD_H_C', 'TEMP_RAD_C_C', 'TEMP_WALL_IN_C', 'TEMP_WALL_OUT_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'TEMP_RAD_H_C' THEN 'Radiators – flow' WHEN 'TEMP_RAD_C_C' THEN 'Radiators – return' WHEN 'TEMP_WALL_IN_C' THEN 'Wall heating – flow' WHEN 'TEMP_WALL_OUT_C' THEN 'Wall heating – return' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_RAD_H_C', 'TEMP_RAD_C_C', 'TEMP_WALL_IN_C', 'TEMP_WALL_OUT_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'TEMP_RAD_H_C' THEN 'Radiators – flow' WHEN 'TEMP_RAD_C_C' THEN 'Radiators – return' WHEN 'TEMP_WALL_IN_C' THEN 'Wall heating – flow' WHEN 'TEMP_WALL_OUT_C' THEN 'Wall heating – return' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_RAD_H_C', 'TEMP_RAD_C_C', 'TEMP_WALL_IN_C', 'TEMP_WALL_OUT_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'TEMP_RAD_H_C' THEN 'Radiators – flow' WHEN 'TEMP_RAD_C_C' THEN 'Radiators – return' WHEN 'TEMP_WALL_IN_C' THEN 'Wall heating – flow' WHEN 'TEMP_WALL_OUT_C' THEN 'Wall heating – return' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_RAD_H_C', 'TEMP_RAD_C_C', 'TEMP_WALL_IN_C', 'TEMP_WALL_OUT_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'TEMP_RAD_H_C' THEN 'Radiators – flow' WHEN 'TEMP_RAD_C_C' THEN 'Radiators – return' WHEN 'TEMP_WALL_IN_C' THEN 'Wall heating – flow' WHEN 'TEMP_WALL_OUT_C' THEN 'Wall heating – return' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_RAD_H_C', 'TEMP_RAD_C_C', 'TEMP_WALL_IN_C', 'TEMP_WALL_OUT_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
           "timeColumns": [
             "time"
           ]
@@ -253,15 +253,15 @@
     },
     {
       "type": "timeseries",
-      "title": "Workshop",
+      "title": "Recuperation",
       "description": "",
       "datasource": {
         "type": "frser-sqlite-datasource",
         "uid": "uhalog"
       },
       "gridPos": {
-        "x": 0,
-        "y": 17,
+        "x": 12,
+        "y": 18,
         "w": 12,
         "h": 8
       },
@@ -299,8 +299,8 @@
             "uid": "uhalog"
           },
           "queryType": "time series",
-          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_DILNA_C', 'TEMP_AKUPACK1_C', 'TEMP_KOLARNA_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_DILNA_C', 'TEMP_AKUPACK1_C', 'TEMP_KOLARNA_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
-          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_DILNA_C', 'TEMP_AKUPACK1_C', 'TEMP_KOLARNA_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_DILNA_C', 'TEMP_AKUPACK1_C', 'TEMP_KOLARNA_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'TEMP_RECU_FC_C' THEN 'Fresh air, cold side' WHEN 'TEMP_RECU_FH_C' THEN 'Supply air' WHEN 'TEMP_RECU_WH_C' THEN 'Extract air' WHEN 'TEMP_RECU_WC_C' THEN 'Exhaust air' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_RECU_FC_C', 'TEMP_RECU_FH_C', 'TEMP_RECU_WH_C', 'TEMP_RECU_WC_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'TEMP_RECU_FC_C' THEN 'Fresh air, cold side' WHEN 'TEMP_RECU_FH_C' THEN 'Supply air' WHEN 'TEMP_RECU_WH_C' THEN 'Extract air' WHEN 'TEMP_RECU_WC_C' THEN 'Exhaust air' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_RECU_FC_C', 'TEMP_RECU_FH_C', 'TEMP_RECU_WH_C', 'TEMP_RECU_WC_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'TEMP_RECU_FC_C' THEN 'Fresh air, cold side' WHEN 'TEMP_RECU_FH_C' THEN 'Supply air' WHEN 'TEMP_RECU_WH_C' THEN 'Extract air' WHEN 'TEMP_RECU_WC_C' THEN 'Exhaust air' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_RECU_FC_C', 'TEMP_RECU_FH_C', 'TEMP_RECU_WH_C', 'TEMP_RECU_WC_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'TEMP_RECU_FC_C' THEN 'Fresh air, cold side' WHEN 'TEMP_RECU_FH_C' THEN 'Supply air' WHEN 'TEMP_RECU_WH_C' THEN 'Extract air' WHEN 'TEMP_RECU_WC_C' THEN 'Exhaust air' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_RECU_FC_C', 'TEMP_RECU_FH_C', 'TEMP_RECU_WH_C', 'TEMP_RECU_WC_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
           "timeColumns": [
             "time"
           ]
@@ -310,21 +310,21 @@
     },
     {
       "type": "timeseries",
-      "title": "Recuperation",
-      "description": "FC fresh cold, FH fresh hot, WH waste hot, WC waste cold",
+      "title": "CO₂",
+      "description": "Recuperation CO₂ sensor",
       "datasource": {
         "type": "frser-sqlite-datasource",
         "uid": "uhalog"
       },
       "gridPos": {
-        "x": 12,
-        "y": 17,
+        "x": 0,
+        "y": 26,
         "w": 12,
         "h": 8
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "celsius",
+          "unit": "ppm",
           "custom": {
             "drawStyle": "line",
             "lineWidth": 1,
@@ -356,8 +356,8 @@
             "uid": "uhalog"
           },
           "queryType": "time series",
-          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_RECU_FC_C', 'TEMP_RECU_FH_C', 'TEMP_RECU_WH_C', 'TEMP_RECU_WC_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_RECU_FC_C', 'TEMP_RECU_FH_C', 'TEMP_RECU_WH_C', 'TEMP_RECU_WC_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
-          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_RECU_FC_C', 'TEMP_RECU_FH_C', 'TEMP_RECU_WH_C', 'TEMP_RECU_WC_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_RECU_FC_C', 'TEMP_RECU_FH_C', 'TEMP_RECU_WH_C', 'TEMP_RECU_WC_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'CO2_RECU' THEN 'CO₂' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('CO2_RECU') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'CO2_RECU' THEN 'CO₂' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('CO2_RECU') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'CO2_RECU' THEN 'CO₂' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('CO2_RECU') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'CO2_RECU' THEN 'CO₂' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('CO2_RECU') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
           "timeColumns": [
             "time"
           ]
@@ -367,15 +367,15 @@
     },
     {
       "type": "timeseries",
-      "title": "Boards and converters",
+      "title": "Electronics",
       "description": "",
       "datasource": {
         "type": "frser-sqlite-datasource",
         "uid": "uhalog"
       },
       "gridPos": {
-        "x": 0,
-        "y": 25,
+        "x": 12,
+        "y": 26,
         "w": 12,
         "h": 8
       },
@@ -413,8 +413,8 @@
             "uid": "uhalog"
           },
           "queryType": "time series",
-          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TECHM_BOARD_C', 'TEMP_IOBOARD_D_C', 'TEMP_IOBOARD_U_C', 'TEMP_ELECON_BOARD_C', 'TEMP_BOARD_ELECON_D_C', 'AXPERT_TEMP_C', 'MPPT_TEMP_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TECHM_BOARD_C', 'TEMP_IOBOARD_D_C', 'TEMP_IOBOARD_U_C', 'TEMP_ELECON_BOARD_C', 'TEMP_BOARD_ELECON_D_C', 'AXPERT_TEMP_C', 'MPPT_TEMP_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
-          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TECHM_BOARD_C', 'TEMP_IOBOARD_D_C', 'TEMP_IOBOARD_U_C', 'TEMP_ELECON_BOARD_C', 'TEMP_BOARD_ELECON_D_C', 'AXPERT_TEMP_C', 'MPPT_TEMP_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TECHM_BOARD_C', 'TEMP_IOBOARD_D_C', 'TEMP_IOBOARD_U_C', 'TEMP_ELECON_BOARD_C', 'TEMP_BOARD_ELECON_D_C', 'AXPERT_TEMP_C', 'MPPT_TEMP_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'TEMP_TECHM_BOARD_C' THEN 'TECHM board' WHEN 'TEMP_IOBOARD_D_C' THEN 'IOBOARD down board' WHEN 'TEMP_IOBOARD_U_C' THEN 'IOBOARD up board' WHEN 'TEMP_ELECON_BOARD_C' THEN 'ELECON board' WHEN 'TEMP_BOARD_ELECON_D_C' THEN 'ELECON_D board' WHEN 'AXPERT_TEMP_C' THEN 'Axpert' WHEN 'MPPT_TEMP_C' THEN 'MPPT' WHEN 'TEMP_AKUPACK1_C' THEN 'Workshop battery pack' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TECHM_BOARD_C', 'TEMP_IOBOARD_D_C', 'TEMP_IOBOARD_U_C', 'TEMP_ELECON_BOARD_C', 'TEMP_BOARD_ELECON_D_C', 'AXPERT_TEMP_C', 'MPPT_TEMP_C', 'TEMP_AKUPACK1_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'TEMP_TECHM_BOARD_C' THEN 'TECHM board' WHEN 'TEMP_IOBOARD_D_C' THEN 'IOBOARD down board' WHEN 'TEMP_IOBOARD_U_C' THEN 'IOBOARD up board' WHEN 'TEMP_ELECON_BOARD_C' THEN 'ELECON board' WHEN 'TEMP_BOARD_ELECON_D_C' THEN 'ELECON_D board' WHEN 'AXPERT_TEMP_C' THEN 'Axpert' WHEN 'MPPT_TEMP_C' THEN 'MPPT' WHEN 'TEMP_AKUPACK1_C' THEN 'Workshop battery pack' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TECHM_BOARD_C', 'TEMP_IOBOARD_D_C', 'TEMP_IOBOARD_U_C', 'TEMP_ELECON_BOARD_C', 'TEMP_BOARD_ELECON_D_C', 'AXPERT_TEMP_C', 'MPPT_TEMP_C', 'TEMP_AKUPACK1_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'TEMP_TECHM_BOARD_C' THEN 'TECHM board' WHEN 'TEMP_IOBOARD_D_C' THEN 'IOBOARD down board' WHEN 'TEMP_IOBOARD_U_C' THEN 'IOBOARD up board' WHEN 'TEMP_ELECON_BOARD_C' THEN 'ELECON board' WHEN 'TEMP_BOARD_ELECON_D_C' THEN 'ELECON_D board' WHEN 'AXPERT_TEMP_C' THEN 'Axpert' WHEN 'MPPT_TEMP_C' THEN 'MPPT' WHEN 'TEMP_AKUPACK1_C' THEN 'Workshop battery pack' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TECHM_BOARD_C', 'TEMP_IOBOARD_D_C', 'TEMP_IOBOARD_U_C', 'TEMP_ELECON_BOARD_C', 'TEMP_BOARD_ELECON_D_C', 'AXPERT_TEMP_C', 'MPPT_TEMP_C', 'TEMP_AKUPACK1_C') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'TEMP_TECHM_BOARD_C' THEN 'TECHM board' WHEN 'TEMP_IOBOARD_D_C' THEN 'IOBOARD down board' WHEN 'TEMP_IOBOARD_U_C' THEN 'IOBOARD up board' WHEN 'TEMP_ELECON_BOARD_C' THEN 'ELECON board' WHEN 'TEMP_BOARD_ELECON_D_C' THEN 'ELECON_D board' WHEN 'AXPERT_TEMP_C' THEN 'Axpert' WHEN 'MPPT_TEMP_C' THEN 'MPPT' WHEN 'TEMP_AKUPACK1_C' THEN 'Workshop battery pack' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('TEMP_TECHM_BOARD_C', 'TEMP_IOBOARD_D_C', 'TEMP_IOBOARD_U_C', 'TEMP_ELECON_BOARD_C', 'TEMP_BOARD_ELECON_D_C', 'AXPERT_TEMP_C', 'MPPT_TEMP_C', 'TEMP_AKUPACK1_C') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
           "timeColumns": [
             "time"
           ]
@@ -431,8 +431,8 @@
         "uid": "uhalog"
       },
       "gridPos": {
-        "x": 12,
-        "y": 25,
+        "x": 0,
+        "y": 34,
         "w": 12,
         "h": 8
       },
@@ -470,8 +470,8 @@
             "uid": "uhalog"
           },
           "queryType": "time series",
-          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('METEO_WIND_AVG') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('METEO_WIND_AVG') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
-          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT v.name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('METEO_WIND_AVG') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT v.name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('METEO_WIND_AVG') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time,\n       name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "rawQueryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'METEO_WIND_AVG' THEN 'Wind – average' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('METEO_WIND_AVG') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'METEO_WIND_AVG' THEN 'Wind – average' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('METEO_WIND_AVG') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
+          "queryText": "-- raw up to 2 days, agg_15min beyond, one value per (CET) day beyond 60 days\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nsrc AS (\n  SELECT CASE v.name WHEN 'METEO_WIND_AVG' THEN 'Wind – average' ELSE v.name END AS name, x.ts, x.value, max(q.i, v.log_s) AS b\n  FROM q, vars v CROSS JOIN raw x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('METEO_WIND_AVG') AND q.t - q.f <= 172800\n  UNION ALL\n  SELECT CASE v.name WHEN 'METEO_WIND_AVG' THEN 'Wind – average' ELSE v.name END AS name, x.ts, x.value, CASE WHEN q.t - q.f > 5184000 THEN 86400 ELSE max(q.i, 900) END\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('METEO_WIND_AVG') AND q.t - q.f > 172800\n)\nSELECT CASE WHEN b >= 86400 THEN ts - (ts + 3600) % 86400 ELSE ts - ts % b END AS time, name, AVG(value) AS value\nFROM src\nGROUP BY 1, 2\nORDER BY 1",
           "timeColumns": [
             "time"
           ]

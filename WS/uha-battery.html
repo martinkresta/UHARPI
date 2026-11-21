@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UHA</title>
-  <link rel="stylesheet" href="css/uha.css?v=20261121c">
+  <link rel="stylesheet" href="css/uha.css?v=20261122a">
 </head>
 <body>
-<script src="js/uha-common.js?v=20261121c"></script>
+<script src="js/uha-common.js?v=20261122a"></script>
 <script>
 // Cell voltage chart: fixed scale and colour thresholds (as index.html), all in one place.
 const CELL = {
@@ -36,7 +36,6 @@ UHA.start(U => {
       `<div class="meter"><div class="head"><span class="l">${U.t('mon.energy.soc')}</span><span class="v">${soc === null ? '–' : U.format(soc, '%', 0)}</span></div>${U.socBar(soc)}</div>` +
       `<div class="tiles">${U.tile(U.vmeasure(`BMS${n}_VOLTAGE_V`), `BMS${n}_VOLTAGE_V`)}${U.tile(U.vmeasure(`BMS${n}_CURRENT_A`), `BMS${n}_CURRENT_A`)}` +
       `${U.tile(U.vmeasure(`BMS${n}_ENERGY_STORED_WH`), `BMS${n}_ENERGY_STORED_WH`)}</div>` +
-      U.row(U.t('mon.battery.todaydiff'), `BMS${n}_TODAY_ENERGY_WH`) +
       `<h3>${U.t('mon.battery.cells', { lo: U.fmtNum(CELL.SCALE_LO, 1), hi: U.fmtNum(CELL.SCALE_HI, 1) })}</h3><div class="cells">${bars}</div>` +
       U.rowText(U.t('mon.battery.minmax'), ok.length ? `${v3(lo)} V / ${v3(hi)} V` : '–') +
       `<div class="row ${delta !== null && delta > 50 ? 'old' : ''}"><span class="l">${U.t('mon.battery.spread')}</span><span class="v">${delta === null ? '–' : U.format(delta, 'mV', 0)}</span></div>` +

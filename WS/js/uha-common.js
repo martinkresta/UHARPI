@@ -188,6 +188,15 @@
   /* row labelled with the measure part of the variable name (inside a card that names the area) */
   U.mrow = (name, o) => U.row(U.vmeasure(name), name, o);
   U.rowText = (label, text, cls) => `<div class="row ${cls || ''}"><span class="l">${label}</span><span class="v">${text}</span></div>`;
+  /* value computed from several variables: fn(values) or null if one of them is missing / invalid */
+  U.calc = (names, fn) => { const v = names.map(U.num); return v.some(x => x === null) ? null : fn(...v); };
+  U.calcClass = names => { const c = names.map(U.ageClass); return c.includes('bad') ? 'bad' : c.includes('old') ? 'old' : ''; };
+  /* row with a computed value; unit 'Wh' is shown as kWh */
+  U.calcRow = function (label, names, fn, unit) {
+    let x = U.calc(names, fn);
+    if (unit === 'Wh') { unit = 'kWh'; if (x !== null) x /= 1000; }
+    return U.rowText(label, U.format(x, unit), U.calcClass(names));
+  };
   U.card = function (title, body, o) {
     o = o || {};
     const ctrl = o.ctrl && !o.href ? `<a class="ctrllink" href="${U.ctrlHref(o.ctrl)}">${U.t('mon.ctrl.link')}</a>` : '';
