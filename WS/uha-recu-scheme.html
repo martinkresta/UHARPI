@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UHA</title>
+  <link rel="stylesheet" href="css/uha.css?v=20261121b">
+</head>
+<body>
+<script src="js/uha-common.js?v=20261121b"></script>
+<script src="js/uha-scheme.js?v=20261121b"></script>
+<script>
+// RECU schematic: cross-flow exchanger in the middle, outside on the left, house on the right.
+// Ducts coloured by the air temperature on them. FIRST PROPOSAL, to be reviewed by Martin.
+const HX = { x: 300, y: 265, r: 80 };            // exchanger: centre and half diagonal
+const DUCTS = [                                    // [points, temperature variable]
+  [[[20, 165], [200, 165], [HX.x - 40, HX.y - 40]], 'TEMP_RECU_FC_C'],     // outdoor air in
+  [[[HX.x + 40, HX.y + 40], [400, 365], [580, 365]], 'TEMP_RECU_FH_C'],   // supply to the house
+  [[[580, 165], [400, 165], [HX.x + 40, HX.y - 40]], 'TEMP_RECU_WH_C'],   // extract from the house
+  [[[HX.x - 40, HX.y + 40], [200, 365], [20, 365]], 'TEMP_RECU_WC_C']     // exhaust out
+];
+const MIN_DT_K = 5;                                // efficiency shown only when |extract - outdoor| > this
+
+function efficiency(U) {
+  const fc = U.num('TEMP_RECU_FC_C'), fh = U.num('TEMP_RECU_FH_C'), wh = U.num('TEMP_RECU_WH_C');
+  if (fc === null || fh === null || wh === null || Math.abs(wh - fc) <= MIN_DT_K) return null;
+  return (fh - fc) / (wh - fc) * 100;
+}
+
+UHA.scheme({
+  title: 'mon.scheme.recu_t', sub: 'mon.scheme.recu_sub', head: [['uha-climate.html', 'mon.scheme.back_climate']],
+  width: 600, height: 715,
+  blocks: [
+    { id: 'out', x: 10, y: 20, w: 250, label: 'mon.scheme.outdoor', cls: 'home', rows: [{ v: 'TEMP_RECU_FC_C', l: 'mon.scheme.temp' }] },
+    { id: 'ext', x: 340, y: 20, w: 250, label: 'mon.scheme.extract', cls: 'home',
+      rows: [{ v: 'TEMP_RECU_WH_C', l: 'mon.scheme.temp' }, { v: 'RH_RECU_WASTE', l: 'mon.scheme.rh' }, { v: 'CO2_RECU' , l: 'CO2_RECU' }] },
+    { id: 'exh', x: 10, y: 395, w: 250, label: 'mon.scheme.exhaust', cls: 'home',
+      rows: [{ v: 'TEMP_RECU_WC_C', l: 'mon.scheme.temp' }, { v: 'RECU_FAN_WASTE', l: 'mon.scheme.fan' }, { v: 'DP_RECU_WASTE', l: 'mon.scheme.dp' }] },
+    { id: 'sup', x: 340, y: 395, w: 250, label: 'mon.scheme.supply', cls: 'home',
+      rows: [{ v: 'TEMP_RECU_FH_C', l: 'mon.scheme.temp' }, { v: 'RH_RECU_FH', l: 'mon.scheme.rh' }, { v: 'RECU_FAN_F', l: 'mon.scheme.fan' }, { v: 'DP_RECU_F', l: 'mon.scheme.dp' }] },
+    { id: 'st', x: 10, y: 575, w: 580, label: 'mon.scheme.recu_state', cls: 'home',
+      rows: [{ v: 'ST_RECU_REMOTE_MODE' }, { v: 'ST_RECU_LIMIT' },
+        { fn: U => { const e = efficiency(U); return [U.t('mon.scheme.eff'), e === null ? '–' : U.format(e, '%', 0), e === null ? 'bad' : '']; } }] }
+  ],
+  symbols: [
+    { type: 'fan', x: 480, y: 365, r: 20, v: 'RECU_FAN_F', label: [0, -28] },
+    { type: 'fan', x: 110, y: 365, r: 20, v: 'RECU_FAN_WASTE', label: [0, -28] }
+  ],
+  texts: [
+    { x: 20, y: 275, l: 'mon.scheme.outside', cls: 'area' },
+    { x: 580, y: 275, l: 'mon.scheme.inside', cls: 'area', anchor: 'end' }
+  ],
+  extra: U => {
+    const ducts = DUCTS.map(([pts, t]) => {
+      const cls = U.ageClass(t), [a, b] = pts.slice(-2), ang = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI;
+      const mid = pts[1];
+      return `<path class="duct" d="M ${pts.map(p => p.join(' ')).join(' L ')}" stroke="${U.tempColor(U.num(t))}"${cls === 'bad' ? ' stroke-opacity=".3"' : ''}/>` +
+        `<path d="M 10 0 L -6 -9 L -6 9 Z" fill="#fff" opacity=".8" transform="translate(${(mid[0] + b[0]) / 2} ${(mid[1] + b[1]) / 2}) rotate(${ang.toFixed(0)})"/>`;
+    }).join('');
+    const { x, y, r } = HX;
+    return ducts + `<path class="hx" d="M ${x} ${y - r} L ${x + r} ${y} L ${x} ${y + r} L ${x - r} ${y} Z"/>` +
+      [-40, -20, 0, 20, 40].map(k => `<line class="hxline" x1="${x - r / 2 + k}" y1="${y - r / 2 - k}" x2="${x + r / 2 + k}" y2="${y + r / 2 - k}"/>`).join('');
+  },
+  note: 'mon.scheme.recu_note'
+});
+</script>
+</body>
+</html>

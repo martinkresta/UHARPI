@@ -1,39 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>UHA Heat</title>
-  <link rel="stylesheet" href="css/uha.css">
+  <title>UHA</title>
+  <link rel="stylesheet" href="css/uha.css?v=20261121b">
 </head>
 <body>
-<script src="js/uha-common.js"></script>
+<script src="js/uha-common.js?v=20261121b"></script>
 <script>
 UHA.start(U => {
-  const levels = [6, 5, 4, 3, 2, 1].map(i => {
-    const t = U.num(`TEMP_TANK_${i}_C`);
-    return `<div class="lv" style="background:${t === null ? 'var(--card2)' : U.tempColor(t)}"><span>Sensor ${i}</span><span>${U.show(`TEMP_TANK_${i}_C`)}</span></div>`;
-  }).join('');
-
-  return `<h1 class="pagetitle">Heat & water</h1><p class="pagesub">Accumulation tank, boiler, heating and water</p><div class="grid wide">` +
-    U.card('Accumulation tank', `<div class="tank">${levels}</div>` +
-      `<h3>Heating circuit</h3>` + U.row('Tank in (hot side)', 'TEMP_TANK_IN_H_C') + U.row('Tank out (hot side)', 'TEMP_TANK_OUT_H_C') +
-      U.row('Tank in (cold side)', 'TEMP_TANK_IN_C_C') + U.row('Tank out (cold side)', 'TEMP_TANK_OUT_C_C'), { cls: 'heat' }) +
-    U.card('Boiler',
-      `<div class="tiles">${U.tile('Power', 'BOILER_POWER_W')}${U.tile('Boiler', 'TEMP_BOILER_C')}</div>` +
-      U.row('Inlet', 'TEMP_BOILER_IN_C') + U.row('Outlet', 'TEMP_BOILER_OUT_C') + U.row('Exhaust', 'TEMP_BOILER_EXHAUST_C') +
-      U.row('Heat', 'BOILER_HEAT'), { cls: 'heat' }) +
-    U.card('Electric heater (tank)',
-      `<div class="tiles">${U.tile('State', 'EL_HEATER_STATUS')}${U.tile('Current', 'EL_HEATER_CURRENT_A')}</div>` +
-      U.row('Load current', 'EL_HEATER_LOAD_A') + U.row('Energy consumed', 'EL_HEATER_CONS_WH'), { cls: 'heat' }) +
-    U.card('Heat energy',
-      `<div class="tiles">${U.tile('Total', 'HEAT_TOTAL_WH')}${U.tile('Heating', 'HEAT_HEATING_WH')}</div>` +
-      `<h3>Floor / wall / radiators</h3>` + U.row('Wall in', 'TEMP_WALL_IN_C') + U.row('Wall out', 'TEMP_WALL_OUT_C') +
-      U.row('Radiators hot', 'TEMP_RAD_H_C') + U.row('Radiators cold', 'TEMP_RAD_C_C'), { cls: 'heat' }) +
-    U.card('Water',
-      `<div class="tiles">${U.tile('Cold flow', 'FLOW_COLD_LPM')}${U.tile('Hot flow', 'FLOW_HOT_LPM')}</div>` +
-      U.row('Cold water consumed', 'CONS_COLD_L') + U.row('Hot water consumed', 'CONS_HOT_L'), { cls: 'load' }) +
-    `</div><p class="note"><a href="uha-detail.html#heat">All heat variables →</a></p>`;
+  const r = name => U.row(U.vshort(name), name);
+  return U.pageHead(U.t('mon.heat.title'), U.t('mon.heat.sub'), [['uha-heat-scheme.html', U.t('mon.scheme.link')]]) +
+    `<div class="grid wide">` +
+    U.card(U.t('mon.heat.tank'), U.tankSvg(220, 330) +
+      U.row(U.t('mon.home.heatenergy'), 'HEAT_TOTAL_WH'), { cls: 'heat' }) +
+    U.card(U.t('mon.heat.boiler'),
+      `<div class="tiles">${U.tile(U.vmeasure('BOILER_POWER_W'), 'BOILER_POWER_W')}${U.tile(U.t('mon.scheme.temp'), 'TEMP_BOILER_C')}` +
+      `${U.tile(U.vmeasure('ST_BOILER_STATE'), 'ST_BOILER_STATE')}</div>` +
+      r('TEMP_BOILER_IN_C') + r('TEMP_BOILER_OUT_C') + r('TEMP_BOILER_EXHAUST_C') + r('ST_EXHAUST_SET_C') +
+      r('TECHM_AIR_VALVE_SIGNAL_PCT') + U.row(U.vmeasure('BOILER_HEAT'), 'BOILER_HEAT'), { cls: 'heat' }) +
+    U.card(U.t('mon.heat.elheater'),
+      `<div class="tiles">${U.tile(U.vmeasure('EL_HEATER_STATUS'), 'EL_HEATER_STATUS')}${U.tile(U.vmeasure('EL_HEATER_CURRENT_A'), 'EL_HEATER_CURRENT_A')}</div>` +
+      U.mrow('EL_HEATER_LOAD_A') + U.mrow('EL_HEATER_CONS_WH') + U.row(U.vmeasure('ST_EL_HEATER_COILS'), 'ST_EL_HEATER_COILS', { d: 0 }), { cls: 'heat' }) +
+    U.card(U.t('mon.heat.heatenergy'),
+      `<div class="tiles">${U.tile(U.vmeasure('HEAT_TOTAL_WH'), 'HEAT_TOTAL_WH')}${U.tile(U.vmeasure('HEAT_HEATING_WH'), 'HEAT_HEATING_WH')}</div>` +
+      `<h3>${U.t('mon.heat.floor')}</h3>` + r('TEMP_WALL_IN_C') + r('TEMP_WALL_OUT_C') + r('TEMP_RAD_H_C') + r('TEMP_RAD_C_C'), { cls: 'heat' }) +
+    `</div><p class="note"><a href="uha-detail.html#heat">${U.t('mon.heat.more')}</a></p>`;
 });
 </script>
 </body>

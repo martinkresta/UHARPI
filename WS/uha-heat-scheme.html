@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UHA</title>
+  <link rel="stylesheet" href="css/uha.css?v=20261121b">
+</head>
+<body>
+<script src="js/uha-common.js?v=20261121b"></script>
+<script src="js/uha-scheme.js?v=20261121b"></script>
+<script>
+// Heat schematic (TECHM) - FIRST PROPOSAL of the topology, to be reviewed by Martin. Pipes are coloured by the
+// temperature variable on them; pumps filled when on; valves with their %. All positions in the arrays below.
+const TANK = { x: 360, y: 30, w: 110, h: 330 };
+
+UHA.scheme({
+  title: 'mon.scheme.heat_t', sub: 'mon.scheme.heat_sub', head: [['uha-heat.html', 'mon.scheme.back_heat']],
+  width: 600, height: 895,
+  pipes: [
+    // boiler <-> tank, hot side: boiler outlet -> tank top, tank bottom -> boiler inlet (boiler pump)
+    { pts: [[270, 60], [TANK.x, 60]], t: 'TEMP_TANK_IN_H_C', label: [315, 48] },
+    { pts: [[TANK.x, 340], [300, 340], [300, 200], [270, 200]], t: 'TEMP_TANK_OUT_H_C', label: [304, 366, 'start'] },
+    // tank -> heating circuits, cold (consumer) side: tank top -> supply header, return header -> tank bottom
+    { pts: [[TANK.x + TANK.w, 75], [585, 75], [585, 455], [80, 455]], t: 'TEMP_TANK_OUT_C_C', label: [528, 63] },
+    { pts: [[230, 480], [545, 480], [545, 345], [TANK.x + TANK.w, 345]], t: 'TEMP_TANK_IN_C_C', label: [508, 333] },
+    // circuits: supply drop (valve), return rise (pump)
+    { pts: [[80, 455], [80, 540]], t: 'TEMP_RAD_H_C' }, { pts: [[230, 540], [230, 480]], t: 'TEMP_RAD_C_C' },
+    { pts: [[370, 455], [370, 540]], t: 'TEMP_WALL_IN_C' }, { pts: [[520, 540], [520, 480]], t: 'TEMP_WALL_OUT_C' }
+  ],
+  blocks: [
+    { id: 'boiler', x: 20, y: 20, w: 250, label: 'mon.heat.boiler', state: 'ST_BOILER_STATE', cls: 'heat',
+      rows: [{ v: 'TEMP_BOILER_C', l: 'mon.scheme.temp' }, { v: 'TEMP_BOILER_OUT_C' }, { v: 'TEMP_BOILER_IN_C' },
+        { v: 'TEMP_BOILER_EXHAUST_C' }, { v: 'ST_EXHAUST_SET_C' }, { v: 'BOILER_POWER_W' }, { v: 'TECHM_AIR_VALVE_SIGNAL_PCT' }] },
+    { id: 'elh', x: 20, y: 300, w: 250, label: 'mon.scheme.elheater', state: 'EL_HEATER_STATUS', cls: 'heat',
+      rows: [{ v: 'EL_HEATER_CURRENT_A' }, { v: 'ST_EL_HEATER_COILS', o: { d: 0 } }] },
+    { id: 'rad', x: 20, y: 540, w: 270, label: 'mon.scheme.rad', state: 'ST_RAD_ON', cls: 'heat',
+      rows: [{ v: 'TEMP_RAD_H_C' }, { v: 'TEMP_RAD_C_C' }, { v: 'TECHM_REQ_WATER_RAD_C' }, { v: 'TECHM_VALVE_RAD_PCT', l: 'mon.scheme.valve' }, { v: 'ST_PUMP_RAD', l: 'mon.scheme.pump' }] },
+    { id: 'wall', x: 310, y: 540, w: 270, label: 'mon.scheme.wall', state: 'ST_WALL_ON', cls: 'heat',
+      rows: [{ v: 'TEMP_WALL_IN_C' }, { v: 'TEMP_WALL_OUT_C' }, { v: 'TECHM_REQ_WATER_WALL_C' }, { v: 'TECHM_VALVE_WALL_PCT', l: 'mon.scheme.valve' }, { v: 'ST_PUMP_WALL', l: 'mon.scheme.pump' }] },
+    // rooms: target now vs actual (upstairs: kids room sensor, the only one upstairs)
+    { id: 'up', x: 20, y: 775, w: 270, label: 'mon.scheme.up', cls: 'home',
+      rows: [{ v: 'ST_UP_REQ_C', l: 'mon.scheme.req' }, { v: 'TEMP_KIDROOM_C', l: 'mon.scheme.actual' }] },
+    { id: 'down', x: 310, y: 775, w: 270, label: 'mon.scheme.down', cls: 'home',
+      rows: [{ v: 'ST_DOWN_REQ_C', l: 'mon.scheme.req' }, { v: 'TEMP_DOWNSTAIRS_C', l: 'mon.scheme.actual' }] }
+  ],
+  symbols: [
+    { type: 'pump', x: 300, y: 270, v: 'ST_PUMP_BOILER', dir: 'up' },
+    { type: 'valve', x: 80, y: 497, v: 'TECHM_VALVE_RAD_PCT', dir: 'down', label: [24, 6, 'start'] },
+    { type: 'pump', x: 230, y: 510, v: 'ST_PUMP_RAD', dir: 'up' },
+    { type: 'valve', x: 370, y: 497, v: 'TECHM_VALVE_WALL_PCT', dir: 'down', label: [24, 6, 'start'] },
+    { type: 'pump', x: 520, y: 510, v: 'ST_PUMP_WALL', dir: 'up' }
+  ],
+  extra: U => {
+    // tank with its 6 levels + the electric heater coil in its lower part (orange when coils are on)
+    const coils = U.num('ST_EL_HEATER_COILS'), on = coils !== null && coils > 0;
+    let zig = '', x0 = TANK.x + 22, y0 = TANK.y + TANK.h - 50;
+    for (let k = 0; k <= 8; k++) zig += `${k ? 'L' : 'M'} ${x0 + k * 8} ${y0 + (k % 2 ? -10 : 10)} `;
+    return U.tankGroup(TANK.x, TANK.y, TANK.w, TANK.h, { fs: 18 }) +
+      `<path d="${zig}" fill="none" stroke="${on ? 'var(--heat)' : '#8b9aab'}" stroke-width="3"/>` +
+      `<path d="M 270 ${TANK.y + TANK.h - 50} L ${x0} ${TANK.y + TANK.h - 50}" fill="none" stroke="${on ? 'var(--heat)' : '#8b9aab'}" stroke-width="2" stroke-dasharray="5 5"/>`;
+  },
+  note: 'mon.scheme.heat_note'
+});
+</script>
+</body>
+</html>

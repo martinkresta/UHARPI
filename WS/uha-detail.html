@@ -1,56 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>UHA All data</title>
-  <link rel="stylesheet" href="css/uha.css">
+  <title>UHA</title>
+  <link rel="stylesheet" href="css/uha.css?v=20261121b">
 </head>
 <body>
-<script src="js/uha-common.js"></script>
+<script src="js/uha-common.js?v=20261121b"></script>
 <script>
 // Level 3: every variable of uha2.json in physical units, grouped like the level 2 pages.
-let filter = '', hideInvalid = false;
+let filter = '', hideInvalid = false, qFocus = false;
 const groupId = () => (location.hash || '#energy').slice(1);
 
 UHA.start(U => {
   const gid = groupId();
-  const all = Object.entries(U.vars()).map(([name, v]) => ({ name, v, g: U.groupOf(name) }));
+  const all = Object.entries(U.vars()).map(([name, v]) => ({ name, v, g: U.groupOf(name), label: U.vname(name) }));
   const counts = {};
   all.forEach(x => counts[x.g] = (counts[x.g] || 0) + 1);
 
   const tabs = U.GROUPS.filter(g => counts[g[0]]).map(g =>
-    `<a href="#${g[0]}" class="${g[0] === gid ? 'active' : ''}">${g[1]} (${counts[g[0]]})</a>`).join('');
+    `<a href="#${g[0]}" class="${g[0] === gid ? 'active' : ''}">${U.t('mon.detail.g.' + g[0])} (${counts[g[0]]})</a>`).join('');
 
   const f = filter.toLowerCase();
   const rows = all.filter(x => x.g === gid && (!hideInvalid || (x.v.valid && x.v.value !== null)) &&
-    (!f || x.name.toLowerCase().includes(f) || U.label(x.name).toLowerCase().includes(f)))
+    (!f || x.name.toLowerCase().includes(f) || x.label.toLowerCase().includes(f)))
     .sort((a, b) => a.v.id - b.v.id)
-    .map(({ name, v }) => {
-      const cls = U.ageClass(name);
+    .map(({ name, v, label }) => {
       const val = v.value === null ? '–' : U.show(name, { force: true, kwh: false });
-      return `<tr class="${cls}"><td>${U.label(name)}<span class="raw">${name}</span></td><td class="n">${val}</td>` +
-        `<td class="n hide-sm">${v.age_s === null ? '–' : v.age_s.toFixed(1) + ' s'}</td>` +
-        `<td class="hide-sm">${v.producer}</td><td class="hide-sm"><span class="tag ${v.valid ? 'ok' : 'bad'}">${v.valid ? 'fresh' : v.value === null ? 'never' : 'stale'}</span></td><td class="hide-sm n">${v.id}</td></tr>`;
+      const state = v.valid ? 'fresh' : v.value === null ? 'never' : 'stale';
+      return `<tr class="${U.ageClass(name)}"><td>${U.esc(label)}<span class="raw">${name}</span></td><td class="n">${val}</td>` +
+        `<td class="n hide-sm">${v.age_s === null ? '–' : U.format(v.age_s, 's', 1)}</td>` +
+        `<td class="hide-sm">${v.producer}</td><td class="hide-sm"><span class="tag ${v.valid ? 'ok' : 'bad'}">${U.t('mon.detail.' + state)}</span></td>` +
+        `<td class="hide-sm n">${v.id}</td></tr>`;
     }).join('');
 
-  return `<h1 class="pagetitle">All data</h1><p class="pagesub">Every variable in physical units (${all.length} total)</p>` +
+  const c = k => U.t('mon.detail.col.' + k);
+  return U.pageHead(U.t('mon.detail.title'), U.t('mon.detail.sub', { n: all.length })) +
     `<div class="tabs">${tabs}</div>` +
-    `<div class="tools"><input type="search" id="q" placeholder="Filter…" value="${filter}">` +
-    `<label><input type="checkbox" id="hi" ${hideInvalid ? 'checked' : ''}> hide invalid</label></div>` +
-    `<table class="t"><tr><th>Variable</th><th class="n">Value</th><th class="n hide-sm">Age</th><th class="hide-sm">Producer</th><th class="hide-sm">State</th><th class="hide-sm n">ID</th></tr>${rows}</table>`;
+    `<div class="tools"><input type="search" id="q" placeholder="${U.t('mon.detail.filter')}" value="${U.esc(filter)}">` +
+    `<label><input type="checkbox" id="hi" ${hideInvalid ? 'checked' : ''}> ${U.t('mon.detail.hideinvalid')}</label></div>` +
+    `<table class="t"><tr><th>${c('var')}</th><th class="n">${c('value')}</th><th class="n hide-sm">${c('age')}</th>` +
+    `<th class="hide-sm">${c('producer')}</th><th class="hide-sm">${c('state')}</th><th class="hide-sm n">${c('id')}</th></tr>${rows}</table>`;
 }, {
   after() {      // the page is re-rendered every tick: rebind controls and restore focus
     const q = document.getElementById('q'), hi = document.getElementById('hi');
-    q.oninput = () => { filter = q.value; U_refresh(); };
+    q.oninput = () => { filter = q.value; UHA.refresh(); };
     q.onfocus = () => { qFocus = true; }; q.onblur = () => { qFocus = false; };
-    hi.onchange = () => { hideInvalid = hi.checked; U_refresh(); };
+    hi.onchange = () => { hideInvalid = hi.checked; UHA.refresh(); };
     if (qFocus) { q.focus(); q.setSelectionRange(q.value.length, q.value.length); }
   }
 });
-let qFocus = false;
-const U_refresh = () => UHA.refresh();
-window.addEventListener('hashchange', U_refresh);
+window.addEventListener('hashchange', () => UHA.refresh && UHA.refresh());
 </script>
 </body>
 </html>
