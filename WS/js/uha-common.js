@@ -22,12 +22,20 @@
   U.SOLAR_PEAK_W = U.PV_HOUSE_MAX_W + U.PV_WORKSHOP_PEAK_W;
   U.TEMP_COLD_C = 20;          // temperature colour scale (tank, pipes): blue at or below ...
   U.TEMP_HOT_C = 70;           // ... red at or above
+  U.AIR_COLD_C = 0;            // air colour scale (RECU ducts): blue at or below ...
+  U.AIR_HOT_C = 25;            // ... red at or above
+  // LVDC link house -> workshop, ESTIMATE (+ = house -> workshop) from the workshop bus balance: pack current -
+  // Axpert battery current + Victron DC input (AC / 0.9); same formula as Grafana "Storages power" and the energy scheme
+  U.LVDC_NAMES = ['BMS1_CURRENT_A', 'AXPERT_BAT_CURRENT_A', 'POW_WS_HEATING_W', 'STRG2_VOLTAGE_V'];
+  U.lvdcA = U => U.calc(U.LVDC_NAMES, (p, a, h, v) => p - a + h / 0.9 / v);
+  U.lvdcW = U => U.calc(U.LVDC_NAMES, (p, a, h, v) => (p - a) * v + h / 0.9);
 
   // [href, text key, sub-entry (schematic) of the page above]
   const NAV = [
     ['uha.html', 'mon.nav.home'],
-    ['uha-energy.html', 'mon.nav.energy'], ['uha-energy-scheme.html', 'mon.nav.scheme_energy', true],
-    ['uha-battery.html', 'mon.nav.battery'], ['uha-loads.html', 'mon.nav.loads'],
+    ['uha-solar.html', 'mon.nav.solar'], ['uha-storage.html', 'mon.nav.storage'],
+    ['uha-energy-scheme.html', 'mon.nav.scheme_energy', true],
+    ['uha-battery.html', 'mon.nav.packs'], ['uha-loads.html', 'mon.nav.loads'],
     ['uha-heat.html', 'mon.nav.heat'], ['uha-heat-scheme.html', 'mon.nav.scheme_heat', true],
     ['uha-climate.html', 'mon.nav.climate'], ['uha-recu-scheme.html', 'mon.nav.scheme_recu', true],
     ['uha-detail.html', 'mon.nav.detail'], ['uha-status.html', 'mon.nav.status']
@@ -223,11 +231,13 @@
   U.socClass = soc => (soc === null ? '' : soc < 20 ? 'bad' : soc < 40 ? 'warn' : 'bat');
   U.socBar = soc => U.bar(soc === null ? 0 : soc / 100, U.socClass(soc));
 
-  /* temperature colour: blue (TEMP_COLD_C) -> violet -> red (TEMP_HOT_C), no green */
+  /* temperature colour: blue (cold) -> violet -> red (hot), no green; default scale TEMP_COLD_C .. TEMP_HOT_C (water),
+     other scales pass their own limits (air: AIR_COLD_C .. AIR_HOT_C) */
   const STOPS = [[59, 111, 217], [163, 79, 196], [224, 53, 43]];
-  U.tempColor = function (t) {
+  U.tempColor = function (t, cold, hot) {
     if (t === null || t === undefined) return '#56606b';
-    const f = Math.max(0, Math.min(1, (t - U.TEMP_COLD_C) / (U.TEMP_HOT_C - U.TEMP_COLD_C))) * (STOPS.length - 1);
+    if (cold === undefined) { cold = U.TEMP_COLD_C; hot = U.TEMP_HOT_C; }
+    const f = Math.max(0, Math.min(1, (t - cold) / (hot - cold))) * (STOPS.length - 1);
     const i = Math.min(STOPS.length - 2, Math.floor(f)), k = f - i;
     const c = STOPS[i].map((a, j) => Math.round(a + (STOPS[i + 1][j] - a) * k));
     return `rgb(${c.join(',')})`;

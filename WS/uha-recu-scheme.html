@@ -4,14 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UHA</title>
-  <link rel="stylesheet" href="css/uha.css?v=20261122a">
+  <link rel="stylesheet" href="css/uha.css?v=20261122b">
 </head>
 <body>
-<script src="js/uha-common.js?v=20261122a"></script>
-<script src="js/uha-scheme.js?v=20261122a"></script>
+<script src="js/uha-common.js?v=20261122b"></script>
+<script src="js/uha-scheme.js?v=20261122b"></script>
 <script>
 // RECU schematic: cross-flow exchanger in the middle, outside on the left, house on the right.
-// Ducts coloured by the air temperature on them. FIRST PROPOSAL, to be reviewed by Martin.
+// Ducts coloured by the air temperature on the air scale U.AIR_COLD_C .. U.AIR_HOT_C (0 .. 25 °C, uha-common.js).
+// Efficiency and mode are written inside the exchanger.
 const HX = { x: 300, y: 265, r: 80 };            // exchanger: centre and half diagonal
 const DUCTS = [                                    // [points, temperature variable]
   [[[20, 165], [200, 165], [HX.x - 40, HX.y - 40]], 'TEMP_RECU_FC_C'],     // outdoor air in
@@ -39,8 +40,7 @@ UHA.scheme({
     { id: 'sup', x: 340, y: 395, w: 250, label: 'mon.scheme.supply', cls: 'home',
       rows: [{ v: 'TEMP_RECU_FH_C', l: 'mon.scheme.temp' }, { v: 'RH_RECU_FH', l: 'mon.scheme.rh' }, { v: 'RECU_FAN_F', l: 'mon.scheme.fan' }, { v: 'DP_RECU_F', l: 'mon.scheme.dp' }] },
     { id: 'st', x: 10, y: 575, w: 580, label: 'mon.scheme.recu_state', cls: 'home',
-      rows: [{ v: 'ST_RECU_REMOTE_MODE' }, { v: 'ST_RECU_LIMIT' },
-        { fn: U => { const e = efficiency(U); return [U.t('mon.scheme.eff'), e === null ? '–' : U.format(e, '%', 0), e === null ? 'bad' : '']; } }] }
+      rows: [{ v: 'ST_RECU_REMOTE_MODE' }, { v: 'ST_RECU_LIMIT' }] }
   ],
   symbols: [
     { type: 'fan', x: 480, y: 365, r: 20, v: 'RECU_FAN_F', label: [0, -28] },
@@ -54,12 +54,19 @@ UHA.scheme({
     const ducts = DUCTS.map(([pts, t]) => {
       const cls = U.ageClass(t), [a, b] = pts.slice(-2), ang = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI;
       const mid = pts[1];
-      return `<path class="duct" d="M ${pts.map(p => p.join(' ')).join(' L ')}" stroke="${U.tempColor(U.num(t))}"${cls === 'bad' ? ' stroke-opacity=".3"' : ''}/>` +
+      return `<path class="duct" d="M ${pts.map(p => p.join(' ')).join(' L ')}" stroke="${U.tempColor(U.num(t), U.AIR_COLD_C, U.AIR_HOT_C)}"${cls === 'bad' ? ' stroke-opacity=".3"' : ''}/>` +
         `<path d="M 10 0 L -6 -9 L -6 9 Z" fill="#fff" opacity=".8" transform="translate(${(mid[0] + b[0]) / 2} ${(mid[1] + b[1]) / 2}) rotate(${ang.toFixed(0)})"/>`;
     }).join('');
     const { x, y, r } = HX;
+    // inside the exchanger: efficiency (hidden when |extract - outdoor| <= MIN_DT_K) and the mode (enum text)
+    const e = efficiency(U), mode = U.show('ST_RECU_REMOTE_MODE');
+    const room = 2 * (r - 18) - 4;                                  // diamond width at the mode line
+    const fs = Math.max(12, Math.min(18, room / (0.56 * Math.max(1, mode.length))));
+    const squeeze = mode.length * fs * 0.56 > room ? ` textLength="${room}" lengthAdjust="spacingAndGlyphs"` : '';
     return ducts + `<path class="hx" d="M ${x} ${y - r} L ${x + r} ${y} L ${x} ${y + r} L ${x - r} ${y} Z"/>` +
-      [-40, -20, 0, 20, 40].map(k => `<line class="hxline" x1="${x - r / 2 + k}" y1="${y - r / 2 - k}" x2="${x + r / 2 + k}" y2="${y + r / 2 - k}"/>`).join('');
+      [-40, -20, 0, 20, 40].map(k => `<line class="hxline" x1="${x - r / 2 + k}" y1="${y - r / 2 - k}" x2="${x + r / 2 + k}" y2="${y + r / 2 - k}"/>`).join('') +
+      `<text class="lv big" x="${x}" y="${y - 8}" text-anchor="middle">${e === null ? '' : U.format(e, '%', 0)}</text>` +
+      `<text class="lv ${U.ageClass('ST_RECU_REMOTE_MODE')}" x="${x}" y="${y + 22}" text-anchor="middle" style="font-size:${fs.toFixed(0)}px"${squeeze}>${U.esc(mode)}</text>`;
   },
   note: 'mon.scheme.recu_note'
 });

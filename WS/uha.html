@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UHA</title>
-  <link rel="stylesheet" href="css/uha.css?v=20261122a">
+  <link rel="stylesheet" href="css/uha.css?v=20261122b">
 </head>
 <body>
-<script src="js/uha-common.js?v=20261122a"></script>
+<script src="js/uha-common.js?v=20261122b"></script>
 <script>
 // Home: compact cards, must fit 360 x 640 CSS px without scrolling (2 columns of small cards on phones).
 UHA.start(U => {
@@ -34,13 +34,14 @@ UHA.start(U => {
     `</div><div class="vbar" title="${U.t('mon.home.peak', { x: U.format(U.SOLAR_PEAK_W, 'W') })}">` +
     `<div class="fill" style="height:${pv === null ? 0 : Math.max(0, Math.min(100, pv / U.SOLAR_PEAK_W * 100)).toFixed(1)}%"></div></div></div>`;
 
-  // --- Battery: SOC big + battery symbol, stored, today diff (sum of the three packs), voltage, current, state
+  // --- Battery: SOC big + battery symbol, stored, today balance, voltage, current, state
   const soc = U.num('BAT_SOC'), bp = U.num('BAT_POWER_W');
   const lvl = soc === null ? 0 : Math.max(0, Math.min(100, soc)) / 100 * 48;
   const sym = `<svg class="batsym" viewBox="0 0 28 60" aria-hidden="true"><rect class="cap" x="9" y="1" width="10" height="5" rx="1.5"/>` +
     `<rect class="shell" x="2" y="6" width="24" height="52" rx="4"/>` +
     `<rect class="lvl ${U.socClass(soc) === 'bat' ? '' : U.socClass(soc)}" x="4" y="${(56 - lvl).toFixed(1)}" width="20" height="${lvl.toFixed(1)}" rx="2"/></svg>`;
-  const todayDiff = U.sum(['BMS1_TODAY_ENERGY_WH', 'BMS2_TODAY_ENERGY_WH', 'BMS3_TODAY_ENERGY_WH']);
+  // today = balance of all storages (solar - consumption today), as the old index.html "Daily diff"
+  const todayDiff = U.calc(['SOLAR_ENERGY_TODAY_WH', 'CONS_TODAY_WH'], (p, c) => p - c);
   const state = bp === null ? '–' : bp > 50 ? U.t('mon.home.charging', { x: U.format(bp, 'W', 0) })
     : bp < -50 ? U.t('mon.home.discharging', { x: U.format(-bp, 'W', 0) }) : U.t('mon.home.idle');
   const battery = `<div class="hmain"><div class="vals">${big('BAT_SOC', soc === null ? null : { num: U.fmtNum(soc, 0), unit: '%' })}` +
@@ -65,8 +66,8 @@ UHA.start(U => {
     `${tile('CO2_RECU')}${tile('TEMP_DILNA_C')}</div>`;
 
   return `<div class="hgrid">` +
-    U.card(U.t('mon.home.solar_t'), solar, { href: 'uha-energy.html', cls: 'solar' }) +
-    U.card(U.t('mon.home.bat'), battery, { href: 'uha-battery.html', cls: 'bat' }) +
+    U.card(U.t('mon.home.solar_t'), solar, { href: 'uha-solar.html', cls: 'solar' }) +
+    U.card(U.t('mon.home.bat'), battery, { href: 'uha-storage.html', cls: 'bat' }) +
     U.card(U.t('mon.home.load_t'), load, { href: 'uha-loads.html', cls: 'load' }) +
     U.card(U.t('mon.home.heat'), heat, { href: 'uha-heat.html', cls: 'heat' }) +
     U.card(U.t('mon.home.house'), house, { href: 'uha-climate.html', cls: 'home house' }) +

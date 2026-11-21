@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UHA</title>
-  <link rel="stylesheet" href="css/uha.css?v=20261122a">
+  <link rel="stylesheet" href="css/uha.css?v=20261122b">
 </head>
 <body>
-<script src="js/uha-common.js?v=20261122a"></script>
-<script src="js/uha-scheme.js?v=20261122a"></script>
+<script src="js/uha-common.js?v=20261122b"></script>
+<script src="js/uha-scheme.js?v=20261122b"></script>
 <script>
 // Energy schematic after UHA_FW UHA_COMMON/VarDefs/ENERGY_TOPOLOGY.md (reviewed with Martin 2026-11-21). Everything is
 // in the arrays below: blocks (x, y, w in a 600 wide drawing; height = 38 + 27 per row + 10), links (from -> to or
@@ -18,11 +18,8 @@ const C1 = 10, C2 = 198, C3 = 386, W = 178;
 const calc = (names, fn) => U => U.calc(names, fn);
 const heaterW = calc(['EL_HEATER_CURRENT_A', 'STRG1_VOLTAGE_V'], (a, v) => a * v);
 const victronDcW = calc(['POW_WS_HEATING_W'], p => p / 0.9);
-// LVDC link house -> workshop (estimate, + = house -> workshop): workshop bus balance, Victron DC input = AC / 0.9;
-// workshop DC lights and the pack heater neglected (same formula as the Grafana panel "Storages power")
-const LVDC_NAMES = ['BMS1_CURRENT_A', 'AXPERT_BAT_CURRENT_A', 'POW_WS_HEATING_W', 'STRG2_VOLTAGE_V'];
-const lvdcA = calc(LVDC_NAMES, (p, a, h, v) => p - a + h / 0.9 / v);
-const lvdcW = calc(LVDC_NAMES, (p, a, h, v) => (p - a) * v + h / 0.9);
+// LVDC link estimate: U.lvdcW / U.lvdcA in uha-common.js (same formula as Grafana "Storages power")
+const lvdcA = U => U.lvdcA(U), lvdcW = U => U.lvdcW(U);
 const fnRow = (label, f, unit, wh) => ({
   fn: U => { let x = f(U); if (wh && x !== null) x /= 1000; return [U.t(label), U.format(x, unit), x === null ? 'bad' : '']; }
 });
@@ -30,7 +27,7 @@ const approx = (label, f, unit) => ({ fn: U => { const x = f(U); return [U.t(lab
 const unmeasured = label => ({ fn: U => [U.t(label), '–', 'dim'] });
 
 UHA.scheme({
-  title: 'mon.scheme.energy_t', sub: 'mon.scheme.energy_sub', head: [['uha-energy.html', 'mon.scheme.back_energy'], [UHA.ctrlHref('inverter'), 'mon.ctrl.link']],
+  title: 'mon.scheme.energy_t', sub: 'mon.scheme.energy_sub', head: [['uha-solar.html', 'mon.scheme.back_solar'], ['uha-storage.html', 'mon.scheme.back_storage'], [UHA.ctrlHref('inverter'), 'mon.ctrl.link']],
   width: 600, height: 1610, modes: true,
   areas: [
     { x: 5, y: 125, w: 590, h: 670, label: 'mon.scheme.area_house' },

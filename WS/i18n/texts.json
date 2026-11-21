@@ -1347,6 +1347,86 @@
   "mon.scheme.pvws": {
    "cz": "FV dílna",
    "en": "PV workshop"
+  },
+  "mon.nav.solar": {
+   "cz": "Solár",
+   "en": "Solar"
+  },
+  "mon.nav.storage": {
+   "cz": "Úložiště",
+   "en": "Storage"
+  },
+  "mon.nav.packs": {
+   "cz": "Akupacky",
+   "en": "Battery packs"
+  },
+  "mon.solar.title": {
+   "cz": "Solár",
+   "en": "Solar"
+  },
+  "mon.solar.sub": {
+   "cz": "Výroba FV – dům a dílna",
+   "en": "PV production – house and workshop"
+  },
+  "mon.solar.total": {
+   "cz": "Celkem",
+   "en": "Total"
+  },
+  "mon.solar.mppt": {
+   "cz": "MPPT (dům)",
+   "en": "MPPT (house)"
+  },
+  "mon.solar.axpv": {
+   "cz": "FV Axpert (dílna)",
+   "en": "Axpert PV (workshop)"
+  },
+  "mon.storage.title": {
+   "cz": "Úložiště",
+   "en": "Storage"
+  },
+  "mon.storage.sub": {
+   "cz": "Baterie domu a dílny, propoj LVDC",
+   "en": "House and workshop storage, LVDC link"
+  },
+  "mon.storage.global": {
+   "cz": "Baterie celkem",
+   "en": "Battery total"
+  },
+  "mon.storage.packs": {
+   "cz": "Akupacky ›",
+   "en": "Battery packs ›"
+  },
+  "mon.storage.dv": {
+   "cz": "Rozdíl napětí dům − dílna",
+   "en": "Voltage difference house − workshop"
+  },
+  "mon.storage.to_ws": {
+   "cz": "z domu do dílny",
+   "en": "house to workshop"
+  },
+  "mon.storage.to_house": {
+   "cz": "z dílny do domu",
+   "en": "workshop to house"
+  },
+  "mon.storage.lvdcnote": {
+   "cz": "Proud kabelem se neměří. Odhad: proud baterie dílny − proud baterie Axpertu + příkon Victronu (AC / 0,9); světla a ohřev baterie v dílně zanedbány. Kladné = z domu do dílny.",
+   "en": "The cable current is not measured. Estimate: workshop pack current − Axpert battery current + Victron input (AC / 0.9); workshop lights and pack heater neglected. Positive = house to workshop."
+  },
+  "mon.packs.title": {
+   "cz": "Akupacky",
+   "en": "Battery packs"
+  },
+  "mon.packs.back": {
+   "cz": "‹ Úložiště",
+   "en": "‹ Storage"
+  },
+  "mon.scheme.back_solar": {
+   "cz": "‹ Solár",
+   "en": "‹ Solar"
+  },
+  "mon.scheme.back_storage": {
+   "cz": "‹ Úložiště",
+   "en": "‹ Storage"
   }
  },
  "vars": {

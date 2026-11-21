@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UHA</title>
-  <link rel="stylesheet" href="css/uha.css?v=20261122a">
+  <link rel="stylesheet" href="css/uha.css?v=20261122b">
 </head>
 <body>
-<script src="js/uha-common.js?v=20261122a"></script>
+<script src="js/uha-common.js?v=20261122b"></script>
 <script>
 // Inverters: name = state variable (dictionary name), power / today from a meter, rated power W.
 // The Victron has no own meter yet: it shows the workshop heating meter (its only load today). When it gets its
@@ -36,6 +36,15 @@ UHA.start(U => {
       `${st ? ' · ' + st : ''}</span><span>${U.t('mon.loads.todayx', { x: U.show(x.cons) })}</span></div></div>`;
   }).join('');
 
+  // Axpert 8 kW (combined MPPT + inverter): AC side and today's DC input / AC output / losses.
+  // AXPERT_ENERGY_TODAY_WH is the net battery energy through the Axpert, not PV (ENERGY_TOPOLOGY.md)
+  const axpert = `<h3>${U.t('mon.energy.axpert')}</h3>` +
+    U.mrow('AXPERT_AC_POWER_W') + U.mrow('AXPERT_LOAD_W') +
+    U.calcRow(U.t('mon.energy.ax_dcin'), ['LPV2_PROD_WH', 'AXPERT_ENERGY_TODAY_WH'], (p, b) => p - b, 'Wh') +
+    U.calcRow(U.t('mon.energy.ax_acout'), ['CONS_AXPERT_WH'], a => a, 'Wh') +
+    U.calcRow(U.t('mon.energy.ax_loss'), ['LPV2_PROD_WH', 'AXPERT_ENERGY_TODAY_WH', 'CONS_AXPERT_WH'], (p, b, a) => p - b - a, 'Wh') +
+    U.mrow('AXPERT_TEMP_C');
+
   const present = CIRCUITS.filter(id => U.get(`POW_${id}_W`) && U.get(`POW_${id}_W`).value !== null);
   const rows = present.map(id =>
     `<tr class="${U.ageClass(`POW_${id}_W`)}"><td>${U.vshort(`POW_${id}_W`)}</td><td class="n">${U.show(`POW_${id}_W`)}</td>` +
@@ -54,7 +63,7 @@ UHA.start(U => {
   return U.pageHead(U.t('mon.loads.title'), U.t('mon.loads.sub')) + `<div class="grid wide">` +
     U.card(U.t('mon.loads.total'), `<div class="tiles">${U.tile(U.t('mon.loads.consnow'), 'LOAD_W', { big: true })}` +
       `${U.tile(U.t('mon.home.today'), 'CONS_TODAY_WH', { big: true })}</div>`, { cls: 'load' }) +
-    U.card(U.t('mon.loads.inverters'), inv, { cls: 'load', ctrl: 'inverter' }) +
+    U.card(U.t('mon.loads.inverters'), inv + axpert, { cls: 'load', ctrl: 'inverter' }) +
     U.card(U.t('mon.loads.circuits'), `<table class="t"><tr><th>${U.t('mon.loads.circuit')}</th><th class="n">${U.t('mon.loads.power')}</th>` +
       `<th class="n">${U.t('mon.home.today')}</th></tr>${rows}</table>` +
       (bars ? `<div class="hbars"><h3>${U.t('mon.loads.todaybars')}</h3>${bars}</div>` : ''), { cls: 'load' }) +

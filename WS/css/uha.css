@@ -136,6 +136,13 @@ h3:first-child { margin-top: 0; }
 .tanksvg text { font: 600 15px system-ui, sans-serif; fill: #fff; paint-order: stroke; stroke: rgba(0,0,0,.45); stroke-width: 3px; }
 .tanksvg text.lbl { font-weight: 400; font-size: 12px; }
 .tanksvg .outline { fill: none; stroke: var(--muted); stroke-width: 2; }
+/* compact tank beside the rows (Heat page) */
+.tankrow { display: flex; gap: 14px; align-items: flex-start; }
+.tankrow .tankrows { flex: 1; min-width: 0; }
+.tankrow .tankrows h3 { margin-top: 10px; }
+.tankc { flex: none; width: 84px; height: auto; }
+.tankc text { font: 700 15px system-ui, sans-serif; fill: #fff; paint-order: stroke; stroke: rgba(0,0,0,.45); stroke-width: 3px; font-variant-numeric: tabular-nums; }
+.tankc .outline { fill: none; stroke: var(--muted); stroke-width: 2; }
 
 /* ---------- tables (level 3) ---------- */
 .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
