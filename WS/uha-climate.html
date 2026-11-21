@@ -14,7 +14,7 @@ UHA.start(U => {
   return `<h1 class="pagetitle">Climate</h1><p class="pagesub">Temperatures, ventilation and weather</p><div class="grid wide">` +
     U.card('Temperatures',
       `<div class="tiles">${U.tile('Outside', 'TEMP_OUTSIDE_C')}${U.tile('Downstairs', 'TEMP_DOWNSTAIRS_C')}${U.tile('Office', 'TEMP_OFFICE_C')}${U.tile('Kids room', 'TEMP_KIDROOM_C')}</div>` +
-      U.row('Workshop', 'TEMP_DILNA_C') + U.row('Workshop battery pack', 'TEMP_AKUPACK1_C') + U.row('Solar field room', 'TEMP_KOLARNA_C'), { cls: 'home' }) +
+      U.row('Workshop', 'TEMP_DILNA_C') + U.row('Workshop battery pack', 'TEMP_AKUPACK1_C') + U.row('Bike shed', 'TEMP_KOLARNA_C'), { cls: 'home' }) +
     U.card('Ventilation (recuperation)',
       `<div class="tiles">${U.tile('CO₂', 'CO2_RECU', { cls: co2 !== null && co2 > 1000 ? 'old' : '' })}${U.tile('Humidity supply', 'RH_RECU_FH')}${U.tile('Humidity waste', 'RH_RECU_WASTE')}</div>` +
       `<h3>Temperatures</h3>` + U.row('Fresh air cold side', 'TEMP_RECU_FC_C') + U.row('Fresh air warm side', 'TEMP_RECU_FH_C') +
