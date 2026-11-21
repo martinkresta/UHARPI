@@ -1,93 +1,389 @@
 {
  "_comment": "Texts the pages need that are not in uha_ui_dict.xlsx yet. dict_to_texts.py merges them into texts.json (the dictionary wins) and lists which ones are already in the dictionary. Add them to the sheet 'UI texty', then delete them here.",
  "ui": {
-  "mon.nav.menu": {"cz": "Menu", "en": "Menu"},
-  "mon.nav.lang": {"cz": "Jazyk", "en": "Language"},
-  "mon.nav.grafana": {"cz": "Grafy (Grafana)", "en": "Charts (Grafana)"},
-  "mon.nav.scheme_energy": {"cz": "Schéma energie", "en": "Energy schematic"},
-  "mon.nav.scheme_heat": {"cz": "Schéma topení", "en": "Heating schematic"},
-  "mon.nav.scheme_recu": {"cz": "Schéma rekuperace", "en": "Recuperation schematic"},
-
-  "mon.home.solar_t": {"cz": "Solár", "en": "Solar"},
-  "mon.home.load_t": {"cz": "Spotřeba", "en": "Load"},
-  "mon.home.peak": {"cz": "Výkon vůči instalovanému maximu {x}", "en": "Power against the installed peak {x}"},
-
-  "mon.battery.lg_ok": {"cz": "v pořádku", "en": "ok"},
-  "mon.battery.lg_high": {"cz": "≥ {x} V", "en": "≥ {x} V"},
-  "mon.battery.lg_bad": {"cz": "< {lo} V nebo > {hi} V", "en": "< {lo} V or > {hi} V"},
-  "mon.battery.lg_minmax": {"cz": "obrys = nejnižší / nejvyšší článek", "en": "outline = lowest / highest cell"},
-  "mon.battery.spreadnote": {"cz": "Rozptyl nad 50 mV je zvýrazněn.", "en": "Spread above 50 mV is highlighted."},
-
-  "mon.loads.todaybars": {"cz": "Spotřeba dnes po okruzích", "en": "Today's consumption per circuit"},
-  "mon.loads.victronnote": {"cz": "Victron zatím nemá vlastní elektroměr: ukazuje elektroměr topení dílny (jeho jedinou zátěž).", "en": "The Victron has no own meter yet: it shows the workshop heating meter (its only load)."},
-
-  "mon.climate.recumore": {"cz": "Teploty, vlhkost a tlak rekuperace ve schématu →", "en": "Recuperation temperatures, humidity and pressure in the schematic →"},
-
-  "mon.status.nofile": {"cz": "Soubor uha_status.json není k dispozici.", "en": "uha_status.json not available."},
-  "mon.status.up": {"cz": "spojeno", "en": "up"},
-  "mon.status.down": {"cz": "odpojeno", "en": "down"},
-  "mon.status.col.uptime": {"cz": "Běží", "en": "Uptime"},
-  "mon.status.col.fw": {"cz": "Verze FW", "en": "FW version"},
-  "mon.status.err.UnknownIds": {"cz": "Neznámá ID proměnných", "en": "Unknown variable ids"},
-  "mon.status.err.WrongProducer": {"cz": "Špatný zdroj proměnné", "en": "Wrong producer"},
-  "mon.status.err.ChecksumErrors": {"cz": "Chyby kontrolního součtu", "en": "Checksum errors"},
-  "mon.status.err.LengthErrors": {"cz": "Chyby délky paketu", "en": "Length errors"},
-  "mon.status.err.DiscardedBytes": {"cz": "Zahozené bajty", "en": "Discarded bytes"},
-  "mon.status.err.TxErrors": {"cz": "Chyby odesílání", "en": "Send errors"},
-  "mon.status.err.WriteErrors": {"cz": "Chyby zápisu souborů", "en": "File write errors"},
-  "mon.status.err.EventLogErrors": {"cz": "Chyby logu událostí", "en": "Event log errors"},
-
-  "mon.scheme.link": {"cz": "Schéma ›", "en": "Schematic ›"},
-  "mon.scheme.back_energy": {"cz": "‹ Energie", "en": "‹ Energy"},
-  "mon.scheme.back_heat": {"cz": "‹ Teplo", "en": "‹ Heat"},
-  "mon.scheme.back_climate": {"cz": "‹ Klima", "en": "‹ Climate"},
-  "mon.scheme.mode_power": {"cz": "Výkon", "en": "Power"},
-  "mon.scheme.mode_current": {"cz": "Proud", "en": "Current"},
-  "mon.scheme.mode_both": {"cz": "Obojí", "en": "Both"},
-  "mon.scheme.state": {"cz": "Stav", "en": "State"},
-  "mon.scheme.temp": {"cz": "Teplota", "en": "Temperature"},
-
-  "mon.scheme.energy_t": {"cz": "Schéma energie", "en": "Energy schematic"},
-  "mon.scheme.energy_sub": {"cz": "Toky výkonu – návrh, topologii zkontroluje Martin", "en": "Power flows – proposal, topology to be reviewed"},
-  "mon.scheme.energy_note": {"cz": "Šipka ukazuje směr toku, když je výkon aspoň 20 W (proud 0,5 A). Šedé = neplatná nebo stará data.", "en": "The arrow shows the flow direction when the power is at least 20 W (current 0.5 A). Grey = invalid or old data."},
-  "mon.scheme.area_house": {"cz": "Dům", "en": "House"},
-  "mon.scheme.area_workshop": {"cz": "Dílna", "en": "Workshop"},
-  "mon.scheme.pv": {"cz": "FV panely", "en": "PV panels"},
-  "mon.scheme.mppt": {"cz": "MPPT", "en": "MPPT"},
-  "mon.scheme.p251": {"cz": "251 Ah", "en": "251 Ah"},
-  "mon.scheme.p220": {"cz": "220 Ah", "en": "220 Ah"},
-  "mon.scheme.p80": {"cz": "80 Ah", "en": "80 Ah"},
-  "mon.scheme.house_total": {"cz": "Dům celkem", "en": "House total"},
-  "mon.scheme.ws_total": {"cz": "Dílna celkem", "en": "Workshop total"},
-  "mon.scheme.pv_short": {"cz": "FV", "en": "PV"},
-  "mon.scheme.load_short": {"cz": "Spotřeba", "en": "Load"},
-
-  "mon.scheme.heat_t": {"cz": "Schéma topení", "en": "Heating schematic"},
-  "mon.scheme.heat_sub": {"cz": "Kotel, nádrž a topné okruhy – návrh, topologii zkontroluje Martin", "en": "Boiler, tank and heating circuits – proposal, topology to be reviewed"},
-  "mon.scheme.heat_note": {"cz": "Barva potrubí = teplota. Čerpadlo plné = běží. Patro: skutečná teplota z dětského pokoje.", "en": "Pipe colour = temperature. Filled pump = running. Upstairs: actual temperature from the kids room."},
-  "mon.scheme.elheater": {"cz": "El. ohřev v nádrži", "en": "Electric heater (tank)"},
-  "mon.scheme.rad": {"cz": "Radiátory", "en": "Radiators"},
-  "mon.scheme.wall": {"cz": "Stěnové topení", "en": "Wall heating"},
-  "mon.scheme.valve": {"cz": "Směšovací ventil", "en": "Mixing valve"},
-  "mon.scheme.pump": {"cz": "Čerpadlo", "en": "Pump"},
-  "mon.scheme.up": {"cz": "Patro", "en": "Upstairs"},
-  "mon.scheme.down": {"cz": "Přízemí", "en": "Downstairs"},
-  "mon.scheme.req": {"cz": "Nastaveno teď", "en": "Target now"},
-  "mon.scheme.actual": {"cz": "Skutečnost", "en": "Actual"},
-
-  "mon.scheme.recu_t": {"cz": "Schéma rekuperace", "en": "Recuperation schematic"},
-  "mon.scheme.recu_sub": {"cz": "Výměník tepla, přívod a odtah – návrh", "en": "Heat exchanger, supply and extract – proposal"},
-  "mon.scheme.recu_note": {"cz": "Účinnost = (přívod − venku) / (odtah − venku), jen když se odtah a venkovní vzduch liší o víc než 5 K.", "en": "Efficiency = (supply − outdoor) / (extract − outdoor), only when extract and outdoor air differ by more than 5 K."},
-  "mon.scheme.outdoor": {"cz": "Venkovní vzduch", "en": "Outdoor air"},
-  "mon.scheme.extract": {"cz": "Odtah z domu", "en": "Extract (house)"},
-  "mon.scheme.exhaust": {"cz": "Výfuk ven", "en": "Exhaust (out)"},
-  "mon.scheme.supply": {"cz": "Přívod do domu", "en": "Supply (house)"},
-  "mon.scheme.recu_state": {"cz": "Rekuperace", "en": "Recuperation"},
-  "mon.scheme.outside": {"cz": "Venku", "en": "Outside"},
-  "mon.scheme.inside": {"cz": "Dům", "en": "House"},
-  "mon.scheme.rh": {"cz": "Vlhkost", "en": "Humidity"},
-  "mon.scheme.fan": {"cz": "Ventilátor", "en": "Fan"},
-  "mon.scheme.dp": {"cz": "Tlak", "en": "Pressure"},
-  "mon.scheme.eff": {"cz": "Účinnost", "en": "Efficiency"}
+  "mon.nav.menu": {
+   "cz": "Menu",
+   "en": "Menu"
+  },
+  "mon.nav.lang": {
+   "cz": "Jazyk",
+   "en": "Language"
+  },
+  "mon.nav.grafana": {
+   "cz": "Grafy (Grafana)",
+   "en": "Charts (Grafana)"
+  },
+  "mon.nav.scheme_energy": {
+   "cz": "Schéma energie",
+   "en": "Energy schematic"
+  },
+  "mon.nav.scheme_heat": {
+   "cz": "Schéma topení",
+   "en": "Heating schematic"
+  },
+  "mon.nav.scheme_recu": {
+   "cz": "Schéma rekuperace",
+   "en": "Recuperation schematic"
+  },
+  "mon.home.solar_t": {
+   "cz": "Solár",
+   "en": "Solar"
+  },
+  "mon.home.load_t": {
+   "cz": "Spotřeba",
+   "en": "Load"
+  },
+  "mon.home.peak": {
+   "cz": "Výkon vůči instalovanému maximu {x}",
+   "en": "Power against the installed peak {x}"
+  },
+  "mon.battery.lg_ok": {
+   "cz": "v pořádku",
+   "en": "ok"
+  },
+  "mon.battery.lg_high": {
+   "cz": "≥ {x} V",
+   "en": "≥ {x} V"
+  },
+  "mon.battery.lg_bad": {
+   "cz": "< {lo} V nebo > {hi} V",
+   "en": "< {lo} V or > {hi} V"
+  },
+  "mon.battery.lg_minmax": {
+   "cz": "obrys = nejnižší / nejvyšší článek",
+   "en": "outline = lowest / highest cell"
+  },
+  "mon.battery.spreadnote": {
+   "cz": "Rozptyl nad 50 mV je zvýrazněn.",
+   "en": "Spread above 50 mV is highlighted."
+  },
+  "mon.loads.todaybars": {
+   "cz": "Spotřeba dnes po okruzích",
+   "en": "Today's consumption per circuit"
+  },
+  "mon.loads.victronnote": {
+   "cz": "Victron zatím nemá vlastní elektroměr: ukazuje elektroměr topení dílny (jeho jedinou zátěž).",
+   "en": "The Victron has no own meter yet: it shows the workshop heating meter (its only load)."
+  },
+  "mon.climate.recumore": {
+   "cz": "Teploty, vlhkost a tlak rekuperace ve schématu →",
+   "en": "Recuperation temperatures, humidity and pressure in the schematic →"
+  },
+  "mon.status.nofile": {
+   "cz": "Soubor uha_status.json není k dispozici.",
+   "en": "uha_status.json not available."
+  },
+  "mon.status.up": {
+   "cz": "spojeno",
+   "en": "up"
+  },
+  "mon.status.down": {
+   "cz": "odpojeno",
+   "en": "down"
+  },
+  "mon.status.col.uptime": {
+   "cz": "Běží",
+   "en": "Uptime"
+  },
+  "mon.status.col.fw": {
+   "cz": "Verze FW",
+   "en": "FW version"
+  },
+  "mon.status.err.UnknownIds": {
+   "cz": "Neznámá ID proměnných",
+   "en": "Unknown variable ids"
+  },
+  "mon.status.err.WrongProducer": {
+   "cz": "Špatný zdroj proměnné",
+   "en": "Wrong producer"
+  },
+  "mon.status.err.ChecksumErrors": {
+   "cz": "Chyby kontrolního součtu",
+   "en": "Checksum errors"
+  },
+  "mon.status.err.LengthErrors": {
+   "cz": "Chyby délky paketu",
+   "en": "Length errors"
+  },
+  "mon.status.err.DiscardedBytes": {
+   "cz": "Zahozené bajty",
+   "en": "Discarded bytes"
+  },
+  "mon.status.err.TxErrors": {
+   "cz": "Chyby odesílání",
+   "en": "Send errors"
+  },
+  "mon.status.err.WriteErrors": {
+   "cz": "Chyby zápisu souborů",
+   "en": "File write errors"
+  },
+  "mon.status.err.EventLogErrors": {
+   "cz": "Chyby logu událostí",
+   "en": "Event log errors"
+  },
+  "mon.scheme.link": {
+   "cz": "Schéma ›",
+   "en": "Schematic ›"
+  },
+  "mon.scheme.back_energy": {
+   "cz": "‹ Energie",
+   "en": "‹ Energy"
+  },
+  "mon.scheme.back_heat": {
+   "cz": "‹ Teplo",
+   "en": "‹ Heat"
+  },
+  "mon.scheme.back_climate": {
+   "cz": "‹ Klima",
+   "en": "‹ Climate"
+  },
+  "mon.scheme.mode_power": {
+   "cz": "Výkon",
+   "en": "Power"
+  },
+  "mon.scheme.mode_current": {
+   "cz": "Proud",
+   "en": "Current"
+  },
+  "mon.scheme.mode_both": {
+   "cz": "Obojí",
+   "en": "Both"
+  },
+  "mon.scheme.state": {
+   "cz": "Stav",
+   "en": "State"
+  },
+  "mon.scheme.temp": {
+   "cz": "Teplota",
+   "en": "Temperature"
+  },
+  "mon.scheme.energy_t": {
+   "cz": "Schéma energie",
+   "en": "Energy schematic"
+  },
+  "mon.scheme.energy_sub": {
+   "cz": "Toky výkonu – návrh, topologii zkontroluje Martin",
+   "en": "Power flows – proposal, topology to be reviewed"
+  },
+  "mon.scheme.energy_note": {
+   "cz": "Šipka ukazuje směr toku, když je výkon aspoň 20 W (proud 0,5 A). Šedé = neplatná nebo stará data.",
+   "en": "The arrow shows the flow direction when the power is at least 20 W (current 0.5 A). Grey = invalid or old data."
+  },
+  "mon.scheme.area_house": {
+   "cz": "Dům",
+   "en": "House"
+  },
+  "mon.scheme.area_workshop": {
+   "cz": "Dílna",
+   "en": "Workshop"
+  },
+  "mon.scheme.pv": {
+   "cz": "FV panely",
+   "en": "PV panels"
+  },
+  "mon.scheme.mppt": {
+   "cz": "MPPT",
+   "en": "MPPT"
+  },
+  "mon.scheme.p251": {
+   "cz": "251 Ah",
+   "en": "251 Ah"
+  },
+  "mon.scheme.p220": {
+   "cz": "220 Ah",
+   "en": "220 Ah"
+  },
+  "mon.scheme.p80": {
+   "cz": "80 Ah",
+   "en": "80 Ah"
+  },
+  "mon.scheme.house_total": {
+   "cz": "Dům celkem",
+   "en": "House total"
+  },
+  "mon.scheme.ws_total": {
+   "cz": "Dílna celkem",
+   "en": "Workshop total"
+  },
+  "mon.scheme.pv_short": {
+   "cz": "FV",
+   "en": "PV"
+  },
+  "mon.scheme.load_short": {
+   "cz": "Spotřeba",
+   "en": "Load"
+  },
+  "mon.scheme.heat_t": {
+   "cz": "Schéma topení",
+   "en": "Heating schematic"
+  },
+  "mon.scheme.heat_sub": {
+   "cz": "Kotel, nádrž a topné okruhy – návrh, topologii zkontroluje Martin",
+   "en": "Boiler, tank and heating circuits – proposal, topology to be reviewed"
+  },
+  "mon.scheme.heat_note": {
+   "cz": "Barva potrubí = teplota. Čerpadlo plné = běží. Patro: skutečná teplota z dětského pokoje.",
+   "en": "Pipe colour = temperature. Filled pump = running. Upstairs: actual temperature from the kids room."
+  },
+  "mon.scheme.elheater": {
+   "cz": "El. ohřev v nádrži",
+   "en": "Electric heater (tank)"
+  },
+  "mon.scheme.rad": {
+   "cz": "Radiátory",
+   "en": "Radiators"
+  },
+  "mon.scheme.wall": {
+   "cz": "Stěnové topení",
+   "en": "Wall heating"
+  },
+  "mon.scheme.valve": {
+   "cz": "Směšovací ventil",
+   "en": "Mixing valve"
+  },
+  "mon.scheme.pump": {
+   "cz": "Čerpadlo",
+   "en": "Pump"
+  },
+  "mon.scheme.up": {
+   "cz": "Patro",
+   "en": "Upstairs"
+  },
+  "mon.scheme.down": {
+   "cz": "Přízemí",
+   "en": "Downstairs"
+  },
+  "mon.scheme.req": {
+   "cz": "Nastaveno teď",
+   "en": "Target now"
+  },
+  "mon.scheme.actual": {
+   "cz": "Skutečnost",
+   "en": "Actual"
+  },
+  "mon.scheme.recu_t": {
+   "cz": "Schéma rekuperace",
+   "en": "Recuperation schematic"
+  },
+  "mon.scheme.recu_sub": {
+   "cz": "Výměník tepla, přívod a odtah – návrh",
+   "en": "Heat exchanger, supply and extract – proposal"
+  },
+  "mon.scheme.recu_note": {
+   "cz": "Účinnost = (přívod − venku) / (odtah − venku), jen když se odtah a venkovní vzduch liší o víc než 5 K.",
+   "en": "Efficiency = (supply − outdoor) / (extract − outdoor), only when extract and outdoor air differ by more than 5 K."
+  },
+  "mon.scheme.outdoor": {
+   "cz": "Venkovní vzduch",
+   "en": "Outdoor air"
+  },
+  "mon.scheme.extract": {
+   "cz": "Odtah z domu",
+   "en": "Extract (house)"
+  },
+  "mon.scheme.exhaust": {
+   "cz": "Výfuk ven",
+   "en": "Exhaust (out)"
+  },
+  "mon.scheme.supply": {
+   "cz": "Přívod do domu",
+   "en": "Supply (house)"
+  },
+  "mon.scheme.recu_state": {
+   "cz": "Rekuperace",
+   "en": "Recuperation"
+  },
+  "mon.scheme.outside": {
+   "cz": "Venku",
+   "en": "Outside"
+  },
+  "mon.scheme.inside": {
+   "cz": "Dům",
+   "en": "House"
+  },
+  "mon.scheme.rh": {
+   "cz": "Vlhkost",
+   "en": "Humidity"
+  },
+  "mon.scheme.fan": {
+   "cz": "Ventilátor",
+   "en": "Fan"
+  },
+  "mon.scheme.dp": {
+   "cz": "Tlak",
+   "en": "Pressure"
+  },
+  "mon.scheme.eff": {
+   "cz": "Účinnost",
+   "en": "Efficiency"
+  },
+  "mon.ctrl.link": {
+   "cz": "Ovládat ›",
+   "en": "Control ›"
+  },
+  "ctrl.page.light": {
+   "cz": "Světla",
+   "en": "Lights"
+  },
+  "ctrl.page.heating": {
+   "cz": "Topení a rekuperace",
+   "en": "Heating and ventilation"
+  },
+  "ctrl.page.other": {
+   "cz": "Ostatní",
+   "en": "Other"
+  },
+  "ctrl.page.history": {
+   "cz": "Historie příkazů",
+   "en": "Command history"
+  },
+  "ctrl.cat.loads": {
+   "cz": "Vytěžování",
+   "en": "Surplus loads"
+  },
+  "ctrl.monlink": {
+   "cz": "Přehled ›",
+   "en": "Overview ›"
+  },
+  "ctrl.histlink": {
+   "cz": "Historie příkazů ›",
+   "en": "Command history ›"
+  },
+  "ctrl.notyet": {
+   "cz": "zatím nelze ovládat",
+   "en": "cannot be controlled yet"
+  },
+  "ctrl.dim": {
+   "cz": "Jas",
+   "en": "Brightness"
+  },
+  "ctrl.dec": {
+   "cz": "Snížit",
+   "en": "Decrease"
+  },
+  "ctrl.inc": {
+   "cz": "Zvýšit",
+   "en": "Increase"
+  },
+  "ctrl.now": {
+   "cz": "teď {x}",
+   "en": "now {x}"
+  },
+  "ctrl.dry": {
+   "cz": "Zkušební režim (?dry=1): příkazy se neodesílají, jen se vypíší do konzole.",
+   "en": "Dry run (?dry=1): commands are not sent, only logged in the console."
+  },
+  "ctrl.err.commands": {
+   "cz": "Nelze načíst seznam příkazů: {e}",
+   "en": "Cannot load the command list: {e}"
+  },
+  "ctrl.log.empty": {
+   "cz": "Zatím žádný příkaz.",
+   "en": "No command yet."
+  },
+  "ctrl.log.err": {
+   "cz": "Nelze načíst historii příkazů: {e}",
+   "en": "Cannot load the command history: {e}"
+  }
  }
 }

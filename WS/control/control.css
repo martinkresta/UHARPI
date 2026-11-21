@@ -1,37 +1,71 @@
-/* UHA control page: deliberately plain (the look is refined later). */
-body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; margin: 0 auto; max-width: 720px;
-       padding: 12px 16px; background: #f6f7f9; color: #222; }
-header { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; }
-h1 { font-size: 1.4rem; margin: 0 0 8px; }
-a { color: #0b5cad; }
-table { width: 100%; border-collapse: collapse; background: #fff; }
-th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #e3e5e8; vertical-align: middle; }
-th { font-size: 0.8rem; color: #666; font-weight: 600; }
-td.state { white-space: nowrap; }
-td.msg { font-size: 0.85rem; color: #666; min-width: 7em; }
-td.msg.error { color: #b00020; }
-td.msg.ok { color: #1b7f3b; }
-td.actions { white-space: nowrap; text-align: right; }
-button { font-size: 0.95rem; padding: 6px 12px; margin-left: 4px; border: 1px solid #aab; border-radius: 4px;
-         background: #fff; cursor: pointer; }
-button:disabled { opacity: 0.5; cursor: default; }
-button.on { border-color: #1b7f3b; }
-button.current { background: #ffe58a; border-color: #b08a00; font-weight: 600; }
-td.actions input { width: 5.5em; font-size: 0.95rem; padding: 5px 4px; }
-td.actions .unit { margin-left: 3px; color: #666; }
-#groups h2:first-child { margin-top: 8px; }
-.badge { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 0.85rem; background: #e3e5e8; }
-.badge.on { background: #ffe58a; }
-.badge.unknown { background: #f3d1d6; }
-h2 { font-size: 1.1rem; margin: 20px 0 8px; }
-#log td { font-size: 0.9rem; }
-#log td.time { white-space: nowrap; color: #666; }
-.note { font-size: 0.85rem; color: #666; }
-.note.error { color: #b00020; }
-@media (max-width: 480px) {
-  thead { display: none; }
-  td { display: block; border: 0; padding: 2px 4px; }
-  tr { display: block; border-bottom: 1px solid #e3e5e8; padding: 6px 0; }
-  td.actions { text-align: left; white-space: normal; }
-  td.actions button { margin: 2px 4px 2px 0; }
+/* UHA control pages: on top of css/uha.css (same dark theme, colours, menu). Phone first (360 px). */
+.cgrid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); }
+.csec { padding: 12px 14px; scroll-margin-top: 56px; }
+.csec h2 { align-items: center; }
+.crows { display: flex; flex-direction: column; }
+
+/* row: name | control | state, message below */
+.crow { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(64px, auto); grid-template-areas: "name ctl state" "msg msg msg";
+  align-items: center; gap: 2px 10px; padding: 4px 0; border-bottom: 1px solid var(--line); min-height: 50px; }
+.crow:last-child { border-bottom: 0; }
+.cname { grid-area: name; font-size: 15px; overflow: hidden; text-overflow: ellipsis; }
+.cnote { font-size: 11px; color: var(--muted); }
+.cctl { grid-area: ctl; display: flex; align-items: center; gap: 8px; }
+.cstate { grid-area: state; text-align: right; }
+.cstate.empty { min-width: 0; }
+.cmsg { grid-area: msg; font-size: 12px; color: var(--muted); display: none; }
+.cmsg.show { display: block; } .cmsg.ok { color: var(--ok); } .cmsg.error { color: var(--bad); }
+.badge { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 13px; font-variant-numeric: tabular-nums;
+  background: var(--card2); color: var(--muted); white-space: nowrap; }
+.badge.on { background: var(--bat); color: #1a1a1a; font-weight: 600; }
+.badge.unknown { background: transparent; border: 1px dashed var(--line); }
+.placeholder .cname { color: var(--muted); }
+
+/* toggle switch (CSS only), 44 x 26, touch area 44 px high */
+.sw { position: relative; display: inline-flex; align-items: center; height: 44px; cursor: pointer; flex: none; }
+.sw input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.sw span { width: 46px; height: 26px; border-radius: 13px; background: var(--card2); border: 1px solid var(--line); position: relative; transition: background .2s; }
+.sw span::after { content: ""; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: var(--muted); transition: transform .2s, background .2s; }
+.sw input:checked + span { background: var(--bat); border-color: var(--bat); }
+.sw input:checked + span::after { transform: translateX(20px); background: #1a1a1a; }
+.sw input:focus-visible + span { outline: 2px solid var(--text); outline-offset: 2px; }
+.sw input:disabled + span { opacity: .45; cursor: default; }
+.sw.unknown span { border-style: dashed; }
+
+/* brightness slider (disabled until dimming exists) */
+.dim { width: 92px; accent-color: var(--bat); height: 28px; }
+.dim:disabled { opacity: .45; }
+
+/* enum buttons (blinds ▲ ■ ▼) */
+.ebtn { min-width: 44px; height: 40px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--card2);
+  color: var(--text); font-size: 15px; cursor: pointer; }
+.ebtn.sym { font-size: 17px; }
+.ebtn.current { background: var(--bat); color: #1a1a1a; border-color: var(--bat); }
+.ebtn:disabled, .stp:disabled, .setbtn:disabled { opacity: .5; cursor: default; }
+
+/* stepper − value + */
+.k-stepper { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name ctl" "msg msg"; }
+.k-stepper .cstate { display: none; }
+.stp { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--line); background: var(--card2); color: var(--text);
+  font-size: 22px; line-height: 1; cursor: pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.stp:active { background: var(--line); }
+.stpval { min-width: 84px; text-align: center; }
+.stpval .v { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.stpval .v.pending { color: var(--bat); }
+.stpval .sub { font-size: 11px; color: var(--muted); min-height: 0; white-space: nowrap; }
+
+/* generic fallback */
+.num { width: 84px; background: var(--card2); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 8px; font-size: 15px; }
+.setbtn { height: 40px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--card2); color: var(--text); cursor: pointer; }
+
+.banner.dry { margin: 0 0 12px; border-radius: 8px; }
+#app td.time { white-space: nowrap; color: var(--muted); }
+.note.error { color: var(--bad); }
+
+@media (max-width: 400px) {
+  .crow { gap: 4px 8px; }
+  .cname { font-size: 14px; }
+  .dim { width: 64px; }
+  .stpval { min-width: 72px; }
+  .stpval .v { font-size: 18px; }
 }

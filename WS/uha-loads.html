@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UHA</title>
-  <link rel="stylesheet" href="css/uha.css?v=20261121b">
+  <link rel="stylesheet" href="css/uha.css?v=20261121c">
 </head>
 <body>
-<script src="js/uha-common.js?v=20261121b"></script>
+<script src="js/uha-common.js?v=20261121c"></script>
 <script>
 // Inverters: name = state variable (dictionary name), power / today from a meter, rated power W.
 // The Victron has no own meter yet: it shows the workshop heating meter (its only load today). When it gets its
@@ -46,7 +46,7 @@ UHA.start(U => {
   return U.pageHead(U.t('mon.loads.title'), U.t('mon.loads.sub')) + `<div class="grid wide">` +
     U.card(U.t('mon.loads.total'), `<div class="tiles">${U.tile(U.t('mon.loads.consnow'), 'LOAD_W', { big: true })}` +
       `${U.tile(U.t('mon.home.today'), 'CONS_TODAY_WH', { big: true })}</div>`, { cls: 'load' }) +
-    U.card(U.t('mon.loads.inverters'), inv, { cls: 'load' }) +
+    U.card(U.t('mon.loads.inverters'), inv, { cls: 'load', ctrl: 'inverter' }) +
     U.card(U.t('mon.loads.circuits'), `<table class="t"><tr><th>${U.t('mon.loads.circuit')}</th><th class="n">${U.t('mon.loads.power')}</th>` +
       `<th class="n">${U.t('mon.home.today')}</th></tr>${rows}</table>` +
       (bars ? `<div class="hbars"><h3>${U.t('mon.loads.todaybars')}</h3>${bars}</div>` : ''), { cls: 'load' }) +

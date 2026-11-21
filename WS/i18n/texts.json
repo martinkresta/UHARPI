@@ -1187,6 +1187,74 @@
   "mon.scheme.eff": {
    "cz": "Účinnost",
    "en": "Efficiency"
+  },
+  "mon.ctrl.link": {
+   "cz": "Ovládat ›",
+   "en": "Control ›"
+  },
+  "ctrl.page.light": {
+   "cz": "Světla",
+   "en": "Lights"
+  },
+  "ctrl.page.heating": {
+   "cz": "Topení a rekuperace",
+   "en": "Heating and ventilation"
+  },
+  "ctrl.page.other": {
+   "cz": "Ostatní",
+   "en": "Other"
+  },
+  "ctrl.page.history": {
+   "cz": "Historie příkazů",
+   "en": "Command history"
+  },
+  "ctrl.cat.loads": {
+   "cz": "Vytěžování",
+   "en": "Surplus loads"
+  },
+  "ctrl.monlink": {
+   "cz": "Přehled ›",
+   "en": "Overview ›"
+  },
+  "ctrl.histlink": {
+   "cz": "Historie příkazů ›",
+   "en": "Command history ›"
+  },
+  "ctrl.notyet": {
+   "cz": "zatím nelze ovládat",
+   "en": "cannot be controlled yet"
+  },
+  "ctrl.dim": {
+   "cz": "Jas",
+   "en": "Brightness"
+  },
+  "ctrl.dec": {
+   "cz": "Snížit",
+   "en": "Decrease"
+  },
+  "ctrl.inc": {
+   "cz": "Zvýšit",
+   "en": "Increase"
+  },
+  "ctrl.now": {
+   "cz": "teď {x}",
+   "en": "now {x}"
+  },
+  "ctrl.dry": {
+   "cz": "Zkušební režim (?dry=1): příkazy se neodesílají, jen se vypíší do konzole.",
+   "en": "Dry run (?dry=1): commands are not sent, only logged in the console."
+  },
+  "ctrl.err.commands": {
+   "cz": "Nelze načíst seznam příkazů: {e}",
+   "en": "Cannot load the command list: {e}"
+  },
+  "ctrl.log.empty": {
+   "cz": "Zatím žádný příkaz.",
+   "en": "No command yet."
+  },
+  "ctrl.log.err": {
+   "cz": "Nelze načíst historii příkazů: {e}",
+   "en": "Cannot load the command history: {e}"
   }
  },
  "vars": {

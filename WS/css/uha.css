@@ -56,6 +56,9 @@ main { max-width: 1200px; margin: 0 auto; padding: 16px; }
   display: flex; justify-content: space-between; }
 .card.link:hover { border-color: var(--muted); background: var(--card2); }
 .chev { font-size: 20px; line-height: 1; }
+.ctrllink { font-size: 12px; text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--text); border: 1px solid var(--line);
+  border-radius: 8px; padding: 3px 9px; margin: -4px 0; white-space: nowrap; }
+.ctrllink:hover { background: var(--card2); }
 .card.solar { border-top: 3px solid var(--solar); } .card.bat { border-top: 3px solid var(--bat); }
 .card.load { border-top: 3px solid var(--load); } .card.heat { border-top: 3px solid var(--heat); }
 .card.home { border-top: 3px solid var(--home); }
@@ -181,6 +184,7 @@ table.t tr.old td.n { color: var(--warn); } table.t tr.bad td { color: var(--mut
 .scheme .hx { fill: var(--card2); stroke: var(--muted); stroke-width: 2; } .scheme .hxline { stroke: var(--line); stroke-width: 2; }
 .scheme .fan { fill: var(--card); stroke: var(--text); stroke-width: 2.5; } .scheme .fanblade { fill: var(--text); }
 .scheme .big { font-size: 26px; font-weight: 700; }
+.scheme .blink:hover .blk { stroke: var(--muted); }
 .modesw { display: flex; gap: 6px; justify-content: center; margin: 0 0 10px; }
 .modesw button { background: var(--card); color: var(--muted); border: 1px solid var(--line); border-radius: 8px; padding: 6px 14px; font-size: 14px; cursor: pointer; }
 .modesw button.on { background: var(--card2); color: var(--text); border-color: var(--muted); font-weight: 600; }

@@ -33,6 +33,17 @@
     ['uha-detail.html', 'mon.nav.detail'], ['uha-status.html', 'mon.nav.status']
   ];
   const EXTERNAL = [['/grafana/', 'mon.nav.grafana'], ['https://ctrl.uha.mkresta.cz/', 'mon.nav.control']];
+  // menu of the current site: the control site (ctrl.uha.mkresta.cz) sets its own with U.setNav()
+  let nav = { items: NAV, external: EXTERNAL, home: 'uha.html', status: 'uha-status.html' };
+  U.setNav = o => { nav = Object.assign({}, nav, o); };
+
+  /* Cross-links monitoring <-> control: control page of each section (one table). Without a client certificate
+     the control site answers 400 - accepted, only family devices have one. */
+  U.MON_URL = 'https://uha.mkresta.cz/';
+  U.CTRL_URL = 'https://ctrl.uha.mkresta.cz/';
+  U.CTRL_PAGES = { light: 'index.html', heating: 'heating.html', ventilation: 'heating.html',
+    blind: 'other.html', inverter: 'other.html', loads: 'other.html' };
+  U.ctrlHref = section => U.CTRL_URL + (U.CTRL_PAGES[section] || '') + '#' + section;
 
   /* Level 3 grouping (All data page): first matching rule wins. Same split as the level 2 pages. */
   U.GROUPS = [
@@ -86,6 +97,15 @@
     const part = i < 0 ? full : full.slice(i + 3);
     return part.charAt(0).toUpperCase() + part.slice(1);
   };
+  /* command name from the dictionary (sheet "Příkazy YAML"), fallback: the given text, then the command name */
+  U.cname = function (name, fallback) {
+    const e = T.cmds[name];
+    if (!e) { miss(name); return fallback || name; }
+    return e[lang] || fallback || name;
+  };
+  U.varEnum = name => T.var_enums[name] || null;        // enum name of an enum variable (from uha_vars.yaml)
+  /* enum item by enum name and number (e.g. the BlindCmd buttons); null when the dictionary has none */
+  U.enumItem = (en, value) => { const e = T.enums[en] && T.enums[en][String(value)]; return e ? { name: e.name, text: e[lang] } : null; };
   /* text of an enum variable in the current language (the YAML item name when the dictionary has none) */
   U.enumText = function (name) {
     const v = vars[name];
@@ -97,6 +117,7 @@
     lang = l;
     try { localStorage.setItem('uha.lang', l); } catch (e) { /* no storage */ }
     buildFrame();
+    if (U.langChanged) U.langChanged();
     if (U.refresh) U.refresh();
   };
 
@@ -169,7 +190,8 @@
   U.rowText = (label, text, cls) => `<div class="row ${cls || ''}"><span class="l">${label}</span><span class="v">${text}</span></div>`;
   U.card = function (title, body, o) {
     o = o || {};
-    const head = `<h2>${title}${o.href ? '<span class="chev">›</span>' : ''}</h2>`;
+    const ctrl = o.ctrl && !o.href ? `<a class="ctrllink" href="${U.ctrlHref(o.ctrl)}">${U.t('mon.ctrl.link')}</a>` : '';
+    const head = `<h2><span>${title}</span>${o.href ? '<span class="chev">›</span>' : ctrl}</h2>`;
     return o.href
       ? `<a class="card link ${o.cls || ''}" href="${o.href}">${head}${body}</a>`
       : `<section class="card ${o.cls || ''}">${head}${body}</section>`;
@@ -231,18 +253,18 @@
   U.clock = unix => (unix ? new Date(unix * 1000).toLocaleTimeString(U.locale()) : '–');
 
   /* ---------- page frame: top bar + hamburger menu ---------- */
-  const page = () => location.pathname.split('/').pop() || 'uha.html';
+  const page = () => location.pathname.split('/').pop() || nav.home;
 
   function buildFrame() {
     const active = page();
     const navItem = ([href, key, sub]) =>
       `<a href="${href}" class="${sub ? 'sub' : ''}${href === active ? ' active' : ''}">${U.t(key)}</a>`;
-    const menu = NAV.map(navItem).join('') + '<hr>' + EXTERNAL.map(navItem).join('') +
+    const menu = nav.items.map(navItem).join('') + '<hr>' + nav.external.map(navItem).join('') +
       `<div class="langsw"><span>${U.t('mon.nav.lang')}</span>` +
       ['cz', 'en'].map(l => `<button data-lang="${l}" class="${l === lang ? 'on' : ''}">${l.toUpperCase()}</button>`).join('') + '</div>';
     const html =
-      `<header class="top"><a class="brand" href="uha.html">UHA</a><span class="spacer"></span>` +
-      `<a class="stlink${active === 'uha-status.html' ? ' active' : ''}" href="uha-status.html">${U.t('mon.nav.status')}</a>` +
+      `<header class="top"><a class="brand" href="${nav.home}">UHA</a><span class="spacer"></span>` +
+      `<a class="stlink${active === nav.status ? ' active' : ''}" href="${nav.status}">${U.t('mon.nav.status')}</a>` +
       `<div class="feed" id="feed"><span class="dot"></span><span id="feedtxt">${U.t('mon.feed.connecting')}</span></div>` +
       `<button class="burger" id="burger" aria-label="${U.t('mon.nav.menu')}" aria-expanded="false">☰</button></header>` +
       `<div class="menu" id="menu" hidden><div class="scrim" id="scrim"></div><nav class="drawer">${menu}</nav></div>` +
@@ -251,7 +273,7 @@
     if (old) old.innerHTML = html;
     else document.body.insertAdjacentHTML('afterbegin', `<div id="frame">${html}</div><main id="app"></main>`);
     document.documentElement.lang = lang === 'en' ? 'en' : 'cs';
-    const item = NAV.find(n => n[0] === active);
+    const item = nav.items.find(n => n[0] === active);
     document.title = 'UHA – ' + (item ? U.t(item[1]) : '');
 
     const menuEl = document.getElementById('menu'), burger = document.getElementById('burger');
@@ -289,33 +311,46 @@
     }
   }
 
-  /* render(U) returns html for #app; opts.status loads uha_status.json too; opts.after(U) runs after each render */
-  U.start = async function (render, opts) {
-    opts = opts || {};
+  /* texts + page frame (top bar, menu); the control site uses this with U.poll() and keeps its own DOM */
+  U.boot = async function () {
     await loadTexts();
     buildFrame();
-    const app = document.getElementById('app');
+  };
+
+  /* load uha2.json (+ uha_status.json with opts.status) every 2 s and call onData(U); also U.refresh() */
+  U.poll = function (onData, opts) {
+    opts = opts || {};
     async function tick() {
       try {
         const [u, s] = await Promise.all([getJson('uha2.json'), opts.status ? getJson('uha_status.json') : [null, false]]);
         uha = u[0]; usingSample = u[1]; vars = uha.Vars || {}; status = s[0];
         if (uha.UnixTime !== lastUnix) { lastUnix = uha.UnixTime; lastChange = Date.now(); }
       } catch (e) {
-        if (!uha) app.innerHTML = `<div class="card"><h2>${U.t('mon.err.nodata')}</h2><p>${U.t('mon.err.load')}</p></div>`;
+        if (opts.onError && !uha) opts.onError(e);
         setFeed();
         return;
       }
-      try {
-        app.innerHTML = render(U);
-        if (opts.after) opts.after(U);
-      } catch (e) {
-        console.error('UHA: render failed', e);
-      }
+      try { onData(U); } catch (e) { console.error('UHA: render failed', e); }
       setFeed();
     }
     U.refresh = tick;
     tick();
-    setInterval(tick, INTERVAL_MS);
+    setInterval(tick, opts.intervalMs || INTERVAL_MS);
     setInterval(setFeed, 1000);
+  };
+
+  /* monitoring pages: render(U) returns html for #app (rebuilt every tick); opts.status loads uha_status.json too;
+     opts.after(U) runs after each render */
+  U.start = async function (render, opts) {
+    opts = opts || {};
+    await U.boot();
+    const app = document.getElementById('app');
+    U.poll(() => {
+      app.innerHTML = render(U);
+      if (opts.after) opts.after(U);
+    }, {
+      status: opts.status,
+      onError: () => { app.innerHTML = `<div class="card"><h2>${U.t('mon.err.nodata')}</h2><p>${U.t('mon.err.load')}</p></div>`; }
+    });
   };
 })();
