@@ -125,10 +125,6 @@
    "cz": "Schéma ›",
    "en": "Schematic ›"
   },
-  "mon.scheme.back_energy": {
-   "cz": "‹ Energie",
-   "en": "‹ Energy"
-  },
   "mon.scheme.back_heat": {
    "cz": "‹ Teplo",
    "en": "‹ Heat"
@@ -162,12 +158,12 @@
    "en": "Energy schematic"
   },
   "mon.scheme.energy_sub": {
-   "cz": "Toky výkonu podle ENERGY_TOPOLOGY.md",
-   "en": "Power flows after ENERGY_TOPOLOGY.md"
+   "cz": "Přehled toků energie – dům a dílna",
+   "en": "Energy flow overview – house and workshop"
   },
   "mon.scheme.energy_note": {
-   "cz": "Šipka ukazuje směr toku, když je výkon aspoň 20 W (proud 0,5 A). Šedé = neplatná nebo stará data, čárkovaně = neměřeno. Propoj LVDC je odhad (≈): proud baterie dílny − proud baterie Axpertu + příkon Victronu; kladný = z domu do dílny.",
-   "en": "The arrow shows the flow direction when the power is at least 20 W (current 0.5 A). Grey = invalid or old data, dashed = not measured. The LVDC link is an estimate (≈): workshop pack current − Axpert battery current + Victron input; positive = house to workshop."
+   "cz": "Pohyblivé čárky ukazují směr toku (od 20 W), rychlost roste s výkonem. Spotřeba = místní FV − nabíjení úložiště ∓ propoj LVDC. Propoj LVDC je odhad (≈) z proudů dílny. Šedé = neplatná nebo stará data.",
+   "en": "Moving dashes show the flow direction (from 20 W), faster with more power. Load = local PV − storage charging ∓ LVDC link. The LVDC link is an estimate (≈) from the workshop currents. Grey = invalid or old data."
   },
   "mon.scheme.area_house": {
    "cz": "Dům",
@@ -180,38 +176,6 @@
   "mon.scheme.pv": {
    "cz": "FV panely",
    "en": "PV panels"
-  },
-  "mon.scheme.mppt": {
-   "cz": "MPPT",
-   "en": "MPPT"
-  },
-  "mon.scheme.p251": {
-   "cz": "251 Ah",
-   "en": "251 Ah"
-  },
-  "mon.scheme.p220": {
-   "cz": "220 Ah",
-   "en": "220 Ah"
-  },
-  "mon.scheme.p80": {
-   "cz": "80 Ah",
-   "en": "80 Ah"
-  },
-  "mon.scheme.house_total": {
-   "cz": "Dům celkem",
-   "en": "House total"
-  },
-  "mon.scheme.ws_total": {
-   "cz": "Dílna celkem",
-   "en": "Workshop total"
-  },
-  "mon.scheme.pv_short": {
-   "cz": "FV",
-   "en": "PV"
-  },
-  "mon.scheme.load_short": {
-   "cz": "Spotřeba",
-   "en": "Load"
   },
   "mon.scheme.heat_t": {
    "cz": "Schéma topení",
@@ -313,10 +277,6 @@
    "cz": "Tlak",
    "en": "Pressure"
   },
-  "mon.scheme.eff": {
-   "cz": "Účinnost",
-   "en": "Efficiency"
-  },
   "mon.ctrl.link": {
    "cz": "Ovládat ›",
    "en": "Control ›"
@@ -409,42 +369,6 @@
    "cz": "Dílna",
    "en": "Workshop"
   },
-  "mon.scheme.pv_mppt": {
-   "cz": "FV + MPPT",
-   "en": "PV + MPPT"
-  },
-  "mon.scheme.dcloads": {
-   "cz": "DC spotřebiče",
-   "en": "DC loads"
-  },
-  "mon.scheme.waterheater": {
-   "cz": "Ohřev vody",
-   "en": "Water heater"
-  },
-  "mon.scheme.dc12": {
-   "cz": "DC/DC 12 V",
-   "en": "DC/DC 12 V"
-  },
-  "mon.scheme.desk": {
-   "cz": "Pracovní stůl",
-   "en": "Work desk"
-  },
-  "mon.scheme.fans": {
-   "cz": "Ventilátory REKU",
-   "en": "RECU fans"
-  },
-  "mon.scheme.circ": {
-   "cz": "Okruhy",
-   "en": "Circuits"
-  },
-  "mon.scheme.kids_office": {
-   "cz": "Dětský + pracovna",
-   "en": "Kids room + office"
-  },
-  "mon.scheme.dcbus": {
-   "cz": "DC 48 V",
-   "en": "DC 48 V"
-  },
   "mon.scheme.lvdc": {
    "cz": "Propoj LVDC",
    "en": "LVDC link"
@@ -456,26 +380,6 @@
   "mon.scheme.lvdc_i": {
    "cz": "Proud",
    "en": "Current"
-  },
-  "mon.scheme.ws_lights": {
-   "cz": "Světla",
-   "en": "Lights"
-  },
-  "mon.scheme.pack_heater": {
-   "cz": "Ohřev baterie",
-   "en": "Pack heater"
-  },
-  "mon.scheme.aircon": {
-   "cz": "Klimatizace",
-   "en": "Air conditioner"
-  },
-  "mon.scheme.axac": {
-   "cz": "AC výstup Axpert",
-   "en": "Axpert AC output"
-  },
-  "mon.scheme.pvws": {
-   "cz": "FV dílna",
-   "en": "PV workshop"
   },
   "mon.nav.solar": {
    "cz": "Solár",
@@ -556,6 +460,46 @@
   "mon.scheme.back_storage": {
    "cz": "‹ Úložiště",
    "en": "‹ Storage"
+  },
+  "mon.scheme.pv_house": {
+   "cz": "FV dům",
+   "en": "PV house"
+  },
+  "mon.scheme.pv_ws": {
+   "cz": "FV dílna",
+   "en": "PV workshop"
+  },
+  "mon.scheme.load_house": {
+   "cz": "Spotřeba dům",
+   "en": "Load house"
+  },
+  "mon.scheme.load_ws": {
+   "cz": "Spotřeba dílna",
+   "en": "Load workshop"
+  },
+  "mon.solar.pvnow": {
+   "cz": "Výkon FV",
+   "en": "PV power"
+  },
+  "mon.solar.string": {
+   "cz": "Řetězec",
+   "en": "String"
+  },
+  "mon.solar.string1": {
+   "cz": "Řetězec 1",
+   "en": "String 1"
+  },
+  "mon.solar.string2": {
+   "cz": "Řetězec 2",
+   "en": "String 2"
+  },
+  "mon.solar.batv": {
+   "cz": "Napětí baterie",
+   "en": "Battery voltage"
+  },
+  "mon.solar.maxw": {
+   "cz": "Max. výkon dnes",
+   "en": "Max power today"
   }
  }
 }

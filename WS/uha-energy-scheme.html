@@ -4,121 +4,136 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UHA</title>
-  <link rel="stylesheet" href="css/uha.css?v=20261122b">
+  <link rel="stylesheet" href="css/uha.css?v=20261122c">
 </head>
 <body>
-<script src="js/uha-common.js?v=20261122b"></script>
-<script src="js/uha-scheme.js?v=20261122b"></script>
+<script src="js/uha-common.js?v=20261122c"></script>
 <script>
-// Energy schematic after UHA_FW UHA_COMMON/VarDefs/ENERGY_TOPOLOGY.md (reviewed with Martin 2026-11-21). Everything is
-// in the arrays below: blocks (x, y, w in a 600 wide drawing; height = 38 + 27 per row + 10), links (from -> to or
-// explicit pts, variable / function for the flow direction). Columns x = 10 / 198 / 386 (w 178, centres 99 / 287 / 475),
-// lane x = 580 for the LVDC cable. Dashed (dim) = not measured.
-const C1 = 10, C2 = 198, C3 = 386, W = 178;
-const calc = (names, fn) => U => U.calc(names, fn);
-const heaterW = calc(['EL_HEATER_CURRENT_A', 'STRG1_VOLTAGE_V'], (a, v) => a * v);
-const victronDcW = calc(['POW_WS_HEATING_W'], p => p / 0.9);
-// LVDC link estimate: U.lvdcW / U.lvdcA in uha-common.js (same formula as Grafana "Storages power")
-const lvdcA = U => U.lvdcA(U), lvdcW = U => U.lvdcW(U);
-const fnRow = (label, f, unit, wh) => ({
-  fn: U => { let x = f(U); if (wh && x !== null) x /= 1000; return [U.t(label), U.format(x, unit), x === null ? 'bad' : '']; }
+// Energy scheme, high level (ENERGY_TOPOLOGY.md): 6 modules in 2 columns, house left, workshop right.
+//   PV -> storage, storage <-> storage (LVDC link, estimate), storage -> load.
+// Flows are lines with a moving dash pattern in the direction of the energy flow; speed grows with the power.
+// The dash phase lives outside the page html, so a data refresh (re-render every 2 s) does not restart it.
+const FLOW = {
+  MIN_W: 20,             // below: no flow (static, faint)
+  SPEED_MIN: 25,         // dash speed (viewBox units / s) at MIN_W ...
+  SPEED_K: 28,           // ... + SPEED_K * log2(P / MIN_W)
+  SPEED_MAX: 150,
+  DASH: '16 14'
+};
+// drawing 440 x 560 units (narrow, so that the text is readable on a 360 px phone)
+const VIEW = { w: 440, h: 560 };
+const COL = [{ x: 10, side: 1 }, { x: 260, side: 2 }];   // module x per column (w = MOD_W); side = STRG / LPV index
+const MOD_W = 170;
+const ROW = { pv: 50, strg: 230, load: 430 };             // module y per row
+const H = { pv: 120, strg: 140, load: 110 };              // module heights
+const PHASE = {};                                        // dash offset per link id (animation state)
+const REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Link-corrected local load (W), P_link + = house -> workshop; STRGx_POWER_W + = charging (checked on data):
+//   house = LPV1 - STRG1 - P_link, workshop = LPV2 - STRG2 + P_link
+function load(U, side) {
+  const pl = U.lvdcW(U);
+  const base = U.calc([`LPV${side}_POWER_W`, `STRG${side}_POWER_W`], (pv, st) => pv - st);
+  return base === null || pl === null ? null : base + (side === 1 ? -pl : pl);
+}
+
+function speed(p) {
+  const a = Math.abs(p);
+  if (a < FLOW.MIN_W) return 0;
+  return Math.min(FLOW.SPEED_MAX, FLOW.SPEED_MIN + FLOW.SPEED_K * Math.log2(a / FLOW.MIN_W)) * Math.sign(p);
+}
+
+UHA.start(U => {
+  const esc = U.esc;
+
+  // squeeze a text to maxW when its estimated width is larger
+  const fit = (str, perChar, maxW) => (str.length * perChar > maxW ? ` textLength="${maxW}" lengthAdjust="spacingAndGlyphs"` : '');
+  function module(o) {
+    const { x, y, h, cls, href, title, body } = o;
+    return `<a class="blink" href="${href}"><g>` +
+      `<rect class="blk" x="${x}" y="${y}" width="${MOD_W}" height="${h}" rx="12"/>` +
+      `<rect class="stripe ${cls}" x="${x}" y="${y}" width="${MOD_W}" height="6" rx="2"/>` +
+      `<text class="title" x="${x + 12}" y="${y + 33}"${fit(title + ' ›', 11.6, MOD_W - 24)}>${esc(title)} ›</text>${body}</g></a>`;
+  }
+  const big = (x, y, text, cls) => `<text class="big2 ${cls || ''}" x="${x}" y="${y}">${text}</text>`;
+  const small = (x, y, text, cls) => `<text class="rl ${cls || ''}" x="${x}" y="${y}">${text}</text>`;
+  const val = (name, o) => { const p = U.parts(name, o); return p ? `${p.num}<tspan class="u"> ${p.unit}</tspan>` : '–'; };
+  const watts = x => (x === null ? '–' : `${U.fmtNum(x, 0)}<tspan class="u"> W</tspan>`);
+
+  // a flow line from a to b; p > 0 = flow a -> b, p < 0 = b -> a, null = invalid
+  function flow(id, a, b, p, cls) {
+    const d = `M ${a[0]} ${a[1]} L ${b[0]} ${b[1]}`;
+    const valid = p !== null && p !== undefined;
+    const sp = valid ? speed(p) : 0;
+    const w = valid && sp ? Math.min(9, 4 + Math.log10(Math.abs(p) / FLOW.MIN_W + 1) * 2.5) : 4;
+    let s = `<path class="fbase ${cls}${valid ? '' : ' bad'}" d="${d}"/>`;
+    if (sp && !REDUCED) s += `<path class="flow ${cls}" data-id="${id}" data-speed="${sp.toFixed(1)}" d="${d}" stroke-width="${w.toFixed(1)}" stroke-dasharray="${FLOW.DASH}" style="stroke-dashoffset:${(PHASE[id] || 0).toFixed(1)}"/>`;
+    else if (sp) {                                                     // reduced motion: static arrow in the middle
+      const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
+      const ang = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI + (sp < 0 ? 180 : 0);
+      s += `<path class="arrow ${cls}" d="M 11 0 L -8 -10 L -8 10 Z" transform="translate(${mx} ${my}) rotate(${ang.toFixed(0)})"/>`;
+    }
+    return s;
+  }
+
+  let mods = '', flows = '';
+  const pl = U.lvdcW(U);
+  COL.forEach(({ x, side }) => {
+    const cx = x + 12, mx = x + MOD_W / 2;
+    // PV
+    const pvW = side === 1 ? 'MPPT_SOLAR_POWER_W' : 'AXPERT_SOLAR_W', pvT = side === 1 ? 'MPPT_YIELD_TODAY_WH' : 'LPV2_PROD_WH';
+    mods += module({ x, y: ROW.pv, h: H.pv, cls: 'solar', href: 'uha-solar.html', title: U.t(side === 1 ? 'mon.scheme.pv_house' : 'mon.scheme.pv_ws'),
+      body: big(cx, ROW.pv + 78, val(pvW), U.ageClass(pvW)) + small(cx, ROW.pv + 106, `${U.t('mon.home.today')} ${val(pvT)}`, U.ageClass(pvT)) });
+    // storage: SOC big + bar, charging / discharging power
+    const soc = `STRG${side}_SOC`, sp = `STRG${side}_POWER_W`, spw = U.num(sp), socv = U.num(soc);
+    const state = spw === null ? '–' : spw > FLOW.MIN_W ? U.t('mon.home.charging', { x: U.format(spw, 'W', 0) })
+      : spw < -FLOW.MIN_W ? U.t('mon.home.discharging', { x: U.format(-spw, 'W', 0) }) : U.t('mon.home.idle');
+    const bw = MOD_W - 112, fill = bw * Math.max(0, Math.min(100, socv || 0)) / 100;
+    mods += module({ x, y: ROW.strg, h: H.strg, cls: 'bat', href: 'uha-storage.html', title: U.vshort(`STRG${side}_SOC`),
+      body: big(cx, ROW.strg + 82, val(soc, { d: 0 }), U.ageClass(soc)) +
+        `<rect class="socbg" x="${cx + 88}" y="${ROW.strg + 60}" width="${bw}" height="22" rx="5"/>` +
+        `<rect class="socfill ${U.socClass(socv)}" x="${cx + 88}" y="${ROW.strg + 60}" width="${fill.toFixed(1)}" height="22" rx="5"/>` +
+        small(cx, ROW.strg + 120, esc(state), U.ageClass(sp)) });
+    // load (link-corrected, power only: today's LLOADx_CONS_WH are not corrected for the link)
+    const lw = load(U, side);
+    mods += module({ x, y: ROW.load, h: H.load, cls: 'load', href: 'uha-loads.html', title: U.t(side === 1 ? 'mon.scheme.load_house' : 'mon.scheme.load_ws'),
+      body: big(cx, ROW.load + 80, watts(lw), lw === null ? 'bad' : U.calcClass([`LPV${side}_POWER_W`, sp, ...U.LVDC_NAMES])) });
+    // flows PV -> storage (when producing), storage -> load (when consuming)
+    const pv = U.num(pvW);
+    flows += flow(`pv${side}`, [mx, ROW.pv + H.pv], [mx, ROW.strg], pv === null ? null : Math.max(0, pv), 'solar');
+    flows += flow(`ld${side}`, [mx, ROW.strg + H.strg], [mx, ROW.load], lw === null ? null : Math.max(0, lw), 'load');
+  });
+  // LVDC link (estimate) by its sign, + = house -> workshop
+  const ly = ROW.strg + H.strg / 2;
+  flows += flow('lvdc', [COL[0].x + MOD_W, ly], [COL[1].x, ly], pl, 'bat lvdc') +
+    `<text class="lv ${pl === null ? 'bad' : ''}" x="${VIEW.w / 2}" y="${ly - 16}" text-anchor="middle">${pl === null ? '–' : '≈ ' + U.fmtNum(Math.abs(pl), 0) + ' W'}</text>` +
+    `<text class="lvs" x="${VIEW.w / 2}" y="${ly + 34}" text-anchor="middle">LVDC</text>`;
+
+  const heads = `<text class="area" x="${COL[0].x + MOD_W / 2}" y="34" text-anchor="middle">${U.t('mon.scheme.area_house')}</text>` +
+    `<text class="area" x="${COL[1].x + MOD_W / 2}" y="34" text-anchor="middle">${U.t('mon.scheme.area_workshop')}</text>`;
+  return U.pageHead(U.t('mon.scheme.energy_t'), U.t('mon.scheme.energy_sub'),
+    [['uha-solar.html', U.t('mon.scheme.back_solar')], ['uha-storage.html', U.t('mon.scheme.back_storage')]]) +
+    `<div class="schemewrap"><svg class="scheme escheme" viewBox="0 0 ${VIEW.w} ${VIEW.h}" role="img" aria-label="${esc(U.t('mon.scheme.energy_t'))}">` +
+    heads + flows + mods + `</svg></div><p class="note">${U.t('mon.scheme.energy_note')}</p>`;
 });
-const approx = (label, f, unit) => ({ fn: U => { const x = f(U); return [U.t(label), x === null ? '–' : '≈ ' + U.format(x, unit), x === null ? 'bad' : '']; } });
-const unmeasured = label => ({ fn: U => [U.t(label), '–', 'dim'] });
 
-UHA.scheme({
-  title: 'mon.scheme.energy_t', sub: 'mon.scheme.energy_sub', head: [['uha-solar.html', 'mon.scheme.back_solar'], ['uha-storage.html', 'mon.scheme.back_storage'], [UHA.ctrlHref('inverter'), 'mon.ctrl.link']],
-  width: 600, height: 1610, modes: true,
-  areas: [
-    { x: 5, y: 125, w: 590, h: 670, label: 'mon.scheme.area_house' },
-    { x: 5, y: 925, w: 590, h: 675, label: 'mon.scheme.area_workshop' }
-  ],
-  blocks: [
-    // totals (global)
-    { id: 'tsol', x: C1, y: 10, w: W, label: 'SOLAR_POWER_W', cls: 'solar', rows: [{ v: 'SOLAR_POWER_W', i: 'CHARGING_A' }, { v: 'SOLAR_ENERGY_TODAY_WH' }] },
-    { id: 'tload', x: C2, y: 10, w: W, label: 'LOAD_W', cls: 'load', rows: [{ v: 'LOAD_W', i: 'LOAD_A' }, { v: 'CONS_TODAY_WH' }] },
-    { id: 'tbat', x: C3, y: 10, w: W, label: 'BAT_POWER_W', cls: 'bat', rows: [{ v: 'BAT_POWER_W', i: 'BAT_CURRENT_A' }, { v: 'BAT_SOC' }] },
-
-    // HOUSE: above the DC bus PV + MPPT, storage 1 (shunt, packs 220 + 80 Ah), DC loads; below it the inverters
-    { id: 'hpv', x: C1, y: 170, w: W, label: 'mon.scheme.pv_mppt', cls: 'solar',
-      rows: [{ v: 'MPPT_SOLAR_POWER_W', i: 'MPPT_SOLAR_CURRENT_A', l: 'mon.scheme.pv_short' }, { v: 'MPPT_SOLAR_VOLTAGE_V' }, { v: 'MPPT_BAT_CURRENT_A' }, { v: 'MPPT_YIELD_TODAY_WH' }] },
-    { id: 'strg1', x: C2, y: 170, w: W, label: 'STRG1_SOC', cls: 'bat',
-      rows: [{ v: 'STRG1_POWER_W', i: 'STRG1_CURRENT_A' }, { v: 'STRG1_SOC' }, { v: 'BMS2_SOC', l: 'mon.scheme.p220' }, { v: 'BMS3_SOC', l: 'mon.scheme.p80' }] },
-    { id: 'hdc', x: C3, y: 170, w: W, label: 'mon.scheme.dcloads', cls: 'load',
-      rows: [fnRow('mon.scheme.waterheater', heaterW, 'W'), unmeasured('mon.scheme.dc12'), unmeasured('mon.scheme.desk'), unmeasured('mon.scheme.fans')] },
-    { id: 'ac300', x: C1, y: 385, w: W, label: 'ST_AC_300W', state: 'ST_AC_300W', cls: 'load', rows: [{ v: 'POW_AC300_W', i: null }] },
-    { id: 'ac3k', href: UHA.ctrlHref('inverter'), x: C2, y: 385, w: W, label: 'ST_AC_3KW', state: 'ST_AC_3KW', cls: 'load', rows: [{ v: 'POW_AC3KW_W', i: null }] },
-    { id: 'ac5k', href: UHA.ctrlHref('inverter'), x: C3, y: 385, w: W, label: 'ST_AC_5KW', state: 'ST_AC_5KW', cls: 'load', rows: [{ v: 'POW_AC5KW_W', i: null }] },
-    // each inverter's own circuits (meters in the "AC rozvaděč FVE")
-    { id: 'c300', x: C1, y: 525, w: W, label: 'mon.scheme.circ', cls: 'load',
-      rows: [{ v: 'POW_FRIDGE_W', l: 'POW_FRIDGE_W', i: null }, { v: 'POW_TECHM_W', l: 'POW_TECHM_W', i: null }] },
-    { id: 'c3k', x: C2, y: 525, w: W, label: 'mon.scheme.circ', cls: 'load',
-      rows: [{ v: 'POW_KITCHEN_B_W', l: 'POW_KITCHEN_B_W', i: null }, { v: 'POW_WASCHMACHINE_W', l: 'POW_WASCHMACHINE_W', i: null }] },
-    { id: 'c5k', x: C3, y: 525, w: W, label: 'mon.scheme.circ', cls: 'load',
-      rows: [{ v: 'POW_OTHER_W', l: 'POW_OTHER_W', i: null }, { v: 'POW_KITCHEN_A_W', l: 'POW_KITCHEN_A_W', i: null }, unmeasured('mon.scheme.kids_office')] },
-    { id: 'htot', x: C1, y: 680, w: 554, label: 'mon.scheme.house_total', cls: 'home',
-      rows: [{ v: 'LPV1_POWER_W', l: 'mon.scheme.pv_short', i: null }, { v: 'LLOAD1_POWER_W', l: 'mon.scheme.load_short', i: null }] },
-
-    // LVDC link (20 m cable, current not measured): estimate
-    { id: 'lvdc', x: C3, y: 810, w: W, label: 'mon.scheme.lvdc', cls: 'bat',
-      rows: [approx('mon.scheme.lvdc_p', lvdcW, 'W'), approx('mon.scheme.lvdc_i', lvdcA, 'A')] },
-
-    // WORKSHOP: above the DC bus storage 2 (251 Ah, current from the BMS) and unmeasured DC loads; below it the
-    // Victron (air conditioner) and the Axpert (2 PV strings, AC out -> EV charger + workshop)
-    { id: 'strg2', x: C1, y: 970, w: W, label: 'STRG2_SOC', cls: 'bat',
-      rows: [{ v: 'STRG2_POWER_W', i: 'BMS1_CURRENT_A' }, { v: 'STRG2_SOC' }, { v: 'STRG2_VOLTAGE_V' }] },
-    { id: 'wdc', x: C2, y: 970, w: W, label: 'mon.scheme.dcloads', cls: 'load', dim: true,
-      rows: [unmeasured('mon.scheme.ws_lights'), unmeasured('mon.scheme.pack_heater')] },
-    { id: 'victron', href: UHA.ctrlHref('inverter'), x: C1, y: 1155, w: W, label: 'ST_AC_VICTRON', state: 'ST_AC_VICTRON', cls: 'load',
-      rows: [{ v: 'POW_WS_HEATING_W', l: 'mon.loads.power', i: null }] },
-    { id: 'axpert', href: UHA.ctrlHref('inverter'), x: C2, y: 1155, w: 366, label: 'ST_AC_AXPERT', state: 'ST_AC_AXPERT', cls: 'solar',
-      rows: [{ v: 'AXPERT_AC_POWER_W', i: null }, { v: 'AXPERT_SOLAR_W', i: null }, { v: 'AXPERT_BAT_POWER_W', i: 'AXPERT_BAT_CURRENT_A' }] },
-    { id: 'aircon', x: C1, y: 1345, w: W, label: 'mon.scheme.aircon', cls: 'load',
-      rows: [{ v: 'POW_WS_HEATING_W', l: 'mon.loads.power', i: null }, { v: 'CONS_WS_HEATING_WH', l: 'mon.home.today' }] },
-    { id: 'axac', x: C2, y: 1345, w: W, label: 'mon.scheme.axac', cls: 'load',
-      rows: [{ v: 'POW_AXPERT_W', l: 'mon.loads.power', i: null }, { v: 'CONS_AXPERT_WH', l: 'mon.home.today' }] },
-    { id: 'pvws', x: C3, y: 1345, w: W, label: 'mon.scheme.pvws', cls: 'solar',
-      rows: [{ v: 'AXPERT_PVS1_W', l: 'AXPERT_PVS1_W', i: 'AXPERT_PVS1_A' }, { v: 'AXPERT_PVS2_W', l: 'AXPERT_PVS2_W', i: 'AXPERT_PVS2_A' }] },
-    { id: 'wtot', x: C1, y: 1480, w: W, label: 'mon.scheme.ws_total', cls: 'home',
-      rows: [{ v: 'LPV2_POWER_W', l: 'mon.scheme.pv_short', i: null }, { v: 'LLOAD2_POWER_W', l: 'mon.scheme.load_short', i: null }] },
-    { id: 'evse', x: C2, y: 1480, w: W, label: 'POW_EVSE_W', cls: 'load', rows: [{ v: 'POW_EVSE_W', l: 'mon.loads.power', i: null }, { v: 'CONS_EVSE_WH', l: 'mon.home.today' }] },
-    { id: 'wshop', x: C3, y: 1480, w: W, label: 'mon.loads.workshop', cls: 'load',
-      rows: [fnRow('mon.loads.power', calc(['POW_AXPERT_W', 'POW_EVSE_W'], (a, e) => a - e), 'W'),
-             fnRow('mon.home.today', calc(['CONS_AXPERT_WH', 'CONS_EVSE_WH'], (a, e) => a - e), 'kWh', true)] }
-  ],
-  links: [
-    // house DC bus (y 352) + the lane to the LVDC link
-    { pts: [[40, 352], [580, 352]], cls: 'bus' },
-    { pts: [[60, 326], [60, 352]], v: 'MPPT_SOLAR_POWER_W', i: 'MPPT_BAT_CURRENT_A', cls: 'solar' },
-    { pts: [[250, 352], [250, 326]], v: 'STRG1_POWER_W', i: 'STRG1_CURRENT_A', cls: 'bat' },
-    { pts: [[520, 352], [520, 326]], v: heaterW, i: 'EL_HEATER_CURRENT_A', cls: 'load' },
-    { pts: [[99, 352], [99, 385]], v: 'POW_AC300_W', cls: 'load' },
-    { pts: [[287, 352], [287, 385]], v: 'POW_AC3KW_W', cls: 'load' },
-    { pts: [[475, 352], [475, 385]], v: 'POW_AC5KW_W', cls: 'load' },
-    { from: 'ac300', to: 'c300', v: 'POW_AC300_W', cls: 'load' },
-    { from: 'ac3k', to: 'c3k', v: 'POW_AC3KW_W', cls: 'load' },
-    { from: 'ac5k', to: 'c5k', v: 'POW_AC5KW_W', cls: 'load' },
-    // LVDC cable: house bus -> lane -> link block -> workshop bus
-    { pts: [[580, 352], [580, 861], [564, 861]], v: lvdcW, i: lvdcA, cls: 'bat' },
-    { pts: [[475, 912], [475, 1125]], v: lvdcW, i: lvdcA, cls: 'bat' },
-    // workshop DC bus (y 1125)
-    { pts: [[40, 1125], [560, 1125]], cls: 'bus' },
-    { pts: [[70, 1125], [70, 1099]], v: 'STRG2_POWER_W', i: 'BMS1_CURRENT_A', cls: 'bat' },
-    { pts: [[287, 1125], [287, 1072]], cls: 'dim' },
-    { pts: [[130, 1125], [130, 1155]], v: victronDcW, cls: 'load' },
-    { pts: [[250, 1155], [250, 1125]], v: 'AXPERT_BAT_POWER_W', i: 'AXPERT_BAT_CURRENT_A', cls: 'bat' },
-    { from: 'victron', to: 'aircon', v: 'POW_WS_HEATING_W', cls: 'load' },
-    { pts: [[475, 1345], [475, 1311]], v: 'AXPERT_SOLAR_W', cls: 'solar' },
-    { pts: [[250, 1311], [250, 1345]], v: 'POW_AXPERT_W', cls: 'load' },
-    { pts: [[250, 1447], [250, 1480]], v: 'POW_EVSE_W', cls: 'load' },
-    { pts: [[340, 1447], [340, 1463], [475, 1463], [475, 1480]], v: calc(['POW_AXPERT_W', 'POW_EVSE_W'], (a, e) => a - e), cls: 'load' }
-  ],
-  texts: [
-    { x: 150, y: 345, l: 'mon.scheme.dcbus', anchor: 'middle', cls: 'lv' },
-    { x: 193, y: 1118, l: 'mon.scheme.dcbus', anchor: 'middle', cls: 'lv' }
-  ],
-  note: 'mon.scheme.energy_note'
-});
+// dash animation: one loop for the page, phase per link id kept across re-renders
+(function () {
+  if (REDUCED) return;
+  const phase = PHASE, DASH_PERIOD = FLOW.DASH.split(' ').reduce((x, y) => x + Number(y), 0);
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(0.1, (now - last) / 1000);
+    last = now;
+    document.querySelectorAll('.escheme .flow').forEach(el => {
+      const id = el.dataset.id, v = parseFloat(el.dataset.speed) || 0;
+      phase[id] = ((phase[id] || 0) - v * dt) % DASH_PERIOD;   // one dash period: no jump at the wrap
+      el.style.strokeDashoffset = phase[id].toFixed(1);
+    });
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
 </script>
 </body>
 </html>

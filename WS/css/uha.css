@@ -79,6 +79,7 @@ main { max-width: 1200px; margin: 0 auto; padding: 16px; }
 .row:last-child { border-bottom: 0; }
 .row .l { color: var(--muted); } .row .v { font-variant-numeric: tabular-nums; font-weight: 500; text-align: right; }
 .row.old .v { color: var(--warn); } .row.bad .v { color: var(--muted); }
+.small .row { font-size: 12px; padding: 4px 0; }
 h3 { margin: 16px 0 6px; font-size: 13px; color: var(--muted); font-weight: 600; }
 h3:first-child { margin-top: 0; }
 
@@ -194,6 +195,22 @@ table.t tr.old td.n { color: var(--warn); } table.t tr.bad td { color: var(--mut
 .scheme .blink:hover .blk { stroke: var(--muted); }
 .scheme .blk.dim { fill: none; stroke-dasharray: 8 6; } .scheme .rv.dim { fill: var(--muted); font-weight: 400; }
 .scheme .lnk.bus { stroke: #8a96a3; stroke-width: 7; } .scheme .lnk.dim { stroke-dasharray: 8 8; opacity: .5; }
+/* high-level energy scheme (uha-energy-scheme.html): modules + animated flows */
+.escheme { max-width: 520px; margin: 0 auto; }
+.escheme .lv { font-size: 19px; }
+.escheme .big2 { font-size: 44px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.escheme .big2 .u { font-size: 22px; font-weight: 400; fill: var(--muted); }
+.escheme .rl .u { fill: var(--muted); }
+.escheme .big2.old, .escheme .rl.old { fill: var(--warn); } .escheme .big2.bad, .escheme .rl.bad { fill: var(--muted); }
+.escheme .rl { font-size: 21px; fill: var(--text); }
+.escheme .fbase { fill: none; stroke-width: 4; opacity: .28; stroke: #56606b; }
+.escheme .flow { fill: none; stroke-linecap: butt; }
+.escheme .solar { stroke: var(--solar); } .escheme .load { stroke: var(--load); } .escheme .bat { stroke: var(--bat); }
+.escheme .fbase.lvdc { stroke-dasharray: 7 7; opacity: .6; } .escheme .fbase.bad { stroke: #3a434d; opacity: 1; }
+.escheme .arrow.solar { fill: var(--solar); } .escheme .arrow.load { fill: var(--load); } .escheme .arrow.bat { fill: var(--bat); }
+.escheme .socbg { fill: var(--card2); stroke: none; } .escheme .socfill { fill: var(--bat); stroke: none; }
+.escheme .socfill.warn { fill: var(--warn); } .escheme .socfill.bad { fill: var(--bad); }
+.escheme .lvs { font-size: 17px; fill: var(--muted); letter-spacing: .08em; }
 .modesw { display: flex; gap: 6px; justify-content: center; margin: 0 0 10px; }
 .modesw button { background: var(--card); color: var(--muted); border: 1px solid var(--line); border-radius: 8px; padding: 6px 14px; font-size: 14px; cursor: pointer; }
 .modesw button.on { background: var(--card2); color: var(--text); border-color: var(--muted); font-weight: 600; }
