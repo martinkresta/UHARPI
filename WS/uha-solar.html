@@ -4,17 +4,31 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>UHA</title>
-  <link rel="stylesheet" href="css/uha.css?v=20261122b">
+  <link rel="stylesheet" href="css/uha.css?v=20261122c">
 </head>
 <body>
-<script src="js/uha-common.js?v=20261122b"></script>
+<script src="js/uha-common.js?v=20261122c"></script>
 <script>
-// Solar: production only (house MPPT, workshop Axpert PV side). Storage and inverters are on their own pages.
+// Solar: production only. Both chargers (house MPPT, workshop Axpert PV side) are drawn by one function, same layout.
+// Axpert has no "max power today" yet (FW adds it later): max: null -> "–".
+const CHARGERS = [
+  { title: 'mon.solar.mppt', power: 'MPPT_SOLAR_POWER_W', today: 'MPPT_YIELD_TODAY_WH',
+    strings: [['mon.solar.string', 'MPPT_SOLAR_POWER_W', 'MPPT_SOLAR_VOLTAGE_V', 'MPPT_SOLAR_CURRENT_A']],
+    bat: 'MPPT_BAT_VOLTAGE_V', max: 'MPPT_MAX_TODAY_W', temp: 'MPPT_TEMP_C' },
+  { title: 'mon.solar.axpv', power: 'AXPERT_SOLAR_W', today: 'LPV2_PROD_WH',
+    strings: [['mon.solar.string1', 'AXPERT_PVS1_W', 'AXPERT_PVS1_V', 'AXPERT_PVS1_A'],
+              ['mon.solar.string2', 'AXPERT_PVS2_W', 'AXPERT_PVS2_V', 'AXPERT_PVS2_A']],
+    bat: 'AXPERT_BAT_VOLTAGE_V', max: null, temp: 'AXPERT_TEMP_C' }
+];
+
 UHA.start(U => {
-  const mtile = (name, o) => U.tile(U.vmeasure(name), name, o);
   const pv = U.num('SOLAR_POWER_W');
-  const pvRow = n => U.rowText(U.vshort(`AXPERT_PVS${n}_W`),
-    `${U.show(`AXPERT_PVS${n}_W`)} · ${U.show(`AXPERT_PVS${n}_V`)} · ${U.show(`AXPERT_PVS${n}_A`)}`, U.ageClass(`AXPERT_PVS${n}_W`));
+  const charger = c => U.card(U.t(c.title),
+    `<div class="tiles">${U.tile(U.t('mon.solar.pvnow'), c.power)}${U.tile(U.t('mon.energy.ax_pv'), c.today)}</div>` +
+    c.strings.map(([l, w, v, a]) => U.rowText(U.t(l), `${U.show(w)} · ${U.show(v)} · ${U.show(a)}`, U.ageClass(w))).join('') +
+    U.row(U.t('mon.solar.batv'), c.bat) +
+    (c.max ? U.row(U.t('mon.solar.maxw'), c.max) : U.rowText(U.t('mon.solar.maxw'), '–', 'bad')) +
+    `<div class="small">${U.row(U.t('mon.scheme.temp'), c.temp)}</div>`, { cls: 'solar' });
   return U.pageHead(U.t('mon.solar.title'), U.t('mon.solar.sub'), [['uha-energy-scheme.html', U.t('mon.scheme.link')]]) +
     `<div class="grid wide">` +
     U.card(U.t('mon.solar.total'),
@@ -23,13 +37,7 @@ UHA.start(U => {
       `<div class="meter"><div class="head"><span class="l">${U.t('mon.home.peak', { x: U.format(U.SOLAR_PEAK_W, 'W') })}</span>` +
       `<span class="v">${pv === null ? '–' : U.format(pv / U.SOLAR_PEAK_W * 100, '%', 0)}</span></div>` +
       U.bar(pv === null ? 0 : pv / U.SOLAR_PEAK_W, 'solar') + `</div>`, { cls: 'solar' }) +
-    U.card(U.t('mon.solar.mppt'),
-      `<div class="tiles">${mtile('MPPT_SOLAR_POWER_W')}${mtile('MPPT_SOLAR_VOLTAGE_V')}${mtile('MPPT_SOLAR_CURRENT_A')}</div>` +
-      U.mrow('MPPT_BAT_VOLTAGE_V') + U.mrow('MPPT_BAT_CURRENT_A') + U.mrow('MPPT_YIELD_TODAY_WH') + U.mrow('MPPT_MAX_TODAY_W') +
-      U.mrow('MPPT_SOLAR_MAX_VOLTAGE_V') + U.mrow('MPPT_MAX_BAT_CURRENT_A') + U.mrow('MPPT_TEMP_C'), { cls: 'solar' }) +
-    U.card(U.t('mon.solar.axpv'),
-      `<div class="tiles">${mtile('AXPERT_SOLAR_W')}${U.tile(U.t('mon.energy.ax_pv'), 'LPV2_PROD_WH')}</div>` +
-      `<h3>${U.t('mon.energy.pvinputs')}</h3>` + pvRow(1) + pvRow(2), { cls: 'solar' }) +
+    CHARGERS.map(charger).join('') +
     `</div><p class="note"><a href="uha-detail.html#energy">${U.t('mon.energy.more')}</a></p>`;
 });
 </script>
