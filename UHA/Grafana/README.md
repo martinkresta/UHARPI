@@ -50,11 +50,18 @@ English short names of `WS/i18n/texts.json` (no YAML names). Task `tasks/grafana
    the **LVDC link estimate** `(BMS1_CURRENT_A − AXPERT_BAT_CURRENT_A) × STRG2_VOLTAGE_V + POW_WS_HEATING_W / 0.9`
    (+ = house → workshop; the Victron term is needed, checked on data 2026-11-21).
 2. **UHA Packs** — 16 cell voltages per pack (legend = cell number), pack voltage / current / SOC.
-3. **UHA Temperatures** — indoor & outside, tank layers, boiler, heating circuits, recuperation, CO₂, electronics, wind.
+3. **UHA Temperatures** — indoor & outside, tank layers, boiler, heating circuits, recuperation, CO₂, electronics, wind,
+   water per day (last 30 days).
 4. **UHA States** (table `events`) — rows by category (YAML command `category:`, `STATE_CATEGORY` for the rest):
    lights (+ light on-time per day without the exterior outputs and the stair steps), blinds, inverters, heating
    (3 pumps, boiler, setpoints, TECHM panels), loads / relays, ventilation. Enum timelines have a colour legend.
    Invalid is shown as "invalid" (the query writes it as -1).
+5. **UHA Statistics** (default "This month") — period totals following the time picker (energy, water, heat,
+   consumption breakdown table with shares, inverters table kept apart), daily bars (time picker), monthly bars
+   (last 2 years) and yearly bars (last 10 years). Sums from agg_15min (kept forever), first per UTC hour, then per
+   local day / month / year (`period_sql`, `total_sql`). Water: total and hot side by side (hot is part of total).
+   Speed: < 0.1 s per panel with a week of data; estimated ~4 s per panel for a full year, ~7 s for loads per month
+   over 2 years.
 
 Which table a panel reads: raw up to 2 days, agg_15min beyond, one value per day beyond 60 days (CET day for
 averages, exact local day for the energy bars). Speed on the Pi 3 with a full-size database (3 days raw + 1 year

@@ -1,0 +1,1570 @@
+{
+  "uid": "uha-statistics",
+  "title": "UHA Statistics",
+  "tags": [
+    "uha"
+  ],
+  "timezone": "Europe/Prague",
+  "editable": true,
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "5m",
+  "graphTooltip": 1,
+  "time": {
+    "from": "now/M",
+    "to": "now/M"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "1m",
+      "5m",
+      "15m",
+      "1h"
+    ]
+  },
+  "panels": [
+    {
+      "type": "row",
+      "title": "Period totals (time picker)",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 1
+      },
+      "panels": [],
+      "id": 1
+    },
+    {
+      "type": "stat",
+      "title": "Energy",
+      "description": "PV = local PV house / workshop, consumption = load house + workshop (DC side), balance = PV - consumption",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 1,
+        "w": 12,
+        "h": 5
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "kwatth",
+          "decimals": 1,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PV house"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#28a745"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PV workshop"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#28a745"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PV total"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#28a745"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Consumption"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#dc3545"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Balance"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#ffc107"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "table",
+          "rawQueryText": "-- sums over the selected range\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('LLOAD1_CONS_WH', 'LLOAD2_CONS_WH', 'LPV1_PROD_WH', 'LPV2_PROD_WH')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT 0 AS k,\n    COALESCE(SUM(CASE WHEN name = 'LLOAD1_CONS_WH' THEN s END), 0) AS \"LLOAD1_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LLOAD2_CONS_WH' THEN s END), 0) AS \"LLOAD2_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LPV1_PROD_WH' THEN s END), 0) AS \"LPV1_PROD_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LPV2_PROD_WH' THEN s END), 0) AS \"LPV2_PROD_WH\"\n  FROM h\n  GROUP BY 1\n)\nSELECT (\"LPV1_PROD_WH\") / 1000.0 AS \"PV house\",\n       (\"LPV2_PROD_WH\") / 1000.0 AS \"PV workshop\",\n       (\"LPV1_PROD_WH\" + \"LPV2_PROD_WH\") / 1000.0 AS \"PV total\",\n       (\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\") / 1000.0 AS \"Consumption\",\n       ((\"LPV1_PROD_WH\" + \"LPV2_PROD_WH\") - (\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\")) / 1000.0 AS \"Balance\"\nFROM p",
+          "queryText": "-- sums over the selected range\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('LLOAD1_CONS_WH', 'LLOAD2_CONS_WH', 'LPV1_PROD_WH', 'LPV2_PROD_WH')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT 0 AS k,\n    COALESCE(SUM(CASE WHEN name = 'LLOAD1_CONS_WH' THEN s END), 0) AS \"LLOAD1_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LLOAD2_CONS_WH' THEN s END), 0) AS \"LLOAD2_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LPV1_PROD_WH' THEN s END), 0) AS \"LPV1_PROD_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LPV2_PROD_WH' THEN s END), 0) AS \"LPV2_PROD_WH\"\n  FROM h\n  GROUP BY 1\n)\nSELECT (\"LPV1_PROD_WH\") / 1000.0 AS \"PV house\",\n       (\"LPV2_PROD_WH\") / 1000.0 AS \"PV workshop\",\n       (\"LPV1_PROD_WH\" + \"LPV2_PROD_WH\") / 1000.0 AS \"PV total\",\n       (\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\") / 1000.0 AS \"Consumption\",\n       ((\"LPV1_PROD_WH\" + \"LPV2_PROD_WH\") - (\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\")) / 1000.0 AS \"Balance\"\nFROM p",
+          "timeColumns": []
+        }
+      ],
+      "id": 2
+    },
+    {
+      "type": "stat",
+      "title": "Water",
+      "description": "Total = all water, hot = part of it",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 1,
+        "w": 6,
+        "h": 5
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "litre",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#5794f2"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Hot"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#dc3545"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total m³"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#5794f2"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Hot m³"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#dc3545"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total m³"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "m3"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Hot m³"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "m3"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "table",
+          "rawQueryText": "-- sums over the selected range\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('CONS_COLD_L', 'CONS_HOT_L')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT 0 AS k,\n    COALESCE(SUM(CASE WHEN name = 'CONS_COLD_L' THEN s END), 0) AS \"CONS_COLD_L\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_HOT_L' THEN s END), 0) AS \"CONS_HOT_L\"\n  FROM h\n  GROUP BY 1\n)\nSELECT (\"CONS_COLD_L\") / 1.0 AS \"Total\",\n       (\"CONS_HOT_L\") / 1.0 AS \"Hot\",\n       (\"CONS_COLD_L\") / 1000.0 AS \"Total m³\",\n       (\"CONS_HOT_L\") / 1000.0 AS \"Hot m³\"\nFROM p",
+          "queryText": "-- sums over the selected range\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('CONS_COLD_L', 'CONS_HOT_L')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT 0 AS k,\n    COALESCE(SUM(CASE WHEN name = 'CONS_COLD_L' THEN s END), 0) AS \"CONS_COLD_L\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_HOT_L' THEN s END), 0) AS \"CONS_HOT_L\"\n  FROM h\n  GROUP BY 1\n)\nSELECT (\"CONS_COLD_L\") / 1.0 AS \"Total\",\n       (\"CONS_HOT_L\") / 1.0 AS \"Hot\",\n       (\"CONS_COLD_L\") / 1000.0 AS \"Total m³\",\n       (\"CONS_HOT_L\") / 1000.0 AS \"Hot m³\"\nFROM p",
+          "timeColumns": []
+        }
+      ],
+      "id": 3
+    },
+    {
+      "type": "stat",
+      "title": "Heat",
+      "description": "Boiler heat (counter) and the electric heater's consumption in the tank",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 1,
+        "w": 6,
+        "h": 5
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "kwatth",
+          "decimals": 1,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Boiler"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#ff9830"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Electric heater"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#dc3545"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "wideLayout": true,
+        "showPercentChange": false
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "table",
+          "rawQueryText": "-- sums over the selected range\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BOILER_HEAT', 'EL_HEATER_CONS_WH')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT 0 AS k,\n    COALESCE(SUM(CASE WHEN name = 'BOILER_HEAT' THEN s END), 0) AS \"BOILER_HEAT\",\n    COALESCE(SUM(CASE WHEN name = 'EL_HEATER_CONS_WH' THEN s END), 0) AS \"EL_HEATER_CONS_WH\"\n  FROM h\n  GROUP BY 1\n)\nSELECT (\"BOILER_HEAT\") / 1000.0 AS \"Boiler\",\n       (\"EL_HEATER_CONS_WH\") / 1000.0 AS \"Electric heater\"\nFROM p",
+          "queryText": "-- sums over the selected range\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('BOILER_HEAT', 'EL_HEATER_CONS_WH')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT 0 AS k,\n    COALESCE(SUM(CASE WHEN name = 'BOILER_HEAT' THEN s END), 0) AS \"BOILER_HEAT\",\n    COALESCE(SUM(CASE WHEN name = 'EL_HEATER_CONS_WH' THEN s END), 0) AS \"EL_HEATER_CONS_WH\"\n  FROM h\n  GROUP BY 1\n)\nSELECT (\"BOILER_HEAT\") / 1000.0 AS \"Boiler\",\n       (\"EL_HEATER_CONS_WH\") / 1000.0 AS \"Electric heater\"\nFROM p",
+          "timeColumns": []
+        }
+      ],
+      "id": 4
+    },
+    {
+      "type": "table",
+      "title": "Consumption breakdown",
+      "description": "Same categories as Loads per day (UHA Energy); Other = consumption - all categories. Share of the consumption total.",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 6,
+        "w": 12,
+        "h": 11
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "kWh"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "kwatth"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Share"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#dc3545"
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "gauge",
+                  "mode": "basic",
+                  "valueDisplayMode": "text"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "table",
+          "rawQueryText": "-- sums over the selected range\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('AXPERT_LOAD_W', 'CONS_AXPERT_WH', 'CONS_EVSE_WH', 'CONS_FRIDGE_WH', 'CONS_KITCHEN_WH', 'CONS_OTHER_WH', 'CONS_TECHM_WH', 'CONS_WASCHMACHINE_WH', 'CONS_WS_HEATING_WH', 'EL_HEATER_CONS_WH', 'LLOAD1_CONS_WH', 'LLOAD2_CONS_WH')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT 0 AS k,\n    COALESCE(SUM(CASE WHEN name = 'AXPERT_LOAD_W' THEN s END), 0) / 4.0 AS \"AXPERT_LOAD_W\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_AXPERT_WH' THEN s END), 0) AS \"CONS_AXPERT_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_EVSE_WH' THEN s END), 0) AS \"CONS_EVSE_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_FRIDGE_WH' THEN s END), 0) AS \"CONS_FRIDGE_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_KITCHEN_WH' THEN s END), 0) AS \"CONS_KITCHEN_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_OTHER_WH' THEN s END), 0) AS \"CONS_OTHER_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_TECHM_WH' THEN s END), 0) AS \"CONS_TECHM_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_WASCHMACHINE_WH' THEN s END), 0) AS \"CONS_WASCHMACHINE_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_WS_HEATING_WH' THEN s END), 0) AS \"CONS_WS_HEATING_WH\",\n    COALESCE(SUM(CASE WHEN name = 'EL_HEATER_CONS_WH' THEN s END), 0) AS \"EL_HEATER_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LLOAD1_CONS_WH' THEN s END), 0) AS \"LLOAD1_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LLOAD2_CONS_WH' THEN s END), 0) AS \"LLOAD2_CONS_WH\"\n  FROM h\n  GROUP BY 1\n)\nSELECT * FROM (\n  SELECT 'Fridge' AS \"Category\", (\"CONS_FRIDGE_WH\") / 1000.0 AS \"kWh\", (\"CONS_FRIDGE_WH\") * 100.0 / NULLIF(\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Kitchen' AS \"Category\", (\"CONS_KITCHEN_WH\") / 1000.0 AS \"kWh\", (\"CONS_KITCHEN_WH\") * 100.0 / NULLIF(\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Washing machine' AS \"Category\", (\"CONS_WASCHMACHINE_WH\") / 1000.0 AS \"kWh\", (\"CONS_WASCHMACHINE_WH\") * 100.0 / NULLIF(\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Technical room' AS \"Category\", (\"CONS_TECHM_WH\") / 1000.0 AS \"kWh\", (\"CONS_TECHM_WH\") * 100.0 / NULLIF(\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Other circuits' AS \"Category\", (\"CONS_OTHER_WH\") / 1000.0 AS \"kWh\", (\"CONS_OTHER_WH\") * 100.0 / NULLIF(\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Workshop' AS \"Category\", (\"CONS_AXPERT_WH\" - \"CONS_EVSE_WH\") / 1000.0 AS \"kWh\", (\"CONS_AXPERT_WH\" - \"CONS_EVSE_WH\") * 100.0 / NULLIF(\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'EV charger' AS \"Category\", (\"CONS_EVSE_WH\") / 1000.0 AS \"kWh\", (\"CONS_EVSE_WH\") * 100.0 / NULLIF(\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Workshop air conditioner' AS \"Category\", (\"CONS_WS_HEATING_WH\") / 1000.0 AS \"kWh\", (\"CONS_WS_HEATING_WH\") * 100.0 / NULLIF(\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Water heater' AS \"Category\", (\"EL_HEATER_CONS_WH\") / 1000.0 AS \"kWh\", (\"EL_HEATER_CONS_WH\") * 100.0 / NULLIF(\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Axpert losses' AS \"Category\", (\"AXPERT_LOAD_W\" - \"CONS_AXPERT_WH\") / 1000.0 AS \"kWh\", (\"AXPERT_LOAD_W\" - \"CONS_AXPERT_WH\") * 100.0 / NULLIF(\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Other' AS \"Category\", ((\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\") - (\"CONS_FRIDGE_WH\") - (\"CONS_KITCHEN_WH\") - (\"CONS_WASCHMACHINE_WH\") - (\"CONS_TECHM_WH\") - (\"CONS_OTHER_WH\") - (\"CONS_AXPERT_WH\" - \"CONS_EVSE_WH\") - (\"CONS_EVSE_WH\") - (\"CONS_WS_HEATING_WH\") - (\"EL_HEATER_CONS_WH\") - (\"AXPERT_LOAD_W\" - \"CONS_AXPERT_WH\")) / 1000.0 AS \"kWh\", ((\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\") - (\"CONS_FRIDGE_WH\") - (\"CONS_KITCHEN_WH\") - (\"CONS_WASCHMACHINE_WH\") - (\"CONS_TECHM_WH\") - (\"CONS_OTHER_WH\") - (\"CONS_AXPERT_WH\" - \"CONS_EVSE_WH\") - (\"CONS_EVSE_WH\") - (\"CONS_WS_HEATING_WH\") - (\"EL_HEATER_CONS_WH\") - (\"AXPERT_LOAD_W\" - \"CONS_AXPERT_WH\")) * 100.0 / NULLIF(\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\", 0) AS \"Share\" FROM p\n) ORDER BY 2 DESC",
+          "queryText": "-- sums over the selected range\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('AXPERT_LOAD_W', 'CONS_AXPERT_WH', 'CONS_EVSE_WH', 'CONS_FRIDGE_WH', 'CONS_KITCHEN_WH', 'CONS_OTHER_WH', 'CONS_TECHM_WH', 'CONS_WASCHMACHINE_WH', 'CONS_WS_HEATING_WH', 'EL_HEATER_CONS_WH', 'LLOAD1_CONS_WH', 'LLOAD2_CONS_WH')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT 0 AS k,\n    COALESCE(SUM(CASE WHEN name = 'AXPERT_LOAD_W' THEN s END), 0) / 4.0 AS \"AXPERT_LOAD_W\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_AXPERT_WH' THEN s END), 0) AS \"CONS_AXPERT_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_EVSE_WH' THEN s END), 0) AS \"CONS_EVSE_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_FRIDGE_WH' THEN s END), 0) AS \"CONS_FRIDGE_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_KITCHEN_WH' THEN s END), 0) AS \"CONS_KITCHEN_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_OTHER_WH' THEN s END), 0) AS \"CONS_OTHER_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_TECHM_WH' THEN s END), 0) AS \"CONS_TECHM_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_WASCHMACHINE_WH' THEN s END), 0) AS \"CONS_WASCHMACHINE_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_WS_HEATING_WH' THEN s END), 0) AS \"CONS_WS_HEATING_WH\",\n    COALESCE(SUM(CASE WHEN name = 'EL_HEATER_CONS_WH' THEN s END), 0) AS \"EL_HEATER_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LLOAD1_CONS_WH' THEN s END), 0) AS \"LLOAD1_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LLOAD2_CONS_WH' THEN s END), 0) AS \"LLOAD2_CONS_WH\"\n  FROM h\n  GROUP BY 1\n)\nSELECT * FROM (\n  SELECT 'Fridge' AS \"Category\", (\"CONS_FRIDGE_WH\") / 1000.0 AS \"kWh\", (\"CONS_FRIDGE_WH\") * 100.0 / NULLIF(\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Kitchen' AS \"Category\", (\"CONS_KITCHEN_WH\") / 1000.0 AS \"kWh\", (\"CONS_KITCHEN_WH\") * 100.0 / NULLIF(\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Washing machine' AS \"Category\", (\"CONS_WASCHMACHINE_WH\") / 1000.0 AS \"kWh\", (\"CONS_WASCHMACHINE_WH\") * 100.0 / NULLIF(\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Technical room' AS \"Category\", (\"CONS_TECHM_WH\") / 1000.0 AS \"kWh\", (\"CONS_TECHM_WH\") * 100.0 / NULLIF(\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Other circuits' AS \"Category\", (\"CONS_OTHER_WH\") / 1000.0 AS \"kWh\", (\"CONS_OTHER_WH\") * 100.0 / NULLIF(\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Workshop' AS \"Category\", (\"CONS_AXPERT_WH\" - \"CONS_EVSE_WH\") / 1000.0 AS \"kWh\", (\"CONS_AXPERT_WH\" - \"CONS_EVSE_WH\") * 100.0 / NULLIF(\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'EV charger' AS \"Category\", (\"CONS_EVSE_WH\") / 1000.0 AS \"kWh\", (\"CONS_EVSE_WH\") * 100.0 / NULLIF(\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Workshop air conditioner' AS \"Category\", (\"CONS_WS_HEATING_WH\") / 1000.0 AS \"kWh\", (\"CONS_WS_HEATING_WH\") * 100.0 / NULLIF(\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Water heater' AS \"Category\", (\"EL_HEATER_CONS_WH\") / 1000.0 AS \"kWh\", (\"EL_HEATER_CONS_WH\") * 100.0 / NULLIF(\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Axpert losses' AS \"Category\", (\"AXPERT_LOAD_W\" - \"CONS_AXPERT_WH\") / 1000.0 AS \"kWh\", (\"AXPERT_LOAD_W\" - \"CONS_AXPERT_WH\") * 100.0 / NULLIF(\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Other' AS \"Category\", ((\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\") - (\"CONS_FRIDGE_WH\") - (\"CONS_KITCHEN_WH\") - (\"CONS_WASCHMACHINE_WH\") - (\"CONS_TECHM_WH\") - (\"CONS_OTHER_WH\") - (\"CONS_AXPERT_WH\" - \"CONS_EVSE_WH\") - (\"CONS_EVSE_WH\") - (\"CONS_WS_HEATING_WH\") - (\"EL_HEATER_CONS_WH\") - (\"AXPERT_LOAD_W\" - \"CONS_AXPERT_WH\")) / 1000.0 AS \"kWh\", ((\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\") - (\"CONS_FRIDGE_WH\") - (\"CONS_KITCHEN_WH\") - (\"CONS_WASCHMACHINE_WH\") - (\"CONS_TECHM_WH\") - (\"CONS_OTHER_WH\") - (\"CONS_AXPERT_WH\" - \"CONS_EVSE_WH\") - (\"CONS_EVSE_WH\") - (\"CONS_WS_HEATING_WH\") - (\"EL_HEATER_CONS_WH\") - (\"AXPERT_LOAD_W\" - \"CONS_AXPERT_WH\")) * 100.0 / NULLIF(\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\", 0) AS \"Share\" FROM p\n) ORDER BY 2 DESC",
+          "timeColumns": []
+        }
+      ],
+      "id": 5
+    },
+    {
+      "type": "table",
+      "title": "Inverters - AC output (not part of the breakdown)",
+      "description": "AC energy per inverter meter, share of all inverters. Overload / lifetime view - never add it to the consumption breakdown.",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 6,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "kWh"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "kwatth"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Share"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#dc3545"
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "gauge",
+                  "mode": "basic",
+                  "valueDisplayMode": "text"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "table",
+          "rawQueryText": "-- sums over the selected range\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('CONS_AC300_WH', 'CONS_AC3KW_WH', 'CONS_AC5KW_WH', 'CONS_AXPERT_WH', 'CONS_WS_HEATING_WH')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT 0 AS k,\n    COALESCE(SUM(CASE WHEN name = 'CONS_AC300_WH' THEN s END), 0) AS \"CONS_AC300_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_AC3KW_WH' THEN s END), 0) AS \"CONS_AC3KW_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_AC5KW_WH' THEN s END), 0) AS \"CONS_AC5KW_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_AXPERT_WH' THEN s END), 0) AS \"CONS_AXPERT_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_WS_HEATING_WH' THEN s END), 0) AS \"CONS_WS_HEATING_WH\"\n  FROM h\n  GROUP BY 1\n)\nSELECT * FROM (\n  SELECT 'Inverter 300 W' AS \"Inverter\", (\"CONS_AC300_WH\") / 1000.0 AS \"kWh\", (\"CONS_AC300_WH\") * 100.0 / NULLIF(\"CONS_AC300_WH\" + \"CONS_AC3KW_WH\" + \"CONS_AC5KW_WH\" + \"CONS_AXPERT_WH\" + \"CONS_WS_HEATING_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Inverter 3 kW' AS \"Inverter\", (\"CONS_AC3KW_WH\") / 1000.0 AS \"kWh\", (\"CONS_AC3KW_WH\") * 100.0 / NULLIF(\"CONS_AC300_WH\" + \"CONS_AC3KW_WH\" + \"CONS_AC5KW_WH\" + \"CONS_AXPERT_WH\" + \"CONS_WS_HEATING_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Inverter 5 kW' AS \"Inverter\", (\"CONS_AC5KW_WH\") / 1000.0 AS \"kWh\", (\"CONS_AC5KW_WH\") * 100.0 / NULLIF(\"CONS_AC300_WH\" + \"CONS_AC3KW_WH\" + \"CONS_AC5KW_WH\" + \"CONS_AXPERT_WH\" + \"CONS_WS_HEATING_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Axpert 8 kW' AS \"Inverter\", (\"CONS_AXPERT_WH\") / 1000.0 AS \"kWh\", (\"CONS_AXPERT_WH\") * 100.0 / NULLIF(\"CONS_AC300_WH\" + \"CONS_AC3KW_WH\" + \"CONS_AC5KW_WH\" + \"CONS_AXPERT_WH\" + \"CONS_WS_HEATING_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Victron 2 kW' AS \"Inverter\", (\"CONS_WS_HEATING_WH\") / 1000.0 AS \"kWh\", (\"CONS_WS_HEATING_WH\") * 100.0 / NULLIF(\"CONS_AC300_WH\" + \"CONS_AC3KW_WH\" + \"CONS_AC5KW_WH\" + \"CONS_AXPERT_WH\" + \"CONS_WS_HEATING_WH\", 0) AS \"Share\" FROM p\n) ORDER BY 2 DESC",
+          "queryText": "-- sums over the selected range\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('CONS_AC300_WH', 'CONS_AC3KW_WH', 'CONS_AC5KW_WH', 'CONS_AXPERT_WH', 'CONS_WS_HEATING_WH')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT 0 AS k,\n    COALESCE(SUM(CASE WHEN name = 'CONS_AC300_WH' THEN s END), 0) AS \"CONS_AC300_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_AC3KW_WH' THEN s END), 0) AS \"CONS_AC3KW_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_AC5KW_WH' THEN s END), 0) AS \"CONS_AC5KW_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_AXPERT_WH' THEN s END), 0) AS \"CONS_AXPERT_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_WS_HEATING_WH' THEN s END), 0) AS \"CONS_WS_HEATING_WH\"\n  FROM h\n  GROUP BY 1\n)\nSELECT * FROM (\n  SELECT 'Inverter 300 W' AS \"Inverter\", (\"CONS_AC300_WH\") / 1000.0 AS \"kWh\", (\"CONS_AC300_WH\") * 100.0 / NULLIF(\"CONS_AC300_WH\" + \"CONS_AC3KW_WH\" + \"CONS_AC5KW_WH\" + \"CONS_AXPERT_WH\" + \"CONS_WS_HEATING_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Inverter 3 kW' AS \"Inverter\", (\"CONS_AC3KW_WH\") / 1000.0 AS \"kWh\", (\"CONS_AC3KW_WH\") * 100.0 / NULLIF(\"CONS_AC300_WH\" + \"CONS_AC3KW_WH\" + \"CONS_AC5KW_WH\" + \"CONS_AXPERT_WH\" + \"CONS_WS_HEATING_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Inverter 5 kW' AS \"Inverter\", (\"CONS_AC5KW_WH\") / 1000.0 AS \"kWh\", (\"CONS_AC5KW_WH\") * 100.0 / NULLIF(\"CONS_AC300_WH\" + \"CONS_AC3KW_WH\" + \"CONS_AC5KW_WH\" + \"CONS_AXPERT_WH\" + \"CONS_WS_HEATING_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Axpert 8 kW' AS \"Inverter\", (\"CONS_AXPERT_WH\") / 1000.0 AS \"kWh\", (\"CONS_AXPERT_WH\") * 100.0 / NULLIF(\"CONS_AC300_WH\" + \"CONS_AC3KW_WH\" + \"CONS_AC5KW_WH\" + \"CONS_AXPERT_WH\" + \"CONS_WS_HEATING_WH\", 0) AS \"Share\" FROM p\n  UNION ALL\n  SELECT 'Victron 2 kW' AS \"Inverter\", (\"CONS_WS_HEATING_WH\") / 1000.0 AS \"kWh\", (\"CONS_WS_HEATING_WH\") * 100.0 / NULLIF(\"CONS_AC300_WH\" + \"CONS_AC3KW_WH\" + \"CONS_AC5KW_WH\" + \"CONS_AXPERT_WH\" + \"CONS_WS_HEATING_WH\", 0) AS \"Share\" FROM p\n) ORDER BY 2 DESC",
+          "timeColumns": []
+        }
+      ],
+      "id": 6
+    },
+    {
+      "type": "row",
+      "title": "Daily (time picker)",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 17,
+        "w": 24,
+        "h": 1
+      },
+      "panels": [],
+      "id": 7
+    },
+    {
+      "type": "barchart",
+      "title": "Energy per day",
+      "description": "Balance (click it in the legend) = production - consumption",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 18,
+        "w": 12,
+        "h": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "kwatth",
+          "decimals": 1,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "fillOpacity": 85,
+            "lineWidth": 0,
+            "gradientMode": "none",
+            "axisPlacement": "auto",
+            "axisSoftMin": 0
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Production"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#28a745"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Consumption"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#dc3545"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Balance"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#ffc107"
+                }
+              }
+            ]
+          },
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "Production",
+                  "Consumption"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "orientation": "vertical",
+        "xField": "day",
+        "stacking": "none",
+        "groupWidth": 0.8,
+        "barWidth": 0.9,
+        "barRadius": 0,
+        "showValue": "never",
+        "xTickLabelRotation": -45,
+        "xTickLabelSpacing": 0,
+        "fullHighlight": false,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "table",
+          "rawQueryText": "-- sums per local day: counters = SUM of the 15 min increments, powers (_W) = SUM of the 15 min means / 4\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('LLOAD1_CONS_WH', 'LLOAD2_CONS_WH', 'LPV1_PROD_WH', 'LPV2_PROD_WH')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT CAST(strftime('%s', date(hr, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS k,\n    COALESCE(SUM(CASE WHEN name = 'LLOAD1_CONS_WH' THEN s END), 0) AS \"LLOAD1_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LLOAD2_CONS_WH' THEN s END), 0) AS \"LLOAD2_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LPV1_PROD_WH' THEN s END), 0) AS \"LPV1_PROD_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LPV2_PROD_WH' THEN s END), 0) AS \"LPV2_PROD_WH\"\n  FROM h\n  GROUP BY 1\n)\nSELECT substr('JanFebMarAprMayJunJulAugSepOctNovDec', CAST(strftime('%m', k, 'unixepoch', 'localtime') AS INTEGER) * 3 - 2, 3) || ' ' || CAST(strftime('%d', k, 'unixepoch', 'localtime') AS INTEGER) AS day,\n       (\"LPV1_PROD_WH\" + \"LPV2_PROD_WH\") / 1000.0 AS \"Production\",\n       (\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\") / 1000.0 AS \"Consumption\",\n       ((\"LPV1_PROD_WH\" + \"LPV2_PROD_WH\") - (\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\")) / 1000.0 AS \"Balance\"\nFROM p\nORDER BY k",
+          "queryText": "-- sums per local day: counters = SUM of the 15 min increments, powers (_W) = SUM of the 15 min means / 4\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('LLOAD1_CONS_WH', 'LLOAD2_CONS_WH', 'LPV1_PROD_WH', 'LPV2_PROD_WH')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT CAST(strftime('%s', date(hr, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS k,\n    COALESCE(SUM(CASE WHEN name = 'LLOAD1_CONS_WH' THEN s END), 0) AS \"LLOAD1_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LLOAD2_CONS_WH' THEN s END), 0) AS \"LLOAD2_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LPV1_PROD_WH' THEN s END), 0) AS \"LPV1_PROD_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LPV2_PROD_WH' THEN s END), 0) AS \"LPV2_PROD_WH\"\n  FROM h\n  GROUP BY 1\n)\nSELECT substr('JanFebMarAprMayJunJulAugSepOctNovDec', CAST(strftime('%m', k, 'unixepoch', 'localtime') AS INTEGER) * 3 - 2, 3) || ' ' || CAST(strftime('%d', k, 'unixepoch', 'localtime') AS INTEGER) AS day,\n       (\"LPV1_PROD_WH\" + \"LPV2_PROD_WH\") / 1000.0 AS \"Production\",\n       (\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\") / 1000.0 AS \"Consumption\",\n       ((\"LPV1_PROD_WH\" + \"LPV2_PROD_WH\") - (\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\")) / 1000.0 AS \"Balance\"\nFROM p\nORDER BY k",
+          "timeColumns": []
+        }
+      ],
+      "id": 8
+    },
+    {
+      "type": "barchart",
+      "title": "Water per day",
+      "description": "Total = all water, hot = the part of it that is hot water (side by side, not stacked).",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 18,
+        "w": 12,
+        "h": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "litre",
+          "decimals": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "fillOpacity": 85,
+            "lineWidth": 0,
+            "gradientMode": "none",
+            "axisPlacement": "auto",
+            "axisSoftMin": 0
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#5794f2"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Hot"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#dc3545"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "orientation": "vertical",
+        "xField": "day",
+        "stacking": "none",
+        "groupWidth": 0.8,
+        "barWidth": 0.9,
+        "barRadius": 0,
+        "showValue": "never",
+        "xTickLabelRotation": -45,
+        "xTickLabelSpacing": 0,
+        "fullHighlight": false,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "table",
+          "rawQueryText": "-- sums per local day: counters = SUM of the 15 min increments, powers (_W) = SUM of the 15 min means / 4\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('CONS_COLD_L', 'CONS_HOT_L')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT CAST(strftime('%s', date(hr, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS k,\n    COALESCE(SUM(CASE WHEN name = 'CONS_COLD_L' THEN s END), 0) AS \"CONS_COLD_L\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_HOT_L' THEN s END), 0) AS \"CONS_HOT_L\"\n  FROM h\n  GROUP BY 1\n)\nSELECT substr('JanFebMarAprMayJunJulAugSepOctNovDec', CAST(strftime('%m', k, 'unixepoch', 'localtime') AS INTEGER) * 3 - 2, 3) || ' ' || CAST(strftime('%d', k, 'unixepoch', 'localtime') AS INTEGER) AS day,\n       (\"CONS_COLD_L\") / 1.0 AS \"Total\",\n       (\"CONS_HOT_L\") / 1.0 AS \"Hot\"\nFROM p\nORDER BY k",
+          "queryText": "-- sums per local day: counters = SUM of the 15 min increments, powers (_W) = SUM of the 15 min means / 4\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('CONS_COLD_L', 'CONS_HOT_L')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT CAST(strftime('%s', date(hr, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS k,\n    COALESCE(SUM(CASE WHEN name = 'CONS_COLD_L' THEN s END), 0) AS \"CONS_COLD_L\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_HOT_L' THEN s END), 0) AS \"CONS_HOT_L\"\n  FROM h\n  GROUP BY 1\n)\nSELECT substr('JanFebMarAprMayJunJulAugSepOctNovDec', CAST(strftime('%m', k, 'unixepoch', 'localtime') AS INTEGER) * 3 - 2, 3) || ' ' || CAST(strftime('%d', k, 'unixepoch', 'localtime') AS INTEGER) AS day,\n       (\"CONS_COLD_L\") / 1.0 AS \"Total\",\n       (\"CONS_HOT_L\") / 1.0 AS \"Hot\"\nFROM p\nORDER BY k",
+          "timeColumns": []
+        }
+      ],
+      "id": 9
+    },
+    {
+      "type": "row",
+      "title": "Monthly (last 24 months)",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 27,
+        "w": 24,
+        "h": 1
+      },
+      "panels": [],
+      "id": 10
+    },
+    {
+      "type": "barchart",
+      "title": "Energy per month",
+      "description": "",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 28,
+        "w": 12,
+        "h": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "kwatth",
+          "decimals": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "fillOpacity": 85,
+            "lineWidth": 0,
+            "gradientMode": "none",
+            "axisPlacement": "auto",
+            "axisSoftMin": 0
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Production"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#28a745"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Consumption"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#dc3545"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Balance"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#ffc107"
+                }
+              }
+            ]
+          },
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "Production",
+                  "Consumption"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "orientation": "vertical",
+        "xField": "month",
+        "stacking": "none",
+        "groupWidth": 0.8,
+        "barWidth": 0.9,
+        "barRadius": 0,
+        "showValue": "never",
+        "xTickLabelRotation": -45,
+        "xTickLabelSpacing": 0,
+        "fullHighlight": false,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "table",
+          "rawQueryText": "-- sums per local month: counters = SUM of the 15 min increments, powers (_W) = SUM of the 15 min means / 4\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('LLOAD1_CONS_WH', 'LLOAD2_CONS_WH', 'LPV1_PROD_WH', 'LPV2_PROD_WH')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT strftime('%Y-%m', hr, 'unixepoch', 'localtime') AS k,\n    COALESCE(SUM(CASE WHEN name = 'LLOAD1_CONS_WH' THEN s END), 0) AS \"LLOAD1_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LLOAD2_CONS_WH' THEN s END), 0) AS \"LLOAD2_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LPV1_PROD_WH' THEN s END), 0) AS \"LPV1_PROD_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LPV2_PROD_WH' THEN s END), 0) AS \"LPV2_PROD_WH\"\n  FROM h\n  GROUP BY 1\n)\nSELECT substr('JanFebMarAprMayJunJulAugSepOctNovDec', CAST(substr(k, 6, 2) AS INTEGER) * 3 - 2, 3) || ' ' || substr(k, 1, 4) AS month,\n       (\"LPV1_PROD_WH\" + \"LPV2_PROD_WH\") / 1000.0 AS \"Production\",\n       (\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\") / 1000.0 AS \"Consumption\",\n       ((\"LPV1_PROD_WH\" + \"LPV2_PROD_WH\") - (\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\")) / 1000.0 AS \"Balance\"\nFROM p\nORDER BY k",
+          "queryText": "-- sums per local month: counters = SUM of the 15 min increments, powers (_W) = SUM of the 15 min means / 4\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('LLOAD1_CONS_WH', 'LLOAD2_CONS_WH', 'LPV1_PROD_WH', 'LPV2_PROD_WH')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT strftime('%Y-%m', hr, 'unixepoch', 'localtime') AS k,\n    COALESCE(SUM(CASE WHEN name = 'LLOAD1_CONS_WH' THEN s END), 0) AS \"LLOAD1_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LLOAD2_CONS_WH' THEN s END), 0) AS \"LLOAD2_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LPV1_PROD_WH' THEN s END), 0) AS \"LPV1_PROD_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LPV2_PROD_WH' THEN s END), 0) AS \"LPV2_PROD_WH\"\n  FROM h\n  GROUP BY 1\n)\nSELECT substr('JanFebMarAprMayJunJulAugSepOctNovDec', CAST(substr(k, 6, 2) AS INTEGER) * 3 - 2, 3) || ' ' || substr(k, 1, 4) AS month,\n       (\"LPV1_PROD_WH\" + \"LPV2_PROD_WH\") / 1000.0 AS \"Production\",\n       (\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\") / 1000.0 AS \"Consumption\",\n       ((\"LPV1_PROD_WH\" + \"LPV2_PROD_WH\") - (\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\")) / 1000.0 AS \"Balance\"\nFROM p\nORDER BY k",
+          "timeColumns": []
+        }
+      ],
+      "timeFrom": "2y",
+      "id": 11
+    },
+    {
+      "type": "barchart",
+      "title": "Water per month",
+      "description": "Total = all water, hot = part of it",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 28,
+        "w": 12,
+        "h": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "m3",
+          "decimals": 1,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "fillOpacity": 85,
+            "lineWidth": 0,
+            "gradientMode": "none",
+            "axisPlacement": "auto",
+            "axisSoftMin": 0
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#5794f2"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Hot"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#dc3545"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "orientation": "vertical",
+        "xField": "month",
+        "stacking": "none",
+        "groupWidth": 0.8,
+        "barWidth": 0.9,
+        "barRadius": 0,
+        "showValue": "never",
+        "xTickLabelRotation": -45,
+        "xTickLabelSpacing": 0,
+        "fullHighlight": false,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "table",
+          "rawQueryText": "-- sums per local month: counters = SUM of the 15 min increments, powers (_W) = SUM of the 15 min means / 4\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('CONS_COLD_L', 'CONS_HOT_L')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT strftime('%Y-%m', hr, 'unixepoch', 'localtime') AS k,\n    COALESCE(SUM(CASE WHEN name = 'CONS_COLD_L' THEN s END), 0) AS \"CONS_COLD_L\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_HOT_L' THEN s END), 0) AS \"CONS_HOT_L\"\n  FROM h\n  GROUP BY 1\n)\nSELECT substr('JanFebMarAprMayJunJulAugSepOctNovDec', CAST(substr(k, 6, 2) AS INTEGER) * 3 - 2, 3) || ' ' || substr(k, 1, 4) AS month,\n       (\"CONS_COLD_L\") / 1000.0 AS \"Total\",\n       (\"CONS_HOT_L\") / 1000.0 AS \"Hot\"\nFROM p\nORDER BY k",
+          "queryText": "-- sums per local month: counters = SUM of the 15 min increments, powers (_W) = SUM of the 15 min means / 4\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('CONS_COLD_L', 'CONS_HOT_L')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT strftime('%Y-%m', hr, 'unixepoch', 'localtime') AS k,\n    COALESCE(SUM(CASE WHEN name = 'CONS_COLD_L' THEN s END), 0) AS \"CONS_COLD_L\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_HOT_L' THEN s END), 0) AS \"CONS_HOT_L\"\n  FROM h\n  GROUP BY 1\n)\nSELECT substr('JanFebMarAprMayJunJulAugSepOctNovDec', CAST(substr(k, 6, 2) AS INTEGER) * 3 - 2, 3) || ' ' || substr(k, 1, 4) AS month,\n       (\"CONS_COLD_L\") / 1000.0 AS \"Total\",\n       (\"CONS_HOT_L\") / 1000.0 AS \"Hot\"\nFROM p\nORDER BY k",
+          "timeColumns": []
+        }
+      ],
+      "timeFrom": "2y",
+      "id": 12
+    },
+    {
+      "type": "barchart",
+      "title": "Loads per month",
+      "description": "Same categories as Loads per day; the stack = consumption of the month",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 37,
+        "w": 24,
+        "h": 10
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "kwatth",
+          "decimals": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "fillOpacity": 85,
+            "lineWidth": 0,
+            "gradientMode": "none",
+            "axisPlacement": "auto",
+            "axisSoftMin": 0
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Fridge"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#73bf69"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Kitchen"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#ff9830"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Washing machine"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#5794f2"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Technical room"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#b877d9"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Other circuits"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#8ab8ff"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Workshop"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#c4a000"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "EV charger"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#1f60c4"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Workshop air conditioner"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#37c2c2"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Water heater"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#f2495c"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Axpert losses"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#8f3bb8"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Other"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#9e9e9e"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "orientation": "vertical",
+        "xField": "month",
+        "stacking": "normal",
+        "groupWidth": 0.8,
+        "barWidth": 0.9,
+        "barRadius": 0,
+        "showValue": "never",
+        "xTickLabelRotation": -45,
+        "xTickLabelSpacing": 0,
+        "fullHighlight": false,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "table",
+          "rawQueryText": "-- sums per local month: counters = SUM of the 15 min increments, powers (_W) = SUM of the 15 min means / 4\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('AXPERT_LOAD_W', 'CONS_AXPERT_WH', 'CONS_EVSE_WH', 'CONS_FRIDGE_WH', 'CONS_KITCHEN_WH', 'CONS_OTHER_WH', 'CONS_TECHM_WH', 'CONS_WASCHMACHINE_WH', 'CONS_WS_HEATING_WH', 'EL_HEATER_CONS_WH', 'LLOAD1_CONS_WH', 'LLOAD2_CONS_WH')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT strftime('%Y-%m', hr, 'unixepoch', 'localtime') AS k,\n    COALESCE(SUM(CASE WHEN name = 'AXPERT_LOAD_W' THEN s END), 0) / 4.0 AS \"AXPERT_LOAD_W\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_AXPERT_WH' THEN s END), 0) AS \"CONS_AXPERT_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_EVSE_WH' THEN s END), 0) AS \"CONS_EVSE_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_FRIDGE_WH' THEN s END), 0) AS \"CONS_FRIDGE_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_KITCHEN_WH' THEN s END), 0) AS \"CONS_KITCHEN_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_OTHER_WH' THEN s END), 0) AS \"CONS_OTHER_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_TECHM_WH' THEN s END), 0) AS \"CONS_TECHM_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_WASCHMACHINE_WH' THEN s END), 0) AS \"CONS_WASCHMACHINE_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_WS_HEATING_WH' THEN s END), 0) AS \"CONS_WS_HEATING_WH\",\n    COALESCE(SUM(CASE WHEN name = 'EL_HEATER_CONS_WH' THEN s END), 0) AS \"EL_HEATER_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LLOAD1_CONS_WH' THEN s END), 0) AS \"LLOAD1_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LLOAD2_CONS_WH' THEN s END), 0) AS \"LLOAD2_CONS_WH\"\n  FROM h\n  GROUP BY 1\n)\nSELECT substr('JanFebMarAprMayJunJulAugSepOctNovDec', CAST(substr(k, 6, 2) AS INTEGER) * 3 - 2, 3) || ' ' || substr(k, 1, 4) AS month,\n       (\"CONS_FRIDGE_WH\") / 1000.0 AS \"Fridge\",\n       (\"CONS_KITCHEN_WH\") / 1000.0 AS \"Kitchen\",\n       (\"CONS_WASCHMACHINE_WH\") / 1000.0 AS \"Washing machine\",\n       (\"CONS_TECHM_WH\") / 1000.0 AS \"Technical room\",\n       (\"CONS_OTHER_WH\") / 1000.0 AS \"Other circuits\",\n       (\"CONS_AXPERT_WH\" - \"CONS_EVSE_WH\") / 1000.0 AS \"Workshop\",\n       (\"CONS_EVSE_WH\") / 1000.0 AS \"EV charger\",\n       (\"CONS_WS_HEATING_WH\") / 1000.0 AS \"Workshop air conditioner\",\n       (\"EL_HEATER_CONS_WH\") / 1000.0 AS \"Water heater\",\n       (\"AXPERT_LOAD_W\" - \"CONS_AXPERT_WH\") / 1000.0 AS \"Axpert losses\",\n       ((\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\") - (\"CONS_FRIDGE_WH\") - (\"CONS_KITCHEN_WH\") - (\"CONS_WASCHMACHINE_WH\") - (\"CONS_TECHM_WH\") - (\"CONS_OTHER_WH\") - (\"CONS_AXPERT_WH\" - \"CONS_EVSE_WH\") - (\"CONS_EVSE_WH\") - (\"CONS_WS_HEATING_WH\") - (\"EL_HEATER_CONS_WH\") - (\"AXPERT_LOAD_W\" - \"CONS_AXPERT_WH\")) / 1000.0 AS \"Other\"\nFROM p\nORDER BY k",
+          "queryText": "-- sums per local month: counters = SUM of the 15 min increments, powers (_W) = SUM of the 15 min means / 4\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('AXPERT_LOAD_W', 'CONS_AXPERT_WH', 'CONS_EVSE_WH', 'CONS_FRIDGE_WH', 'CONS_KITCHEN_WH', 'CONS_OTHER_WH', 'CONS_TECHM_WH', 'CONS_WASCHMACHINE_WH', 'CONS_WS_HEATING_WH', 'EL_HEATER_CONS_WH', 'LLOAD1_CONS_WH', 'LLOAD2_CONS_WH')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT strftime('%Y-%m', hr, 'unixepoch', 'localtime') AS k,\n    COALESCE(SUM(CASE WHEN name = 'AXPERT_LOAD_W' THEN s END), 0) / 4.0 AS \"AXPERT_LOAD_W\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_AXPERT_WH' THEN s END), 0) AS \"CONS_AXPERT_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_EVSE_WH' THEN s END), 0) AS \"CONS_EVSE_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_FRIDGE_WH' THEN s END), 0) AS \"CONS_FRIDGE_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_KITCHEN_WH' THEN s END), 0) AS \"CONS_KITCHEN_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_OTHER_WH' THEN s END), 0) AS \"CONS_OTHER_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_TECHM_WH' THEN s END), 0) AS \"CONS_TECHM_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_WASCHMACHINE_WH' THEN s END), 0) AS \"CONS_WASCHMACHINE_WH\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_WS_HEATING_WH' THEN s END), 0) AS \"CONS_WS_HEATING_WH\",\n    COALESCE(SUM(CASE WHEN name = 'EL_HEATER_CONS_WH' THEN s END), 0) AS \"EL_HEATER_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LLOAD1_CONS_WH' THEN s END), 0) AS \"LLOAD1_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LLOAD2_CONS_WH' THEN s END), 0) AS \"LLOAD2_CONS_WH\"\n  FROM h\n  GROUP BY 1\n)\nSELECT substr('JanFebMarAprMayJunJulAugSepOctNovDec', CAST(substr(k, 6, 2) AS INTEGER) * 3 - 2, 3) || ' ' || substr(k, 1, 4) AS month,\n       (\"CONS_FRIDGE_WH\") / 1000.0 AS \"Fridge\",\n       (\"CONS_KITCHEN_WH\") / 1000.0 AS \"Kitchen\",\n       (\"CONS_WASCHMACHINE_WH\") / 1000.0 AS \"Washing machine\",\n       (\"CONS_TECHM_WH\") / 1000.0 AS \"Technical room\",\n       (\"CONS_OTHER_WH\") / 1000.0 AS \"Other circuits\",\n       (\"CONS_AXPERT_WH\" - \"CONS_EVSE_WH\") / 1000.0 AS \"Workshop\",\n       (\"CONS_EVSE_WH\") / 1000.0 AS \"EV charger\",\n       (\"CONS_WS_HEATING_WH\") / 1000.0 AS \"Workshop air conditioner\",\n       (\"EL_HEATER_CONS_WH\") / 1000.0 AS \"Water heater\",\n       (\"AXPERT_LOAD_W\" - \"CONS_AXPERT_WH\") / 1000.0 AS \"Axpert losses\",\n       ((\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\") - (\"CONS_FRIDGE_WH\") - (\"CONS_KITCHEN_WH\") - (\"CONS_WASCHMACHINE_WH\") - (\"CONS_TECHM_WH\") - (\"CONS_OTHER_WH\") - (\"CONS_AXPERT_WH\" - \"CONS_EVSE_WH\") - (\"CONS_EVSE_WH\") - (\"CONS_WS_HEATING_WH\") - (\"EL_HEATER_CONS_WH\") - (\"AXPERT_LOAD_W\" - \"CONS_AXPERT_WH\")) / 1000.0 AS \"Other\"\nFROM p\nORDER BY k",
+          "timeColumns": []
+        }
+      ],
+      "timeFrom": "2y",
+      "id": 13
+    },
+    {
+      "type": "row",
+      "title": "Yearly (last 10 years)",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 47,
+        "w": 24,
+        "h": 1
+      },
+      "panels": [],
+      "id": 14
+    },
+    {
+      "type": "barchart",
+      "title": "Energy per year",
+      "description": "",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 48,
+        "w": 12,
+        "h": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "kwatth",
+          "decimals": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "fillOpacity": 85,
+            "lineWidth": 0,
+            "gradientMode": "none",
+            "axisPlacement": "auto",
+            "axisSoftMin": 0
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Production"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#28a745"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Consumption"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#dc3545"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Balance"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#ffc107"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "orientation": "vertical",
+        "xField": "year",
+        "stacking": "none",
+        "groupWidth": 0.8,
+        "barWidth": 0.9,
+        "barRadius": 0,
+        "showValue": "never",
+        "xTickLabelRotation": -45,
+        "xTickLabelSpacing": 0,
+        "fullHighlight": false,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "table",
+          "rawQueryText": "-- sums per local year: counters = SUM of the 15 min increments, powers (_W) = SUM of the 15 min means / 4\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('LLOAD1_CONS_WH', 'LLOAD2_CONS_WH', 'LPV1_PROD_WH', 'LPV2_PROD_WH')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT strftime('%Y', hr, 'unixepoch', 'localtime') AS k,\n    COALESCE(SUM(CASE WHEN name = 'LLOAD1_CONS_WH' THEN s END), 0) AS \"LLOAD1_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LLOAD2_CONS_WH' THEN s END), 0) AS \"LLOAD2_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LPV1_PROD_WH' THEN s END), 0) AS \"LPV1_PROD_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LPV2_PROD_WH' THEN s END), 0) AS \"LPV2_PROD_WH\"\n  FROM h\n  GROUP BY 1\n)\nSELECT k AS year,\n       (\"LPV1_PROD_WH\" + \"LPV2_PROD_WH\") / 1000.0 AS \"Production\",\n       (\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\") / 1000.0 AS \"Consumption\"\nFROM p\nORDER BY k",
+          "queryText": "-- sums per local year: counters = SUM of the 15 min increments, powers (_W) = SUM of the 15 min means / 4\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('LLOAD1_CONS_WH', 'LLOAD2_CONS_WH', 'LPV1_PROD_WH', 'LPV2_PROD_WH')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT strftime('%Y', hr, 'unixepoch', 'localtime') AS k,\n    COALESCE(SUM(CASE WHEN name = 'LLOAD1_CONS_WH' THEN s END), 0) AS \"LLOAD1_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LLOAD2_CONS_WH' THEN s END), 0) AS \"LLOAD2_CONS_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LPV1_PROD_WH' THEN s END), 0) AS \"LPV1_PROD_WH\",\n    COALESCE(SUM(CASE WHEN name = 'LPV2_PROD_WH' THEN s END), 0) AS \"LPV2_PROD_WH\"\n  FROM h\n  GROUP BY 1\n)\nSELECT k AS year,\n       (\"LPV1_PROD_WH\" + \"LPV2_PROD_WH\") / 1000.0 AS \"Production\",\n       (\"LLOAD1_CONS_WH\" + \"LLOAD2_CONS_WH\") / 1000.0 AS \"Consumption\"\nFROM p\nORDER BY k",
+          "timeColumns": []
+        }
+      ],
+      "timeFrom": "10y",
+      "id": 15
+    },
+    {
+      "type": "barchart",
+      "title": "Water per year",
+      "description": "",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 48,
+        "w": 12,
+        "h": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "m3",
+          "decimals": 1,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "fillOpacity": 85,
+            "lineWidth": 0,
+            "gradientMode": "none",
+            "axisPlacement": "auto",
+            "axisSoftMin": 0
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#5794f2"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Hot"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#dc3545"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "orientation": "vertical",
+        "xField": "year",
+        "stacking": "none",
+        "groupWidth": 0.8,
+        "barWidth": 0.9,
+        "barRadius": 0,
+        "showValue": "never",
+        "xTickLabelRotation": -45,
+        "xTickLabelSpacing": 0,
+        "fullHighlight": false,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "table",
+          "rawQueryText": "-- sums per local year: counters = SUM of the 15 min increments, powers (_W) = SUM of the 15 min means / 4\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('CONS_COLD_L')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT strftime('%Y', hr, 'unixepoch', 'localtime') AS k,\n    COALESCE(SUM(CASE WHEN name = 'CONS_COLD_L' THEN s END), 0) AS \"CONS_COLD_L\"\n  FROM h\n  GROUP BY 1\n)\nSELECT k AS year,\n       (\"CONS_COLD_L\") / 1000.0 AS \"Total\"\nFROM p\nORDER BY k",
+          "queryText": "-- sums per local year: counters = SUM of the 15 min increments, powers (_W) = SUM of the 15 min means / 4\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= q.f AND x.ts < q.t\n  WHERE v.name IN ('CONS_COLD_L')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT strftime('%Y', hr, 'unixepoch', 'localtime') AS k,\n    COALESCE(SUM(CASE WHEN name = 'CONS_COLD_L' THEN s END), 0) AS \"CONS_COLD_L\"\n  FROM h\n  GROUP BY 1\n)\nSELECT k AS year,\n       (\"CONS_COLD_L\") / 1000.0 AS \"Total\"\nFROM p\nORDER BY k",
+          "timeColumns": []
+        }
+      ],
+      "timeFrom": "10y",
+      "id": 16
+    }
+  ],
+  "templating": {
+    "list": []
+  },
+  "annotations": {
+    "list": []
+  },
+  "links": [
+    {
+      "title": "UHA dashboards",
+      "type": "dashboards",
+      "tags": [
+        "uha"
+      ],
+      "asDropdown": false
+    }
+  ]
+}

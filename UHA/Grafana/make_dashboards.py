@@ -154,31 +154,76 @@ FROM p
 ORDER BY 1"""
 
 
-def day_sql(items):
-    """kWh per local day for the bar charts, wide: column `day` ("Nov 21") + one column per label.
-    items = [(label, expr)], expr with {NAME} = the day's energy in Wh of that variable: counters (agg: delta) summed,
-    powers (name ending in _W) integrated from the 15 min means. Days start at the first full local day of the range."""
+# Period buckets for the sums (key = SQL of the hour start `hr`, label = SQL of the key `k`). The 15 min rows are first
+# summed per UTC hour (cheap integer grouping), only the hours are converted to local time: exact also across summer
+# time (Prague offsets are whole hours) and ~4x fewer 'localtime' calls on the Pi 3.
+MONTHS = "'JanFebMarAprMayJunJulAugSepOctNovDec'"
+BUCKETS = {
+    "day": (LOCAL_DAY.format(t="hr"), DAY_LABEL.format(d="k")),
+    "month": ("strftime('%Y-%m', hr, 'unixepoch', 'localtime')",
+              f"substr({MONTHS}, CAST(substr(k, 6, 2) AS INTEGER) * 3 - 2, 3) || ' ' || substr(k, 1, 4)"),
+    "year": ("strftime('%Y', hr, 'unixepoch', 'localtime')", "k"),
+    "total": ("0", "'total'"),
+}
+FULL_DAY_START = "CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER)"
+
+
+def sums_cte(items, bucket, full_days):
+    """CTEs h (per variable and UTC hour) and p (one row per bucket, one column per variable = its energy / volume in
+    the bucket): counters (agg: delta) summed, powers (name ending in _W) integrated from the 15 min means (Wh).
+    full_days: start at the first full local day of the range (rolling "last 30 days"), else at the range start."""
     names = sorted({n for _, e in items for n in expr_vars(e)})
-    start = "CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER)"
+    start = FULL_DAY_START if full_days else "q.f"
     cols = []
     for n in names:
-        s = f"COALESCE(SUM(CASE WHEN v.name = {q(n)} THEN x.value END), 0)"
-        cols.append(f"{s} / 4.0 AS \"{n}\"" if n.endswith("_W") else f"{s} AS \"{n}\"")
+        c = f"COALESCE(SUM(CASE WHEN name = {q(n)} THEN s END), 0)"
+        cols.append(f"{c} / 4.0 AS \"{n}\"" if n.endswith("_W") else f"{c} AS \"{n}\"")
     cols = ",\n    ".join(cols)
-    outs = ",\n       ".join(f"({sql_expr(e)}) / 1000.0 AS \"{label}\"" for label, e in items)
-    return f"""-- kWh per local day: counters = SUM of the 15 min increments, powers (_W) = SUM of the 15 min means / 4
-{RANGE_CTE},
-p AS (
-  SELECT {LOCAL_DAY.format(t="x.ts")} AS d,
-    {cols}
+    return f"""{RANGE_CTE},
+h AS (
+  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s
   FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= {start} AND x.ts < q.t
   WHERE v.name IN ({names_sql(names)})
+  GROUP BY 1, 2
+),
+p AS (
+  SELECT {BUCKETS[bucket][0]} AS k,
+    {cols}
+  FROM h
   GROUP BY 1
-)
-SELECT {DAY_LABEL.format(d="d")} AS day,
+)"""
+
+
+def period_sql(items, bucket="day", full_days=True, scale=1000.0, xcol="day"):
+    """Sums per local day / month / year for the bar charts, wide: column xcol ("Nov 21", "Nov 2026", "2026") + one
+    column per label. items = [(label, expr)], expr with {NAME} = the bucket sum of that variable; value / scale
+    (Wh -> kWh by default, litres: scale 1 or 1000 for m3)."""
+    outs = ",\n       ".join(f"({sql_expr(e)}) / {scale} AS \"{label}\"" for label, e in items)
+    return f"""-- sums per local {bucket}: counters = SUM of the 15 min increments, powers (_W) = SUM of the 15 min means / 4
+{sums_cte(items, bucket, full_days)}
+SELECT {BUCKETS[bucket][1]} AS {xcol},
        {outs}
 FROM p
-ORDER BY d"""
+ORDER BY k"""
+
+
+def day_sql(items):
+    """kWh per local day, the days of the range from its first full local day (rolling "last 30 days")."""
+    return period_sql(items, "day", True)
+
+
+def total_sql(items, scale=1000.0, share_of=None, name_col="Category", value_col="kWh"):
+    """Sums over the whole range (time picker). Without share_of: one row, one column per label (Stat panel).
+    With share_of (expr): one row per label + its share of share_of in %, largest first (Table panel)."""
+    head = f"-- sums over the selected range\n{sums_cte([it[:2] for it in items], 'total', False)}\n"
+    if share_of is None:      # an item may carry its own scale: (label, expr, scale)
+        outs = ",\n       ".join(f"({sql_expr(it[1])}) / {it[2] if len(it) > 2 else scale} AS \"{it[0]}\"" for it in items)
+        return head + f"SELECT {outs}\nFROM p"
+    total = sql_expr(share_of)
+    rows = "\n  UNION ALL\n".join(
+        f"  SELECT {q(label)} AS \"{name_col}\", ({sql_expr(e)}) / {scale} AS \"{value_col}\", "
+        f"({sql_expr(e)}) * 100.0 / NULLIF({total}, 0) AS \"Share\" FROM p" for label, e in items)
+    return head + f"SELECT * FROM (\n{rows}\n) ORDER BY 2 DESC"
 
 
 # ---- panels --------------------------------------------------------------------------------------------------
@@ -236,34 +281,66 @@ def panel(title, sql, unit, x, y, w=12, h=8, bars=False, stack=False, decimals=N
     return p
 
 
-def barchart(title, sql, x, y, w=24, h=9, stack=False, colors=None, hidden=None, desc="", time_from="30d"):
-    """Bar chart of day_sql (x = the `day` text column): bars side by side, or stacked."""
+def barchart(title, sql, x, y, w=24, h=9, stack=False, colors=None, hidden=None, desc="", time_from="30d",
+             unit="kwatth", decimals=1, xfield="day"):
+    """Bar chart of period_sql (x = its text column xfield): bars side by side, or stacked.
+    time_from None = the dashboard time picker, else a relative override ("30d", "2y")."""
     overrides = color_overrides(colors or {})
     if hidden:
         overrides.append(hidden_by_default([c for c in colors if c not in hidden]))
     return {
-        "type": "barchart", "title": title, "description": desc, "datasource": DS, "timeFrom": time_from,
+        "type": "barchart", "title": title, "description": desc, "datasource": DS,
         "gridPos": {"x": x, "y": y, "w": w, "h": h},
-        "fieldConfig": {"defaults": {"unit": "kwatth", "decimals": 1, "color": {"mode": "palette-classic"},
+        "fieldConfig": {"defaults": {"unit": unit, "decimals": decimals, "color": {"mode": "palette-classic"},
                                      "custom": {"fillOpacity": 85, "lineWidth": 0, "gradientMode": "none",
                                                 "axisPlacement": "auto", "axisSoftMin": 0}},
                         "overrides": overrides},
-        "options": {"orientation": "vertical", "xField": "day", "stacking": "normal" if stack else "none",
+        "options": {"orientation": "vertical", "xField": xfield, "stacking": "normal" if stack else "none",
                     "groupWidth": 0.8, "barWidth": 0.9, "barRadius": 0, "showValue": "never",
                     "xTickLabelRotation": -45, "xTickLabelSpacing": 0, "fullHighlight": False,
                     "legend": {"displayMode": "list", "placement": "bottom", "showLegend": True},
                     "tooltip": {"mode": "multi", "sort": "none"}},
         "targets": [target(sql, "table")],
+    } | ({"timeFrom": time_from} if time_from else {})
+
+
+def stat(title, sql, x, y, w=12, h=5, unit="kwatth", decimals=1, colors=None, desc="", overrides=None):
+    """Stat panel of a one-row total_sql: one big number per column."""
+    return {
+        "type": "stat", "title": title, "description": desc, "datasource": DS,
+        "gridPos": {"x": x, "y": y, "w": w, "h": h},
+        "fieldConfig": {"defaults": {"unit": unit, "decimals": decimals, "color": {"mode": "fixed", "fixedColor": "text"}},
+                        "overrides": color_overrides(colors or {}) + (overrides or [])},
+        "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": False},
+                    "textMode": "value_and_name", "colorMode": "value", "graphMode": "none", "justifyMode": "auto",
+                    "orientation": "auto", "wideLayout": True, "showPercentChange": False},
+        "targets": [target(sql, "table")],
     }
 
 
-def dashboard(uid, title, panels, time_from="now-24h"):
+def share_table(title, sql, x, y, w=12, h=10, desc="", name_col="Category"):
+    """Table of a total_sql with share_of: name, kWh, share % (as a bar)."""
+    return {
+        "type": "table", "title": title, "description": desc, "datasource": DS,
+        "gridPos": {"x": x, "y": y, "w": w, "h": h},
+        "fieldConfig": {"defaults": {}, "overrides": [
+            by_name("kWh", {"id": "unit", "value": "kwatth"}, {"id": "decimals", "value": 1}),
+            by_name("Share", {"id": "unit", "value": "percent"}, {"id": "decimals", "value": 1},
+                    {"id": "min", "value": 0}, {"id": "max", "value": 100},
+                    {"id": "color", "value": {"mode": "fixed", "fixedColor": LOAD}},
+                    {"id": "custom.cellOptions", "value": {"type": "gauge", "mode": "basic", "valueDisplayMode": "text"}})]},
+        "options": {"showHeader": True, "cellHeight": "sm"},
+        "targets": [target(sql, "table")],
+    }
+
+
+def dashboard(uid, title, panels, time_from="now-24h", time_to="now", refresh="1m"):
     for number, p in enumerate(panels, 1):
         p["id"] = number
     return {
         "uid": uid, "title": title, "tags": ["uha"], "timezone": "Europe/Prague", "editable": True,
-        "schemaVersion": 39, "version": 1, "refresh": "1m", "graphTooltip": 1,
-        "time": {"from": time_from, "to": "now"},
+        "schemaVersion": 39, "version": 1, "refresh": refresh, "graphTooltip": 1,
+        "time": {"from": time_from, "to": time_to},
         "timepicker": {"refresh_intervals": ["1m", "5m", "15m", "1h"]},
         "panels": panels, "templating": {"list": []}, "annotations": {"list": []},
         "links": [{"title": "UHA dashboards", "type": "dashboards", "tags": ["uha"], "asDropdown": False}],
@@ -361,6 +438,20 @@ def energy_dashboard():
     ])
 
 
+# ---- Water ---------------------------------------------------------------------------------------------------
+# CONS_COLD_L = ALL water (dictionary "Voda celkem"), CONS_HOT_L = hot water, a PART of it: side by side, never stacked.
+WATER = [("Total", "{CONS_COLD_L}"), ("Hot", "{CONS_HOT_L}")]
+WATER_COLORS = {"Total": "#5794f2", "Hot": LOAD}
+
+
+def water_per_day(x, y, w, h, rolling=True):
+    """Litres per local day, total and hot side by side (rolling: last 30 full days, else the time picker)."""
+    return barchart("Water per day (last 30 days)" if rolling else "Water per day",
+                    period_sql(WATER, "day", rolling, scale=1.0), x, y, w, h, colors=WATER_COLORS,
+                    time_from="30d" if rolling else None, unit="litre", decimals=0,
+                    desc="Total = all water, hot = the part of it that is hot water (side by side, not stacked).")
+
+
 # ---- Packs ----------------------------------------------------------------------------------------------------
 
 def cells(pack):
@@ -401,6 +492,7 @@ temperatures = dashboard("uha-temperatures", "UHA Temperatures", [
                                   "TEMP_BOARD_ELECON_D_C", ("Axpert", "AXPERT_TEMP_C"), ("MPPT", "MPPT_TEMP_C"),
                                   "TEMP_AKUPACK1_C"]), "celsius", 12, 26, 12, 8),
     panel("Wind (mean)", avg_sql(["METEO_WIND_AVG"]), "velocityms", 0, 34, 12, 8),
+    water_per_day(12, 34, 12, 8),
 ])
 
 # ---- States (events table) -----------------------------------------------------------------------------------
@@ -641,11 +733,69 @@ def states_dashboard(defs):
     return dashboard("uha-states", "UHA States", panels)
 
 
+# ---- Statistics ----------------------------------------------------------------------------------------------
+# Period panels follow the time picker (default this month); monthly / yearly panels have a fixed relative range.
+
+def statistics_dashboard():
+    day_loads, load_colors = with_other(CONSUMPTION_WH, 1)
+    energy_items = [("Production", PRODUCTION_WH), ("Consumption", CONSUMPTION_WH)]
+    energy_colors = {"Production": SOLAR, "Consumption": LOAD, "Balance": BATTERY}
+    balance = ("Balance", f"({PRODUCTION_WH}) - ({CONSUMPTION_WH})")
+    inverters = [("Inverter 300 W", "{CONS_AC300_WH}"), ("Inverter 3 kW", "{CONS_AC3KW_WH}"),
+                 ("Inverter 5 kW", "{CONS_AC5KW_WH}"), ("Axpert 8 kW", "{CONS_AXPERT_WH}"),
+                 ("Victron 2 kW", "{CONS_WS_HEATING_WH}")]
+    m3 = [("Total m³", "{CONS_COLD_L}"), ("Hot m³", "{CONS_HOT_L}")]
+    p = [row("Period totals (time picker)", 0),
+         stat("Energy", total_sql([("PV house", "{LPV1_PROD_WH}"), ("PV workshop", "{LPV2_PROD_WH}"),
+                                   ("PV total", PRODUCTION_WH), ("Consumption", CONSUMPTION_WH), balance]),
+              0, 1, 12, 5, colors={"PV house": SOLAR, "PV workshop": SOLAR, "PV total": SOLAR,
+                                   "Consumption": LOAD, "Balance": BATTERY},
+              desc="PV = local PV house / workshop, consumption = load house + workshop (DC side), balance = PV - consumption"),
+         stat("Water", total_sql(WATER + [(n, e, 1000.0) for n, e in m3], scale=1.0),
+              12, 1, 6, 5, unit="litre", decimals=0, colors={"Total": WATER_COLORS["Total"], "Hot": LOAD,
+                                                            "Total m³": WATER_COLORS["Total"], "Hot m³": LOAD},
+              overrides=[by_name(n, {"id": "unit", "value": "m3"}, {"id": "decimals", "value": 2}) for n, _ in m3],
+              desc="Total = all water, hot = part of it"),
+         stat("Heat", total_sql([("Boiler", "{BOILER_HEAT}"), ("Electric heater", "{EL_HEATER_CONS_WH}")]),
+              18, 1, 6, 5, colors={"Boiler": "#ff9830", "Electric heater": LOAD},
+              desc="Boiler heat (counter) and the electric heater's consumption in the tank"),
+         share_table("Consumption breakdown", total_sql(day_loads, share_of=CONSUMPTION_WH), 0, 6, 12, 11,
+                     desc="Same categories as Loads per day (UHA Energy); Other = consumption - all categories. "
+                          "Share of the consumption total."),
+         share_table("Inverters - AC output (not part of the breakdown)",
+                     total_sql(inverters, share_of=" + ".join(e for _, e in inverters), name_col="Inverter"),
+                     12, 6, 12, 8, name_col="Inverter",
+                     desc="AC energy per inverter meter, share of all inverters. Overload / lifetime view - never "
+                          "add it to the consumption breakdown."),
+         row("Daily (time picker)", 17),
+         barchart("Energy per day", period_sql(energy_items + [balance], "day", False), 0, 18, 12, 9,
+                  colors=energy_colors, hidden=["Balance"], time_from=None,
+                  desc="Balance (click it in the legend) = production - consumption"),
+         water_per_day(12, 18, 12, 9, rolling=False),
+         row("Monthly (last 24 months)", 27),
+         barchart("Energy per month", period_sql(energy_items + [balance], "month", False, xcol="month"), 0, 28, 12, 9,
+                  colors=energy_colors, hidden=["Balance"], time_from="2y", decimals=0, xfield="month"),
+         barchart("Water per month", period_sql(WATER, "month", False, scale=1000.0, xcol="month"), 12, 28, 12, 9,
+                  colors=WATER_COLORS, time_from="2y", unit="m3", decimals=1, xfield="month",
+                  desc="Total = all water, hot = part of it"),
+         barchart("Loads per month", period_sql(day_loads, "month", False, xcol="month"), 0, 37, 24, 10, stack=True,
+                  colors=load_colors, time_from="2y", decimals=0, xfield="month",
+                  desc="Same categories as Loads per day; the stack = consumption of the month"),
+         row("Yearly (last 10 years)", 47),
+         barchart("Energy per year", period_sql(energy_items, "year", False, xcol="year"), 0, 48, 12, 9,
+                  colors=energy_colors, time_from="10y", decimals=0, xfield="year"),
+         barchart("Water per year", period_sql([WATER[0]], "year", False, scale=1000.0, xcol="year"), 12, 48, 12, 9,
+                  colors=WATER_COLORS, time_from="10y", unit="m3", decimals=1, xfield="year")]
+    return dashboard("uha-statistics", "UHA Statistics", p, time_from="now/M", time_to="now/M", refresh="5m")
+
+
 energy = energy_dashboard()
+statistics = statistics_dashboard()
 states = states_dashboard(vars_def.load(YAML))
 
 if __name__ == "__main__":
-    for name, board in (("energy", energy), ("packs", packs), ("temperatures", temperatures), ("states", states)):
+    for name, board in (("energy", energy), ("packs", packs), ("temperatures", temperatures), ("states", states),
+                        ("statistics", statistics)):
         path = os.path.join(HERE, "dashboards", name + ".json")
         with open(path, "w", encoding="utf-8", newline="\n") as f:
             json.dump(board, f, indent=2, ensure_ascii=False)

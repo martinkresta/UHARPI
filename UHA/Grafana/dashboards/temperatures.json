@@ -478,6 +478,105 @@
         }
       ],
       "id": 8
+    },
+    {
+      "type": "barchart",
+      "title": "Water per day (last 30 days)",
+      "description": "Total = all water, hot = the part of it that is hot water (side by side, not stacked).",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "uhalog"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 34,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "litre",
+          "decimals": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "fillOpacity": 85,
+            "lineWidth": 0,
+            "gradientMode": "none",
+            "axisPlacement": "auto",
+            "axisSoftMin": 0
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#5794f2"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Hot"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#dc3545"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "orientation": "vertical",
+        "xField": "day",
+        "stacking": "none",
+        "groupWidth": 0.8,
+        "barWidth": 0.9,
+        "barRadius": 0,
+        "showValue": "never",
+        "xTickLabelRotation": -45,
+        "xTickLabelSpacing": 0,
+        "fullHighlight": false,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "uhalog"
+          },
+          "queryType": "table",
+          "rawQueryText": "-- sums per local day: counters = SUM of the 15 min increments, powers (_W) = SUM of the 15 min means / 4\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_COLD_L', 'CONS_HOT_L')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT CAST(strftime('%s', date(hr, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS k,\n    COALESCE(SUM(CASE WHEN name = 'CONS_COLD_L' THEN s END), 0) AS \"CONS_COLD_L\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_HOT_L' THEN s END), 0) AS \"CONS_HOT_L\"\n  FROM h\n  GROUP BY 1\n)\nSELECT substr('JanFebMarAprMayJunJulAugSepOctNovDec', CAST(strftime('%m', k, 'unixepoch', 'localtime') AS INTEGER) * 3 - 2, 3) || ' ' || CAST(strftime('%d', k, 'unixepoch', 'localtime') AS INTEGER) AS day,\n       (\"CONS_COLD_L\") / 1.0 AS \"Total\",\n       (\"CONS_HOT_L\") / 1.0 AS \"Hot\"\nFROM p\nORDER BY k",
+          "queryText": "-- sums per local day: counters = SUM of the 15 min increments, powers (_W) = SUM of the 15 min means / 4\nWITH q AS (SELECT $__from / 1000 AS f, $__to / 1000 AS t, $__interval_ms / 1000 AS i),\nh AS (\n  SELECT v.name AS name, x.ts - x.ts % 3600 AS hr, SUM(x.value) AS s\n  FROM q, vars v CROSS JOIN agg_15min x ON x.var_id = v.id AND x.ts >= CAST(strftime('%s', date(q.f, 'unixepoch', 'localtime', '+1 day'), 'utc') AS INTEGER) AND x.ts < q.t\n  WHERE v.name IN ('CONS_COLD_L', 'CONS_HOT_L')\n  GROUP BY 1, 2\n),\np AS (\n  SELECT CAST(strftime('%s', date(hr, 'unixepoch', 'localtime'), 'utc') AS INTEGER) AS k,\n    COALESCE(SUM(CASE WHEN name = 'CONS_COLD_L' THEN s END), 0) AS \"CONS_COLD_L\",\n    COALESCE(SUM(CASE WHEN name = 'CONS_HOT_L' THEN s END), 0) AS \"CONS_HOT_L\"\n  FROM h\n  GROUP BY 1\n)\nSELECT substr('JanFebMarAprMayJunJulAugSepOctNovDec', CAST(strftime('%m', k, 'unixepoch', 'localtime') AS INTEGER) * 3 - 2, 3) || ' ' || CAST(strftime('%d', k, 'unixepoch', 'localtime') AS INTEGER) AS day,\n       (\"CONS_COLD_L\") / 1.0 AS \"Total\",\n       (\"CONS_HOT_L\") / 1.0 AS \"Hot\"\nFROM p\nORDER BY k",
+          "timeColumns": []
+        }
+      ],
+      "timeFrom": "30d",
+      "id": 9
     }
   ],
   "templating": {
